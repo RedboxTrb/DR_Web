@@ -12,9 +12,14 @@ export interface AnalysisResult {
   id: string;
   originalImage: string;
   vesselMap: string;
-  diagnosis: 'DR' | 'NODR' | 'Glaucoma';
-  drStage?: 'Mild' | 'Moderate' | 'Severe' | 'Proliferative';
+  grade: number; // 0-4
+  severity: string; // "No DR", "Grade 1", "Grade 2", "Grade 3", "Grade 4"
   confidence: number;
+  processingTime: number;
+  // Detailed cascade results
+  stage1Result?: string;
+  stage2Result?: string;
+  stage3Result?: string;
 }
 
 export default function App() {
@@ -37,34 +42,24 @@ export default function App() {
 
       if (data.success) {
         const analysisResults: AnalysisResult[] = data.results.map((result: any, index: number) => {
-          // Map backend response to frontend format
-          const hasGlaucoma = false; // Backend only does DR classification
-          const diagnosis: 'DR' | 'NODR' | 'Glaucoma' = result.classification.has_dr ? 'DR' : 'NODR';
-
-          // Map severity grades to DR stages
-          let drStage: 'Mild' | 'Moderate' | 'Severe' | 'Proliferative' | undefined;
-          if (diagnosis === 'DR') {
-            const grade = result.classification.grade;
-            if (grade === 1) drStage = 'Mild';
-            else if (grade === 2) drStage = 'Moderate';
-            else if (grade === 3) drStage = 'Severe';
-            else if (grade === 4) drStage = 'Proliferative';
-          }
-
           return {
             id: `result-${Date.now()}-${index}`,
             originalImage: `data:image/png;base64,${result.original_image}`,
             vesselMap: `data:image/png;base64,${result.vessel_map}`,
-            diagnosis,
-            drStage,
-            confidence: result.classification.confidence * 100
+            grade: result.classification.grade,
+            severity: result.classification.severity,
+            confidence: result.classification.confidence * 100,
+            processingTime: result.processing_time,
+            stage1Result: result.classification.stage1_result,
+            stage2Result: result.classification.stage2_result,
+            stage3Result: result.classification.stage3_result
           };
         });
 
         setResults(analysisResults);
       } else {
         console.error('Analysis failed:', data.error);
-        alert('Analysis failed. Please try again.');
+        alert(`Analysis failed: ${data.error || 'Unknown error'}. Please try again.`);
       }
     } catch (error) {
       console.error('Error calling backend:', error);
