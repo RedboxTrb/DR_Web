@@ -67,13 +67,6 @@ AI-powered web application for automated detection and grading of diabetic retin
 - **Grade 3**: Severe DR
 - **Grade 4**: Proliferative DR
 
-## Usage
-
-1. Start backend server
-2. Start frontend application
-3. Upload retinal images
-4. View classification results
-
 ---
 
 **Medical Disclaimer**: This system is for screening and research purposes only. Consult a qualified ophthalmologist for clinical diagnosis.
