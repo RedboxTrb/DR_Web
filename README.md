@@ -1,13 +1,10 @@
 # Retinal DR Detection System
 
-Web application for automated detection and grading of diabetic retinopathy in retinal fundus images.
-
 ## Features
 
-- Automated vessel segmentation
+- Vessel segmentation
 - 4-stage cascade classification (No DR, Mild, Moderate, Severe, Proliferative)
 - Location-based hospital recommendations
-- PDF export functionality
 - Batch image processing
 
 ## How It Works
@@ -66,43 +63,6 @@ Web application for automated detection and grading of diabetic retinopathy in r
 - Image upload interface
 - Results visualization
 - Grade classification display
-
-## Setup
-
-### Backend
-
-1. Install dependencies:
-```bash
-pip install flask flask-cors torch torchvision opencv-python numpy pillow
-```
-
-2. Configure model paths in `backend/config.py`
-
-3. Run the server:
-```bash
-cd backend
-python app.py
-```
-
-Server will start on http://localhost:5000
-
-### Frontend
-
-1. Install dependencies:
-```bash
-cd Website
-npm install
-```
-
-2. Run development server:
-```bash
-npm run dev
-```
-
-3. Build for production:
-```bash
-npm run build
-```
 
 ## Grade Classification
 
