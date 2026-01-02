@@ -38,13 +38,12 @@ export function Hero() {
           </div>
           
           <div className="relative">
-            <div className="bg-gray-50 rounded-2xl p-12 flex items-center justify-center aspect-square border border-gray-200">
-              <div className="text-center">
-                <div className="w-24 h-24 bg-blue-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
-                  <Eye className="w-12 h-12 text-white" />
-                </div>
-                <p className="text-gray-500">Retinal Image Preview</p>
-              </div>
+            <div className="bg-gray-50 rounded-2xl p-8 flex items-center justify-center border border-gray-200">
+              <img
+                src="/b.png"
+                alt="Retinal fundus image example"
+                className="w-full h-full object-contain rounded-xl"
+              />
             </div>
           </div>
         </div>
