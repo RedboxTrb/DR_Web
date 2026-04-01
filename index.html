@@ -1395,8 +1395,17 @@ function updateNavForGuest() {
 
 // ── Auth actions ──────────────────────────────────────────────────────────────
 
-function authGoogle() {
-  window.location.href = BACKEND_URL + '/api/auth/google';
+async function authGoogle() {
+  try {
+    const r = await fetch(BACKEND_URL + '/api/auth/google', {
+      headers: { 'ngrok-skip-browser-warning': '1' }
+    });
+    const d = await r.json();
+    if (d.url) window.location.href = d.url;
+    else showToast('Google sign-in unavailable. Try again.', '#F35858');
+  } catch {
+    showToast('Connection error. Try again.', '#F35858');
+  }
 }
 
 async function authLogin() {
@@ -1464,22 +1473,37 @@ function authLogout() {
   showPage('home');
 }
 
-// Handle Google OAuth callback (token in URL hash)
-function handleAuthCallback() {
-  const hash = window.location.hash;
-  if (hash && hash.length > 1) {
-    const token = hash.slice(1);
-    setToken(token);
-    window.location.hash = '';
-    loadCurrentUser().then(() => {
-      showToast('Signed in with Google!');
-      showPage('upload');
+// Handle Google OAuth callback — Google sends ?code= to /auth/callback on frontend
+async function handleAuthCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const err  = params.get('error');
+
+  if (err || !code) {
+    showToast('Google sign in failed. Please try again.', '#F35858');
+    history.replaceState(null, '', '/');
+    showPage('auth');
+    return;
+  }
+
+  try {
+    const r = await fetch(BACKEND_URL + '/api/auth/google/exchange', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' },
+      body: JSON.stringify({ code })
     });
-  } else {
-    const params = new URLSearchParams(window.location.search);
-    const err = params.get('auth_error');
-    if (err) { showToast('Google sign in failed. Please try again.', '#F35858'); showPage('auth'); }
-    else showPage('home');
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Exchange failed');
+    setToken(d.token);
+    _currentUser = d.user;
+    updateNavForUser(d.user);
+    history.replaceState(null, '', '/');
+    showToast('Signed in with Google!');
+    showPage('upload');
+  } catch (e) {
+    showToast('Google sign in failed: ' + e.message, '#F35858');
+    history.replaceState(null, '', '/');
+    showPage('auth');
   }
 }
 
@@ -1879,15 +1903,12 @@ function findNearbyClinics() {
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 (async function boot() {
-  // Handle Google OAuth callback
-  if (window.location.pathname === '/auth/callback' || window.location.hash.length > 10) {
+  // Handle Google OAuth callback (Google redirects to /auth/callback?code=...)
+  if (window.location.pathname === '/auth/callback') {
     showPage('auth-callback');
     handleAuthCallback();
     return;
   }
-  // Check auth_error in query string
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('auth_error')) { showToast('Google sign in failed. Please try again.', '#F35858'); showPage('auth'); return; }
 
   await loadCurrentUser();
   initLocationClinic();
