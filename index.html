@@ -842,8 +842,15 @@ footer{padding:52px 60px 28px;}
       <a style="color:var(--teal);font-weight:600;">Demo</a>
     </div>
     <div class="nav-right">
-      <button class="nav-btn-ghost" onclick="showPage('auth');const b=document.getElementById('auth-guest-banner');if(b)b.classList.remove('show');">Log in</button>
-      <button class="nav-btn" onclick="showPage('upload')">Try Demo →</button>
+      <div id="nav-guest-upload" style="display:flex;gap:12px;align-items:center;">
+        <button class="nav-btn-ghost" onclick="showPage('auth');const b=document.getElementById('auth-guest-banner');if(b)b.classList.remove('show');">Log in</button>
+        <button class="nav-btn" onclick="showPage('upload')">Try Demo →</button>
+      </div>
+      <div id="nav-user-upload" style="display:none;align-items:center;gap:12px;">
+        <span id="nav-user-name-upload" style="font-size:13px;font-weight:600;color:var(--navy);"></span>
+        <button class="nav-btn-ghost" onclick="showPage('reports')" style="font-size:13px;">My Reports</button>
+        <button class="nav-btn-ghost" onclick="authLogout()" style="font-size:13px;color:var(--g400);">Logout</button>
+      </div>
     </div>
   </nav>
   <div class="upload-hero">
@@ -905,8 +912,16 @@ footer{padding:52px 60px 28px;}
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Analysis</a>
       <a onclick="showPage('upload')">New Analysis</a>
     </div>
-    <div class="nav-right">
-      <button class="nav-btn-ghost" onclick="showToast('Share link copied','#0C1024')">Share</button>
+    <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
+      <div id="nav-guest-analysis" style="display:flex;gap:10px;align-items:center;">
+        <button class="nav-btn-ghost" onclick="showPage('auth')">Log in</button>
+      </div>
+      <div id="nav-user-analysis" style="display:none;align-items:center;gap:10px;">
+        <span id="nav-user-name-analysis" style="font-size:13px;font-weight:600;color:var(--navy);"></span>
+        <button class="nav-btn-ghost" onclick="showPage('reports')" style="font-size:13px;">My Reports</button>
+        <button class="nav-btn-ghost" onclick="authLogout()" style="font-size:13px;color:var(--g400);">Logout</button>
+      </div>
+      <button class="nav-btn-ghost" onclick="shareResult()">Share</button>
       <button class="nav-btn" onclick="exportPDF()">Export PDF</button>
     </div>
   </nav>
@@ -924,7 +939,7 @@ footer{padding:52px 60px 28px;}
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Export
         </button>
-        <button class="ar-btn-ghost" onclick="showToast('Share link copied','#0C1024')">
+        <button class="ar-btn-ghost" onclick="shareResult()">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="11" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="11" cy="11" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="3" cy="7" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.4 6.2l5.2-2.4M4.4 7.8l5.2 2.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
           Share
         </button>
@@ -1347,6 +1362,7 @@ const BACKEND_URL = 'https://hyperthermally-nonimperative-journee.ngrok-free.dev
 // ── Auth state ────────────────────────────────────────────────────────────────
 let _currentUser = null;
 let _uploadedFiles = [];
+let _lastResult = null;
 
 function getToken() { return localStorage.getItem('csr_token'); }
 function setToken(t) { localStorage.setItem('csr_token', t); }
@@ -1372,7 +1388,7 @@ async function loadCurrentUser() {
 
 function updateNavForUser(user) {
   const name = user.name.split(' ')[0];
-  ['home','upload'].forEach(p => {
+  ['home','upload','analysis'].forEach(p => {
     const g = document.getElementById('nav-guest-' + p);
     const u = document.getElementById('nav-user-' + p);
     const n = document.getElementById('nav-user-name-' + p);
@@ -1385,7 +1401,7 @@ function updateNavForUser(user) {
 }
 
 function updateNavForGuest() {
-  ['home','upload'].forEach(p => {
+  ['home','upload','analysis'].forEach(p => {
     const g = document.getElementById('nav-guest-' + p);
     const u = document.getElementById('nav-user-' + p);
     if (g) g.style.display = 'flex';
@@ -1576,6 +1592,7 @@ async function analyzeImages() {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     if (!data.success || !data.results || !data.results.length) { showToast('Analysis failed: ' + (data.error || 'Unknown error'), '#F35858'); btn.disabled = false; txt.textContent = 'Retry →'; return; }
+    _lastResult = { result: data.results[0], numImages: data.num_images, totalTime: data.total_processing_time };
     populateResults(data.results[0], data.num_images, data.total_processing_time);
     showPage('analysis');
   } catch(err) { showToast('Connection error: ' + err.message, '#F35858'); btn.disabled = false; txt.textContent = 'Retry →'; }
@@ -1791,8 +1808,75 @@ function showToast(msg, color) {
   clearTimeout(t._timer); t._timer = setTimeout(() => t.style.opacity = '0', 2800);
 }
 
-function exportPDF() { showToast('Report exported successfully', '#0C1024'); }
-function downloadReport() { showToast('Full report downloaded'); }
+function exportPDF() {
+  if (!_lastResult) { showToast('No analysis to export yet.', '#F35858'); return; }
+  const { result, totalTime } = _lastResult;
+  const cls = result.classification;
+  const grade = cls.grade;
+  const pct = (cls.confidence * 100).toFixed(1);
+  const severityColors = ['#38CC87','#FABD31','#FABD31','#F35858','#F35858'];
+  const recs = [
+    'Continue annual eye screenings to monitor eye health.',
+    'Schedule a follow-up with an ophthalmologist within 12 months.',
+    'Consult an ophthalmologist within 3–6 months. Optimise blood glucose control.',
+    'Urgent referral to a retina specialist recommended. Risk of vision loss without treatment.',
+    'Immediate referral to a retina specialist required. High risk of severe vision loss.'
+  ];
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>DR Report – ChakshurakhsakAI</title>
+  <style>body{font-family:Inter,Arial,sans-serif;max-width:760px;margin:40px auto;padding:0 24px;color:#0C1024;}
+  h1{font-size:26px;font-weight:800;margin-bottom:4px;}
+  .sub{color:#6B7090;font-size:13px;margin-bottom:28px;}
+  .badge{display:inline-block;padding:6px 16px;border-radius:20px;font-weight:700;font-size:14px;background:${severityColors[grade]}22;color:${severityColors[grade]};border:1px solid ${severityColors[grade]}55;margin-bottom:20px;}
+  table{width:100%;border-collapse:collapse;margin-bottom:24px;}
+  td{padding:10px 14px;border-bottom:1px solid #DDE0EA;font-size:13px;}
+  td:first-child{font-weight:600;width:180px;color:#4A5070;}
+  .rec{background:#F0F1F5;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.6;margin-bottom:24px;}
+  img{max-width:220px;border-radius:10px;margin:6px;}
+  .imgs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;}
+  .footer{color:#9096B0;font-size:11px;margin-top:32px;border-top:1px solid #DDE0EA;padding-top:12px;}
+  @media print{body{margin:20px;}}</style></head><body>
+  <h1>DR Analysis Report</h1>
+  <div class="sub">Generated by ChakshurakhsakAI · ${new Date().toLocaleString()}</div>
+  <div class="badge">Grade ${grade} — ${cls.severity}</div>
+  <table>
+    <tr><td>DR Grade</td><td>Grade ${grade} / 4</td></tr>
+    <tr><td>Severity</td><td>${cls.severity}</td></tr>
+    <tr><td>Confidence</td><td>${pct}%</td></tr>
+    ${cls.stage1_result ? `<tr><td>Stage 1</td><td>${cls.stage1_result}</td></tr>` : ''}
+    ${cls.stage2_result ? `<tr><td>Stage 2</td><td>${cls.stage2_result}</td></tr>` : ''}
+    ${cls.stage3_result ? `<tr><td>Stage 3</td><td>${cls.stage3_result}</td></tr>` : ''}
+    <tr><td>Processing Time</td><td>${(result.processing_time || totalTime || 0).toFixed(2)}s</td></tr>
+  </table>
+  <div class="rec"><strong>Recommendation:</strong> ${recs[grade]}</div>
+  <div class="imgs">
+    ${result.original_image ? `<div><div style="font-size:11px;font-weight:600;color:#6B7090;margin-bottom:4px;">Original</div><img src="data:image/png;base64,${result.original_image}"></div>` : ''}
+    ${result.vessel_map ? `<div><div style="font-size:11px;font-weight:600;color:#6B7090;margin-bottom:4px;">Vessel Map</div><img src="data:image/png;base64,${result.vessel_map}"></div>` : ''}
+    ${result.binary_vessel_map ? `<div><div style="font-size:11px;font-weight:600;color:#6B7090;margin-bottom:4px;">Binary Vessel</div><img src="data:image/png;base64,${result.binary_vessel_map}"></div>` : ''}
+  </div>
+  <div class="footer">This report is generated by an AI screening tool and is not a medical diagnosis. Please consult a qualified ophthalmologist for clinical evaluation. · www.chakshurakshakai.com</div>
+  </body></html>`;
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(() => w.print(), 400);
+}
+
+function shareResult() {
+  if (!_lastResult) { showToast('No analysis to share yet.', '#F35858'); return; }
+  const cls = _lastResult.result.classification;
+  const text = `ChakshurakhsakAI DR Analysis\nGrade ${cls.grade} – ${cls.severity}\nConfidence: ${(cls.confidence*100).toFixed(1)}%\n\nTry it at: https://www.chakshurakshakai.com`;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Result summary copied to clipboard!');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('Result summary copied to clipboard!');
+  });
+}
+
+function downloadReport() { exportPDF(); }
 function copyEmail(email, type) {
   navigator.clipboard.writeText(email).then(() => {
     showToast((type === 'api' ? 'info@chakshurakshakai.com — copied! Email us for API access.' : 'info@chakshurakshakai.com — copied!'), '#0C1024');
