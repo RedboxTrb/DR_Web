@@ -1490,10 +1490,13 @@ let _lastResult = null;
 
 function getToken() { return localStorage.getItem('csr_token'); }
 function setToken(t) { localStorage.setItem('csr_token', t); }
-function clearToken() { localStorage.removeItem('csr_token'); }
+function clearToken() { localStorage.removeItem('csr_token'); localStorage.removeItem('csr_user'); }
+
+// Cache user data so we can restore session instantly on reload
+function cacheUser(u) { try { localStorage.setItem('csr_user', JSON.stringify(u)); } catch {} }
+function getCachedUser() { try { return JSON.parse(localStorage.getItem('csr_user')); } catch { return null; } }
 
 function authHeaders(includeContentType) {
-  // Only Authorization for GET; add Content-Type for POST with JSON body
   const t = getToken();
   const h = {};
   if (t) h['Authorization'] = 'Bearer ' + t;
@@ -1504,14 +1507,37 @@ function authHeaders(includeContentType) {
 async function loadCurrentUser() {
   const t = getToken();
   if (!t) { updateNavForGuest(); return null; }
+
+  // Restore session immediately from cache — user sees logged-in state instantly
+  const cached = getCachedUser();
+  if (cached) {
+    _currentUser = cached;
+    updateNavForUser(cached);
+  }
+
+  // Silently validate token in background
   try {
     const r = await fetch(BACKEND_URL + '/api/auth/me', { headers: authHeaders() });
-    if (!r.ok) { clearToken(); updateNavForGuest(); return null; }
+    if (r.status === 401) {
+      // Token is definitively invalid — clear everything and log out
+      clearToken();
+      _currentUser = null;
+      updateNavForGuest();
+      return null;
+    }
+    if (!r.ok) {
+      // Server error / network blip — keep cached session, try again next reload
+      return _currentUser;
+    }
     const d = await r.json();
     _currentUser = d.user;
-    updateNavForUser(_currentUser);
+    cacheUser(d.user);
+    updateNavForUser(d.user);
     return _currentUser;
-  } catch { updateNavForGuest(); return null; }
+  } catch {
+    // Network error — keep cached session, do not log out
+    return _currentUser;
+  }
 }
 
 function updateNavForUser(user) {
@@ -1575,6 +1601,7 @@ async function authLogin() {
     if (!r.ok) { errEl.textContent = d.error || 'Sign in failed.'; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Sign in →'; return; }
     setToken(d.token);
     _currentUser = d.user;
+    cacheUser(d.user);
     updateNavForUser(d.user);
     showToast('Welcome back, ' + d.user.name.split(' ')[0] + '!');
     showPage('upload');
@@ -1605,6 +1632,7 @@ async function authSignup() {
     if (!r.ok) { errEl.textContent = d.error || 'Signup failed.'; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Create account →'; return; }
     setToken(d.token);
     _currentUser = d.user;
+    cacheUser(d.user);
     updateNavForUser(d.user);
     showToast('Account created! Welcome, ' + d.user.name.split(' ')[0] + '!');
     showPage('upload');
@@ -1643,6 +1671,7 @@ async function handleAuthCallback() {
     if (!r.ok) throw new Error(d.error || 'Exchange failed');
     setToken(d.token);
     _currentUser = d.user;
+    cacheUser(d.user);
     updateNavForUser(d.user);
     history.replaceState(null, '', '/');
     showToast('Signed in with Google!');
