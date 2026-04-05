@@ -1492,10 +1492,12 @@ function getToken() { return localStorage.getItem('csr_token'); }
 function setToken(t) { localStorage.setItem('csr_token', t); }
 function clearToken() { localStorage.removeItem('csr_token'); }
 
-function authHeaders() {
+function authHeaders(includeContentType) {
+  // Only Authorization for GET; add Content-Type for POST with JSON body
   const t = getToken();
-  const h = { 'ngrok-skip-browser-warning': '1', 'Content-Type': 'application/json' };
+  const h = {};
   if (t) h['Authorization'] = 'Bearer ' + t;
+  if (includeContentType) h['Content-Type'] = 'application/json';
   return h;
 }
 
@@ -1566,7 +1568,7 @@ async function authLogin() {
   try {
     const r = await fetch(BACKEND_URL + '/api/auth/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders(true),
       body: JSON.stringify({ email, password })
     });
     const d = await r.json();
@@ -1596,7 +1598,7 @@ async function authSignup() {
   try {
     const r = await fetch(BACKEND_URL + '/api/auth/signup', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders(true),
       body: JSON.stringify({ email, name: (first + ' ' + last).trim(), password: pass })
     });
     const d = await r.json();
@@ -1634,7 +1636,7 @@ async function handleAuthCallback() {
   try {
     const r = await fetch(BACKEND_URL + '/api/auth/google/exchange', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' },
+      headers: authHeaders(true),
       body: JSON.stringify({ code })
     });
     const d = await r.json();
