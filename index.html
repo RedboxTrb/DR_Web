@@ -1046,6 +1046,7 @@ footer{padding:52px 60px 28px;}
         </div>
       </div>
       <button class="nav-btn-ghost" onclick="shareResult()">Share</button>
+      <button class="nav-btn-ghost" id="save-report-btn" onclick="saveReport()">Save Report</button>
       <button class="nav-btn" onclick="exportPDF()">Export PDF</button>
     </div>
   </nav>
@@ -1062,6 +1063,10 @@ footer{padding:52px 60px 28px;}
         <button class="ar-btn-ghost" onclick="exportPDF()">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Export
+        </button>
+        <button class="ar-btn-ghost" id="save-report-card-btn" onclick="saveReport()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2.5A.5.5 0 0 1 2.5 2h7l2.5 2.5V11.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-9Z" stroke="currentColor" stroke-width="1.3"/><path d="M5 2v3h4V2M4 12V8h6v4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Save Report
         </button>
         <button class="ar-btn-ghost" onclick="shareResult()">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="11" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="11" cy="11" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="3" cy="7" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.4 6.2l5.2-2.4M4.4 7.8l5.2 2.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
@@ -1613,6 +1618,7 @@ async function authLogin() {
     cacheUser(d.user);
     updateNavForUser(d.user);
     showToast('Welcome back, ' + d.user.name.split(' ')[0] + '!');
+    await checkPendingSave();
     showPage('upload');
   } catch { errEl.textContent = 'Connection error. Please try again.'; errEl.style.display = 'block'; }
   btn.disabled = false; btn.textContent = 'Sign in →';
@@ -1644,6 +1650,7 @@ async function authSignup() {
     cacheUser(d.user);
     updateNavForUser(d.user);
     showToast('Account created! Welcome, ' + d.user.name.split(' ')[0] + '!');
+    await checkPendingSave();
     showPage('upload');
   } catch { errEl.textContent = 'Connection error. Please try again.'; errEl.style.display = 'block'; }
   btn.disabled = false; btn.textContent = 'Create account →';
@@ -1684,6 +1691,7 @@ async function handleAuthCallback() {
     updateNavForUser(d.user);
     history.replaceState(null, '', '/');
     showToast('Signed in with Google!');
+    await checkPendingSave();
     showPage('upload');
   } catch (e) {
     showToast('Google sign in failed: ' + e.message, '#F35858');
@@ -1975,6 +1983,87 @@ function showToast(msg, color) {
   if (!t) { t = document.createElement('div'); t.id = 'toast'; t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:10px;font-size:13px;font-weight:600;color:#fff;z-index:9999;transition:opacity .3s;pointer-events:none;font-family:Inter,sans-serif;'; document.body.appendChild(t); }
   t.textContent = msg; t.style.background = color || '#22B7A3'; t.style.opacity = '1';
   clearTimeout(t._timer); t._timer = setTimeout(() => t.style.opacity = '0', 2800);
+}
+
+// ── Save Report ───────────────────────────────────────────────────────────────
+async function saveReport() {
+  if (!_lastResult) { showToast('No analysis to save.', '#F35858'); return; }
+
+  if (!_currentUser) {
+    // Guest: store result in sessionStorage, redirect to auth
+    try {
+      sessionStorage.setItem('pending_save', JSON.stringify({
+        result: _lastResult.result,
+        totalTime: _lastResult.totalTime,
+        filename: _uploadedFiles[0] ? _uploadedFiles[0].name : 'image.jpg'
+      }));
+    } catch {}
+    showToast('Log in to save this report to your account.');
+    setTimeout(() => showPage('auth'), 900);
+    return;
+  }
+
+  const btns = document.querySelectorAll('#save-report-btn, #save-report-card-btn');
+  btns.forEach(b => { b.disabled = true; b.textContent = 'Saving…'; });
+
+  const r = _lastResult.result;
+  const cls = r.classification;
+  try {
+    const resp = await fetch(BACKEND_URL + '/api/reports/save', {
+      method: 'POST',
+      headers: authHeaders(true),
+      body: JSON.stringify({
+        grade:           cls.grade,
+        severity:        cls.severity,
+        confidence:      cls.confidence,
+        stage1_result:   cls.stage1_result,
+        stage2_result:   cls.stage2_result,
+        stage3_result:   cls.stage3_result,
+        processing_time: r.processing_time || _lastResult.totalTime || 0,
+        original_image:  r.original_image,
+        original_filename: _uploadedFiles[0] ? _uploadedFiles[0].name : 'image.jpg'
+      })
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    showToast('Report saved to My Reports!');
+    btns.forEach(b => {
+      b.textContent = 'Saved ✓';
+      b.style.color = 'var(--green)';
+      b.style.borderColor = 'var(--green)';
+    });
+  } catch(err) {
+    showToast('Could not save report: ' + err.message, '#F35858');
+    btns.forEach(b => { b.disabled = false; b.textContent = 'Save Report'; });
+  }
+}
+
+async function checkPendingSave() {
+  const pending = sessionStorage.getItem('pending_save');
+  if (!pending || !_currentUser) return;
+  sessionStorage.removeItem('pending_save');
+  try {
+    const p = JSON.parse(pending);
+    const cls = p.result.classification;
+    const resp = await fetch(BACKEND_URL + '/api/reports/save', {
+      method: 'POST',
+      headers: authHeaders(true),
+      body: JSON.stringify({
+        grade:           cls.grade,
+        severity:        cls.severity,
+        confidence:      cls.confidence,
+        stage1_result:   cls.stage1_result,
+        stage2_result:   cls.stage2_result,
+        stage3_result:   cls.stage3_result,
+        processing_time: p.result.processing_time || p.totalTime || 0,
+        original_image:  p.result.original_image,
+        original_filename: p.filename || 'image.jpg'
+      })
+    });
+    if (resp.ok) {
+      showToast('Your report has been saved to My Reports!');
+      showPage('reports');
+    }
+  } catch {}
 }
 
 function exportPDF() {
