@@ -1434,7 +1434,7 @@ footer{padding:52px 60px 28px;}
 
     <!-- Empty state -->
     <div id="reports-empty" style="display:none;text-align:center;padding:60px;background:var(--white);border:1px solid var(--g200);border-radius:16px;">
-      <div style="width:64px;height:64px;background:rgba(34,183,163,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;">👁️</div>
+      <div style="width:64px;height:64px;background:rgba(34,183,163,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;">📁</div>
       <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:8px;">No analyses yet</div>
       <div style="font-size:14px;color:var(--g500);margin-bottom:24px;">Upload a retinal image to get your first DR analysis saved here.</div>
       <button class="nav-btn" style="margin:0 auto;" onclick="showPage('upload')">Start Analysis →</button>
@@ -1504,6 +1504,15 @@ function authHeaders(includeContentType) {
   return h;
 }
 
+// For GET requests: append token as ?_t=... so no CORS preflight is needed
+function authUrl(path) {
+  const t = getToken();
+  return BACKEND_URL + path + (t ? '?_t=' + encodeURIComponent(t) : '');
+}
+function authFetch(path) {
+  return fetch(authUrl(path));
+}
+
 async function loadCurrentUser() {
   const t = getToken();
   if (!t) { updateNavForGuest(); return null; }
@@ -1517,7 +1526,7 @@ async function loadCurrentUser() {
 
   // Silently validate token in background
   try {
-    const r = await fetch(BACKEND_URL + '/api/auth/me', { headers: authHeaders() });
+    const r = await authFetch('/api/auth/me');
     if (r.status === 401) {
       // Token is definitively invalid — clear everything and log out
       clearToken();
@@ -1840,7 +1849,7 @@ async function loadReports() {
   loadingEl.style.display = 'block'; emptyEl.style.display = 'none'; listEl.style.display = 'none';
 
   try {
-    const r = await fetch(BACKEND_URL + '/api/reports', { headers: authHeaders() });
+    const r = await authFetch('/api/reports');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
     loadingEl.style.display = 'none';
@@ -1880,7 +1889,7 @@ async function loadReportDetail(reportId) {
   content.innerHTML = '<div style="text-align:center;padding:60px;color:var(--g400);">Loading report...</div>';
 
   try {
-    const r = await fetch(BACKEND_URL + '/api/reports/' + reportId, { headers: authHeaders() });
+    const r = await authFetch('/api/reports/' + reportId);
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
     const rep = d.report;
