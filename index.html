@@ -381,6 +381,12 @@ input[type=file]{display:none;}
 .ar-proc-label{font-size:11px;font-weight:600;color:var(--g500);display:flex;align-items:center;gap:4px;text-transform:uppercase;letter-spacing:.3px;}
 .ar-proc-val{font-size:14px;font-weight:700;color:var(--navy);}
 
+/* Multi-result blocks */
+.ar-result-block{display:flex;flex-direction:column;gap:16px;}
+.ar-result-divider{display:flex;align-items:center;gap:12px;margin:24px 0 4px;}
+.ar-result-divider::before,.ar-result-divider::after{content:'';flex:1;height:1px;background:var(--g200);}
+.ar-result-divider span{font-size:12px;font-weight:600;color:var(--g400);white-space:nowrap;letter-spacing:.3px;padding:0 4px;}
+
 /* Disclaimer */
 .ar-disclaimer{background:var(--g100);border-radius:10px;padding:12px 16px;font-size:11px;color:var(--g500);line-height:1.6;border:1px solid var(--g200);}
 .ar-disclaimer strong{color:var(--navy);}
@@ -1076,146 +1082,8 @@ footer{padding:52px 60px 28px;}
       </div>
     </div>
 
-    <!-- 3 image panels -->
-    <div class="ar-images-card">
-      <div class="ar-image-panels">
-
-        <!-- Panel 1: Original -->
-        <div class="ar-img-panel">
-          <div class="ar-img-label-row">
-            <span class="ar-img-label">Original Image</span>
-            <span class="ar-img-badge">#1</span>
-          </div>
-          <div class="ar-img-box" id="img-original">
-            <div class="ar-fundus"></div>
-            <div class="ar-img-controls">
-              <button class="ar-zoom-btn" onclick="showToast('Zoom in','#0C1024')">+</button>
-              <button class="ar-zoom-btn" onclick="showToast('Zoom out','#0C1024')">−</button>
-              <button class="ar-zoom-btn" onclick="showToast('Reset view','#0C1024')">↺</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Panel 2: Vessel Overlay -->
-        <div class="ar-img-panel">
-          <div class="ar-img-label-row">
-            <span class="ar-img-label">Vessel Overlay</span>
-            <span class="ar-img-tag teal">Visualization</span>
-          </div>
-          <div class="ar-img-box" id="img-vessel">
-            <div class="ar-fundus" style="background:radial-gradient(circle at 50% 50%,#0d0500 0%,#050200 100%);">
-              <div class="ar-vessel-overlay"></div>
-            </div>
-            <div class="ar-img-controls">
-              <button class="ar-zoom-btn" onclick="showToast('Zoom in','#0C1024')">+</button>
-              <button class="ar-zoom-btn" onclick="showToast('Zoom out','#0C1024')">−</button>
-              <button class="ar-zoom-btn" onclick="showToast('Reset view','#0C1024')">↺</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Panel 3: Binary Vessel Map -->
-        <div class="ar-img-panel">
-          <div class="ar-img-label-row">
-            <span class="ar-img-label">Binary Vessel Map</span>
-            <span class="ar-img-tag coral">Segmentation</span>
-          </div>
-          <div class="ar-img-box" id="img-binary">
-            <div class="ar-fundus" style="background:#000;">
-              <div class="ar-binary-overlay"></div>
-            </div>
-            <div class="ar-img-controls">
-              <button class="ar-zoom-btn" onclick="showToast('Zoom in','#0C1024')">+</button>
-              <button class="ar-zoom-btn" onclick="showToast('Zoom out','#0C1024')">−</button>
-              <button class="ar-zoom-btn" onclick="showToast('Reset view','#0C1024')">↺</button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Results row -->
-    <div class="ar-results-row">
-
-      <!-- Left: diagnosis card -->
-      <div class="ar-diag-card success-card">
-        <div class="ar-diag-header">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#38CC87" stroke-width="1.5"/><path d="M6 10l3 3 5-5" stroke="#38CC87" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span class="ar-diag-title">No Diabetic Retinopathy</span>
-        </div>
-        <div class="ar-diag-sub">No signs of diabetic retinopathy detected. Retina appears healthy.</div>
-        <div class="ar-conf-row">
-          <span class="ar-conf-label">Confidence</span>
-          <span class="ar-conf-val">99.9%</span>
-        </div>
-        <div class="ar-conf-track">
-          <div class="ar-conf-fill" style="width:99.9%;background:var(--green);"></div>
-        </div>
-        <div class="ar-decision-path">
-          <div class="ar-dp-title">
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1"/><line x1="6.5" y1="4.5" x2="6.5" y2="6.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><circle cx="6.5" cy="9" r=".6" fill="currentColor"/></svg>
-            Decision Path
-          </div>
-          <div class="ar-dp-stage"><span class="ar-stage-pill">Stage 1</span> No DR <span class="ar-stage-prob">P(DR)=0.001</span></div>
-        </div>
-      </div>
-
-      <!-- Middle: Grade + Risk + Clinical -->
-      <div class="ar-meta-col">
-        <div class="ar-meta-card">
-          <div class="ar-meta-label">Grade</div>
-          <div class="ar-meta-val">Grade 0</div>
-        </div>
-        <div class="ar-meta-card">
-          <div class="ar-meta-label">Risk Level</div>
-          <div class="ar-meta-val" style="color:var(--green);">None</div>
-        </div>
-        <div class="ar-clinical-card">
-          <div class="ar-clinical-title">
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1"/><line x1="6.5" y1="4.5" x2="6.5" y2="6.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><circle cx="6.5" cy="9" r=".6" fill="currentColor"/></svg>
-            Clinical Indicators
-          </div>
-          <div class="ar-clinical-row"><span>Vessel Tortuosity</span><span class="ar-normal">Normal</span></div>
-          <div class="ar-clinical-row"><span>Microaneurysms</span><span class="ar-normal">Normal</span></div>
-          <div class="ar-clinical-row"><span>Optic Disc Changes</span><span class="ar-normal">Normal</span></div>
-        </div>
-      </div>
-
-      <!-- Right: Cascade stages + Recommendation + Processing -->
-      <div class="ar-right-col">
-        <div class="ar-cascade-card">
-          <div class="ar-cascade-title">Cascade Stages</div>
-          <div class="ar-stage-card">
-            <div class="ar-stage-row"><span class="ar-stage-name">Stage 1 · DR Detection</span><span class="ar-stage-badge teal-badge">DR Detected</span></div>
-            <span class="ar-stage-conf">90.6% confidence</span>
-          </div>
-          <div class="ar-stage-card">
-            <div class="ar-stage-row"><span class="ar-stage-name">Stage 2 · Severity</span><span class="ar-stage-badge amber-badge">Moderate DR</span></div>
-            <span class="ar-stage-conf">88.2% confidence</span>
-          </div>
-          <div class="ar-stage-card">
-            <div class="ar-stage-row"><span class="ar-stage-name">Stage 3a · Fine Grade</span><span class="ar-stage-badge coral-badge">Grade 3</span></div>
-            <span class="ar-stage-conf">86.1% confidence</span>
-          </div>
-        </div>
-        <div class="ar-rec-card">
-          <div class="ar-rec-title">
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1"/><path d="M4.5 8.5a3 3 0 010-6" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
-            Recommendation
-          </div>
-          <div class="ar-rec-text">Continue annual eye screenings to monitor eye health.</div>
-        </div>
-        <div class="ar-proc-card">
-          <div class="ar-proc-label">
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1"/><path d="M6.5 3.5v3l2 1.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
-            Processing Time
-          </div>
-          <div class="ar-proc-val">2.87s</div>
-        </div>
-      </div>
-
-    </div>
+    <!-- All results rendered dynamically by populateAllResults() -->
+    <div id="all-results-container"></div>
 
 
     <!-- Nearby Clinics -->
@@ -1229,17 +1097,17 @@ footer{padding:52px 60px 28px;}
       <div class="ar-nearby-sub">Find ophthalmologists, eye clinics, and hospitals near you for follow-up consultation.</div>
 
       <div class="ar-nearby-actions">
-        <button class="ar-locate-btn" id="locate-btn" onclick="findNearbyClinics()">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="white" stroke-width="1.3"/><circle cx="7" cy="7" r="2" fill="white"/><line x1="7" y1="1" x2="7" y2="3" stroke="white" stroke-width="1.3" stroke-linecap="round"/><line x1="7" y1="11" x2="7" y2="13" stroke="white" stroke-width="1.3" stroke-linecap="round"/><line x1="1" y1="7" x2="3" y2="7" stroke="white" stroke-width="1.3" stroke-linecap="round"/><line x1="11" y1="7" x2="13" y2="7" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>
-          Find Clinics Near Me
-        </button>
         <a class="ar-maps-btn" id="maps-link" href="https://www.google.com/maps/search/eye+clinic+ophthalmologist/" target="_blank" rel="noopener">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4 7h6M7 4v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
           Open in Maps
         </a>
+        <button class="ar-locate-btn" id="locate-btn" onclick="findNearbyClinics()" style="display:none;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="white" stroke-width="1.3"/><circle cx="7" cy="7" r="2" fill="white"/></svg>
+          Refresh
+        </button>
       </div>
 
-      <div id="nearby-loading" class="ar-nearby-loading" style="display:none;">
+      <div id="nearby-loading" class="ar-nearby-loading" style="display:block;">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="animation:spin 1s linear infinite;margin-bottom:8px;display:block;margin-left:auto;margin-right:auto;"><circle cx="10" cy="10" r="8" stroke="#DDE0EA" stroke-width="2"/><path d="M10 2a8 8 0 018 8" stroke="#22B7A3" stroke-width="2" stroke-linecap="round"/></svg>
         Locating nearby eye care facilities...
       </div>
@@ -1492,6 +1360,7 @@ const BACKEND_URL = 'https://hyperthermally-nonimperative-journee.ngrok-free.dev
 let _currentUser = null;
 let _uploadedFiles = [];
 let _lastResult = null;
+let _allResults = [];
 
 function getToken() { return localStorage.getItem('csr_token'); }
 function setToken(t) { localStorage.setItem('csr_token', t); }
@@ -1774,83 +1643,92 @@ async function analyzeImages() {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     if (!data.success || !data.results || !data.results.length) { showToast('Analysis failed: ' + (data.error || 'Unknown error'), '#F35858'); btn.disabled = false; txt.textContent = 'Retry →'; return; }
+    _allResults = data.results;
     _lastResult = { result: data.results[0], numImages: data.num_images, totalTime: data.total_processing_time };
-    populateResults(data.results[0], data.num_images, data.total_processing_time);
+    populateAllResults(data.results, data.total_processing_time);
     showPage('analysis');
   } catch(err) { showToast('Connection error: ' + err.message, '#F35858'); btn.disabled = false; txt.textContent = 'Retry →'; }
 }
 
-function populateResults(result, numImages, totalTime) {
-  const cls = result.classification;
-  const grade = cls.grade;
-  const pct = (cls.confidence * 100).toFixed(1);
-  const gradeColor = grade === 0 ? 'var(--green)' : grade <= 2 ? 'var(--amber)' : 'var(--red)';
+function buildResultHTML(result, idx) {
+  var cls = result.classification;
+  var grade = cls.grade;
+  var pct = (cls.confidence * 100).toFixed(1);
+  var gradeColor = grade === 0 ? 'var(--green)' : grade <= 2 ? 'var(--amber)' : 'var(--red)';
+  var bgMap  = ['rgba(56,204,135,.06)','rgba(250,189,49,.06)','rgba(250,189,49,.06)','rgba(243,88,88,.06)','rgba(243,88,88,.06)'];
+  var bdrMap = ['rgba(56,204,135,.25)','rgba(250,189,49,.25)','rgba(250,189,49,.25)','rgba(243,88,88,.25)','rgba(243,88,88,.25)'];
+  var descs = ['No signs of diabetic retinopathy detected. Retina appears healthy.','Mild non-proliferative DR. Microaneurysms present.','Moderate non-proliferative DR. More widespread retinal changes observed.','Severe non-proliferative DR. Significant vascular abnormalities detected.','Proliferative DR. Neovascularization present — immediate attention required.'];
+  var recs  = ['Continue annual eye screenings to monitor eye health.','Schedule a follow-up with an ophthalmologist within 12 months.','Consult an ophthalmologist within 3–6 months. Optimise blood glucose control.','Urgent referral to a retina specialist recommended. Risk of vision loss without treatment.','Immediate referral to a retina specialist required. High risk of severe vision loss.'];
+  var riskLabel = ['None','Low','Moderate','High','Very High'][grade];
+  var riskColor = ['var(--green)','var(--amber)','var(--amber)','var(--red)','var(--red)'][grade];
+  var imageName = result.image_id || ('Image ' + (idx + 1));
+  var procTime  = (result.processing_time || 0).toFixed(2);
 
-  function setImgPanel(id, b64) {
-    const box = document.getElementById(id); if (!box) return;
-    const controls = box.querySelector('.ar-img-controls');
-    box.innerHTML = '';
-    const img = document.createElement('img');
-    img.src = 'data:image/png;base64,' + b64;
-    img.style.cssText = 'width:100%;height:100%;object-fit:contain;border-radius:14px;display:block;';
-    box.appendChild(img);
-    if (controls) box.appendChild(controls);
+  function imgSrc(b64) {
+    if (b64) return '<img src="data:image/png;base64,' + b64 + '" style="width:100%;height:100%;object-fit:contain;border-radius:14px;display:block;">';
+    return '<div class="ar-fundus"></div>';
   }
-  setImgPanel('img-original', result.original_image);
-  setImgPanel('img-vessel',   result.vessel_map);
-  setImgPanel('img-binary',   result.binary_vessel_map);
 
-  const sub = document.querySelector('#page-analysis .ar-subtitle');
-  if (sub) sub.textContent = numImages + ' image' + (numImages > 1 ? 's' : '') + ' processed successfully';
-
-  const bgMap  = ['rgba(56,204,135,.06)','rgba(250,189,49,.06)','rgba(250,189,49,.06)','rgba(243,88,88,.06)','rgba(243,88,88,.06)'];
-  const bdrMap = ['rgba(56,204,135,.25)','rgba(250,189,49,.25)','rgba(250,189,49,.25)','rgba(243,88,88,.25)','rgba(243,88,88,.25)'];
-  const diagCard = document.querySelector('#page-analysis .ar-diag-card');
-  if (diagCard) { diagCard.style.background = bgMap[grade]; diagCard.style.border = '1px solid ' + bdrMap[grade]; }
-
-  const descs = ['No signs of diabetic retinopathy detected. Retina appears healthy.','Mild non-proliferative DR. Microaneurysms present.','Moderate non-proliferative DR. More widespread retinal changes observed.','Severe non-proliferative DR. Significant vascular abnormalities detected.','Proliferative DR. Neovascularization present — immediate attention required.'];
-  const diagTitle = document.querySelector('#page-analysis .ar-diag-title');
-  const diagSub   = document.querySelector('#page-analysis .ar-diag-sub');
-  if (diagTitle) diagTitle.textContent = cls.severity;
-  if (diagSub)   diagSub.textContent   = descs[grade] || '';
-
-  const confVal  = document.querySelector('#page-analysis .ar-conf-val');
-  const confFill = document.querySelector('#page-analysis .ar-conf-fill');
-  if (confVal)  { confVal.textContent = pct + '%'; confVal.style.color = gradeColor; }
-  if (confFill) { confFill.style.width = pct + '%'; confFill.style.background = gradeColor; }
-
-  const dpStage = document.querySelector('#page-analysis .ar-dp-stage');
-  if (dpStage && cls.stage1_result) dpStage.innerHTML = '<span class="ar-stage-pill">Stage 1</span> ' + cls.stage1_result + ' <span class="ar-stage-prob">conf=' + pct + '%</span>';
-
-  const metaVals = document.querySelectorAll('#page-analysis .ar-meta-val');
-  const riskLabel = ['None','Low','Moderate','High','Very High'][grade];
-  const riskColor = ['var(--green)','var(--amber)','var(--amber)','var(--red)','var(--red)'][grade];
-  if (metaVals[0]) metaVals[0].textContent = 'Grade ' + grade;
-  if (metaVals[1]) { metaVals[1].textContent = riskLabel; metaVals[1].style.color = riskColor; }
-
-  const stageCards = document.querySelectorAll('#page-analysis .ar-stage-card');
-  const stageData = [
-    { name: 'Stage 1 · DR Detection', result: cls.stage1_result, conf: pct + '% confidence', show: true },
-    { name: 'Stage 2 · Severity',     result: cls.stage2_result, conf: '',                   show: !!cls.stage2_result },
-    { name: 'Stage 3 · Fine Grade',   result: cls.stage3_result, conf: '',                   show: !!cls.stage3_result }
+  var stageData = [
+    { name: 'Stage 1 \u00b7 DR Detection', res: cls.stage1_result, conf: pct + '% confidence', show: true },
+    { name: 'Stage 2 \u00b7 Severity',     res: cls.stage2_result, conf: '',                    show: !!cls.stage2_result },
+    { name: 'Stage 3 \u00b7 Fine Grade',   res: cls.stage3_result, conf: '',                    show: !!cls.stage3_result }
   ];
-  stageCards.forEach(function(card, i) {
-    const sd = stageData[i]; if (!sd) return;
-    card.style.display = sd.show ? '' : 'none';
-    const nameEl = card.querySelector('.ar-stage-name');
-    const badgeEl = card.querySelector('.ar-stage-badge');
-    const confEl  = card.querySelector('.ar-stage-conf');
-    if (nameEl)  nameEl.textContent  = sd.name;
-    if (badgeEl) badgeEl.textContent = sd.result || '—';
-    if (confEl)  confEl.textContent  = sd.conf;
-  });
+  var stagesHTML = stageData.filter(function(sd){ return sd.show; }).map(function(sd) {
+    return '<div class="ar-stage-card"><div class="ar-stage-row"><span class="ar-stage-name">' + sd.name + '</span><span class="ar-stage-badge teal-badge">' + (sd.res || '\u2014') + '</span></div>' + (sd.conf ? '<span class="ar-stage-conf">' + sd.conf + '</span>' : '') + '</div>';
+  }).join('');
 
-  const recs = ['Continue annual eye screenings to monitor eye health.','Schedule a follow-up with an ophthalmologist within 12 months.','Consult an ophthalmologist within 3–6 months. Optimise blood glucose control.','Urgent referral to a retina specialist recommended. Risk of vision loss without treatment.','Immediate referral to a retina specialist required. High risk of severe vision loss.'];
-  const recText = document.querySelector('#page-analysis .ar-rec-text');
-  if (recText) recText.textContent = recs[grade] || recs[0];
+  var saveBtn = idx > 0 ? '<button class="ar-btn-ghost" style="margin-top:8px;" onclick="saveReportAtIndex(' + idx + ')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2.5A.5.5 0 0 1 2.5 2h7l2.5 2.5V11.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-9Z" stroke="currentColor" stroke-width="1.3"/><path d="M5 2v3h4V2M4 12V8h6v4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Save this report</button>' : '';
 
-  const procVal = document.querySelector('#page-analysis .ar-proc-val');
-  if (procVal) procVal.textContent = (result.processing_time || totalTime || 0).toFixed(2) + 's';
+  var divider = idx > 0 ? '<div class="ar-result-divider"><span>Image ' + (idx + 1) + ' \u00b7 ' + imageName + '</span></div>' : '';
+
+  return divider +
+    '<div class="ar-result-block">' +
+    '<div class="ar-images-card"><div class="ar-image-panels">' +
+    '<div class="ar-img-panel"><div class="ar-img-label-row"><span class="ar-img-label">Original Image</span><span class="ar-img-badge">#' + (idx+1) + '</span></div><div class="ar-img-box">' + imgSrc(result.original_image) + '</div></div>' +
+    '<div class="ar-img-panel"><div class="ar-img-label-row"><span class="ar-img-label">Vessel Overlay</span><span class="ar-img-tag teal">Visualization</span></div><div class="ar-img-box">' + imgSrc(result.vessel_map) + '</div></div>' +
+    '<div class="ar-img-panel"><div class="ar-img-label-row"><span class="ar-img-label">Binary Vessel Map</span><span class="ar-img-tag coral">Segmentation</span></div><div class="ar-img-box">' + imgSrc(result.binary_vessel_map) + '</div></div>' +
+    '</div></div>' +
+    '<div class="ar-results-row">' +
+      '<div class="ar-diag-card" style="background:' + bgMap[grade] + ';border:1px solid ' + bdrMap[grade] + ';">' +
+        '<div class="ar-diag-header"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="' + gradeColor + '" stroke-width="1.5"/><path d="M6 10l3 3 5-5" stroke="' + gradeColor + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="ar-diag-title">' + (cls.severity || '') + '</span></div>' +
+        '<div class="ar-diag-sub">' + (descs[grade] || '') + '</div>' +
+        '<div class="ar-conf-row"><span class="ar-conf-label">Confidence</span><span class="ar-conf-val" style="color:' + gradeColor + ';">' + pct + '%</span></div>' +
+        '<div class="ar-conf-track"><div class="ar-conf-fill" style="width:' + pct + '%;background:' + gradeColor + ';"></div></div>' +
+        '<div class="ar-decision-path"><div class="ar-dp-title"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1"/><line x1="6.5" y1="4.5" x2="6.5" y2="6.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><circle cx="6.5" cy="9" r=".6" fill="currentColor"/></svg>Decision Path</div><div class="ar-dp-stage"><span class="ar-stage-pill">Stage 1</span> ' + (cls.stage1_result || '') + ' <span class="ar-stage-prob">conf=' + pct + '%</span></div></div>' +
+      '</div>' +
+      '<div class="ar-meta-col">' +
+        '<div class="ar-meta-card"><div class="ar-meta-label">Grade</div><div class="ar-meta-val">Grade ' + grade + '</div></div>' +
+        '<div class="ar-meta-card"><div class="ar-meta-label">Risk Level</div><div class="ar-meta-val" style="color:' + riskColor + ';">' + riskLabel + '</div></div>' +
+        '<div class="ar-clinical-card"><div class="ar-clinical-title"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1"/><line x1="6.5" y1="4.5" x2="6.5" y2="6.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><circle cx="6.5" cy="9" r=".6" fill="currentColor"/></svg>Clinical Indicators</div><div class="ar-clinical-row"><span>Vessel Tortuosity</span><span class="ar-normal">Normal</span></div><div class="ar-clinical-row"><span>Microaneurysms</span><span class="ar-normal">Normal</span></div><div class="ar-clinical-row"><span>Optic Disc Changes</span><span class="ar-normal">Normal</span></div></div>' +
+      '</div>' +
+      '<div class="ar-right-col">' +
+        '<div class="ar-cascade-card"><div class="ar-cascade-title">Cascade Stages</div>' + stagesHTML + '</div>' +
+        '<div class="ar-rec-card"><div class="ar-rec-title"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1"/><path d="M4.5 8.5a3 3 0 010-6" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>Recommendation</div><div class="ar-rec-text">' + (recs[grade] || recs[0]) + '</div></div>' +
+        '<div class="ar-proc-card"><div class="ar-proc-label"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1"/><path d="M6.5 3.5v3l2 1.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>Processing Time</div><div class="ar-proc-val">' + procTime + 's</div></div>' +
+        saveBtn +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function populateAllResults(results, totalTime) {
+  var container = document.getElementById('all-results-container');
+  if (!container) return;
+  var sub = document.querySelector('#page-analysis .ar-subtitle');
+  if (sub) sub.textContent = results.length + ' image' + (results.length > 1 ? 's' : '') + ' processed successfully';
+  container.innerHTML = results.map(function(r, i) { return buildResultHTML(r, i); }).join('');
+}
+
+async function saveReportAtIndex(idx) {
+  var r = _allResults[idx];
+  if (!r) return;
+  var prevLastResult = _lastResult;
+  var fname = _uploadedFiles[idx] ? _uploadedFiles[idx].name : ('image_' + (idx+1) + '.jpg');
+  _lastResult = { result: r, numImages: 1, totalTime: r.processing_time || 0 };
+  _uploadedFiles[0] = _uploadedFiles[idx] || _uploadedFiles[0];
+  await saveReport();
+  _lastResult = prevLastResult;
 }
 
 // ── Reports ───────────────────────────────────────────────────────────────────
@@ -2175,10 +2053,59 @@ window.addEventListener('scroll', () => {
 });
 
 // ── Nearby clinics (geolocation + IP fallback) ────────────────────────────────
+let _clinicCoords = null;
+
+function _doClinicFetch(lat, lng) {
+  _clinicCoords = { lat, lng };
+  const loading = document.getElementById('nearby-loading');
+  const grid    = document.getElementById('clinic-grid');
+  const errEl   = document.getElementById('nearby-error');
+  const emptyEl = document.getElementById('nearby-empty');
+  const btn     = document.getElementById('locate-btn');
+  const mapsLink = document.getElementById('maps-link');
+  if (mapsLink) mapsLink.href = `https://www.google.com/maps/search/ophthalmologist+eye+clinic/@${lat},${lng},13z`;
+  if (loading) loading.style.display = 'block';
+  if (grid)    grid.style.display = 'none';
+  if (errEl)   errEl.style.display = 'none';
+  if (emptyEl) emptyEl.style.display = 'none';
+  const query = `[out:json][timeout:15];(node["healthcare"="ophthalmology"](around:10000,${lat},${lng});node["amenity"="hospital"](around:8000,${lat},${lng});node["healthcare"="optometrist"](around:8000,${lat},${lng}););out body 9;`;
+  fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query))
+    .then(r => r.json())
+    .then(data => {
+      if (loading) loading.style.display = 'none';
+      const elements = data.elements || [];
+      if (!elements.length) {
+        if (emptyEl) emptyEl.style.display = 'block';
+        if (btn) { btn.style.display = 'inline-flex'; btn.disabled = false; btn.textContent = 'Try Again'; }
+        return;
+      }
+      const results = elements.slice(0, 6).map(el => {
+        const tags = el.tags || {};
+        const name = tags.name || tags['name:en'] || 'Eye Care Facility';
+        const type = tags.healthcare === 'ophthalmology' ? 'Ophthalmology' : tags.healthcare === 'optometrist' ? 'Optometrist' : 'Hospital';
+        const addr = [tags['addr:street'], tags['addr:housenumber'], tags['addr:city']].filter(Boolean).join(', ') || 'Address not listed';
+        const phone = tags.phone || tags['contact:phone'] || '';
+        const dist = (Math.sqrt(Math.pow(el.lat - lat, 2) + Math.pow(el.lon - lng, 2)) * 111).toFixed(1);
+        const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${el.lat},${el.lon}`;
+        return { name, type, addr, phone, dist, mapsUrl };
+      });
+      if (grid) {
+        grid.style.display = 'grid';
+        grid.innerHTML = results.map(r => `<div class="ar-clinic-card" onclick="window.open('${r.mapsUrl}','_blank')"><div class="ar-clinic-name">${r.name}</div><span class="ar-clinic-type">${r.type}</span><div class="ar-clinic-addr">${r.addr}${r.phone ? '<br>' + r.phone : ''}</div><div class="ar-clinic-footer"><span class="ar-clinic-dist">${r.dist} km away</span><a class="ar-clinic-dir" href="${r.mapsUrl}" target="_blank" onclick="event.stopPropagation()">Get directions →</a></div></div>`).join('');
+      }
+      if (btn) { btn.style.display = 'inline-flex'; btn.disabled = false; btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="white" stroke-width="1.3"/><circle cx="7" cy="7" r="2" fill="white"/></svg> Refresh'; }
+    })
+    .catch(() => {
+      if (loading) loading.style.display = 'none';
+      if (errEl) errEl.style.display = 'block';
+      if (btn) { btn.style.display = 'inline-flex'; btn.disabled = false; btn.textContent = 'Try Again'; }
+    });
+}
+
 async function initLocationClinic() {
   if (!navigator.geolocation) { await ipFallbackClinic(); return; }
   navigator.geolocation.getCurrentPosition(
-    pos => fetchClinics(pos.coords.latitude, pos.coords.longitude),
+    pos => _doClinicFetch(pos.coords.latitude, pos.coords.longitude),
     async () => { await ipFallbackClinic(); },
     { timeout: 6000 }
   );
@@ -2188,62 +2115,25 @@ async function ipFallbackClinic() {
   try {
     const r = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(5000) });
     const d = await r.json();
-    if (d.latitude && d.longitude) fetchClinics(d.latitude, d.longitude);
-  } catch { /* silent — user can still click button manually */ }
-}
-
-function fetchClinics(lat, lng) {
-  const mapsLink = document.getElementById('maps-link');
-  if (mapsLink) mapsLink.href = `https://www.google.com/maps/search/ophthalmologist+eye+clinic/@${lat},${lng},13z`;
+    if (d.latitude && d.longitude) { _doClinicFetch(d.latitude, d.longitude); return; }
+  } catch {}
+  // If IP fallback fails too, show error state
+  const loading = document.getElementById('nearby-loading');
+  const errEl   = document.getElementById('nearby-error');
+  const btn     = document.getElementById('locate-btn');
+  if (loading) loading.style.display = 'none';
+  if (errEl)   errEl.style.display = 'block';
+  if (btn)     { btn.style.display = 'inline-flex'; btn.disabled = false; btn.textContent = 'Try Again'; }
 }
 
 function findNearbyClinics() {
-  const btn     = document.getElementById('locate-btn');
-  const loading = document.getElementById('nearby-loading');
-  const grid    = document.getElementById('clinic-grid');
-  const errEl   = document.getElementById('nearby-error');
-  const emptyEl = document.getElementById('nearby-empty');
-  btn.disabled = true; btn.textContent = 'Locating...';
-  loading.style.display = 'block'; grid.style.display = 'none'; errEl.style.display = 'none'; emptyEl.style.display = 'none';
-
-  function doFetch(lat, lng) {
-    const mapsLink = document.getElementById('maps-link');
-    if (mapsLink) mapsLink.href = `https://www.google.com/maps/search/ophthalmologist+eye+clinic/@${lat},${lng},13z`;
-    const query = `[out:json][timeout:15];(node["healthcare"="ophthalmology"](around:10000,${lat},${lng});node["amenity"="hospital"](around:8000,${lat},${lng});node["healthcare"="optometrist"](around:8000,${lat},${lng}););out body 9;`;
-    fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query))
-      .then(r => r.json())
-      .then(data => {
-        loading.style.display = 'none';
-        const elements = data.elements || [];
-        if (!elements.length) { emptyEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Try Again'; return; }
-        const results = elements.slice(0, 6).map(el => {
-          const tags = el.tags || {};
-          const name = tags.name || tags['name:en'] || 'Eye Care Facility';
-          const type = tags.healthcare === 'ophthalmology' ? 'Ophthalmology' : tags.healthcare === 'optometrist' ? 'Optometrist' : 'Hospital';
-          const addr = [tags['addr:street'], tags['addr:housenumber'], tags['addr:city']].filter(Boolean).join(', ') || 'Address not listed';
-          const phone = tags.phone || tags['contact:phone'] || '';
-          const dist = (Math.sqrt(Math.pow(el.lat - lat, 2) + Math.pow(el.lon - lng, 2)) * 111).toFixed(1);
-          const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${el.lat},${el.lon}`;
-          return { name, type, addr, phone, dist, mapsUrl };
-        });
-        grid.style.display = 'grid';
-        grid.innerHTML = results.map(r => `<div class="ar-clinic-card" onclick="window.open('${r.mapsUrl}','_blank')"><div class="ar-clinic-name">${r.name}</div><span class="ar-clinic-type">${r.type}</span><div class="ar-clinic-addr">${r.addr}${r.phone ? '<br>' + r.phone : ''}</div><div class="ar-clinic-footer"><span class="ar-clinic-dist">${r.dist} km away</span><a class="ar-clinic-dir" href="${r.mapsUrl}" target="_blank" onclick="event.stopPropagation()">Get directions →</a></div></div>`).join('');
-        btn.disabled = false; btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="white" stroke-width="1.3"/><circle cx="7" cy="7" r="2" fill="white"/></svg> Refresh';
-      })
-      .catch(() => { loading.style.display = 'none'; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Try Again'; });
-  }
-
-  if (!navigator.geolocation) { loading.style.display = 'none'; errEl.style.display = 'block'; btn.disabled = false; btn.innerHTML = 'Find Clinics Near Me'; return; }
+  if (_clinicCoords) { _doClinicFetch(_clinicCoords.lat, _clinicCoords.lng); return; }
+  const btn = document.getElementById('locate-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Locating...'; }
+  if (!navigator.geolocation) { ipFallbackClinic(); return; }
   navigator.geolocation.getCurrentPosition(
-    pos => doFetch(pos.coords.latitude, pos.coords.longitude),
-    async () => {
-      try {
-        const r = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(5000) });
-        const d = await r.json();
-        if (d.latitude && d.longitude) { doFetch(d.latitude, d.longitude); return; }
-      } catch {}
-      loading.style.display = 'none'; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Try Again';
-    },
+    pos => _doClinicFetch(pos.coords.latitude, pos.coords.longitude),
+    async () => { await ipFallbackClinic(); },
     { timeout: 6000 }
   );
 }
