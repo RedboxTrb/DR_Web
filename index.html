@@ -1701,7 +1701,12 @@ async function handleAuthCallback() {
 }
 
 // ── Page system ───────────────────────────────────────────────────────────────
-function showAuthGate() { showPage('auth'); const b = document.getElementById('auth-guest-banner'); if(b) b.classList.add('show'); }
+function showAuthGate() {
+  if (_currentUser) { showPage('upload'); return; }
+  showPage('auth');
+  const b = document.getElementById('auth-guest-banner');
+  if (b) b.classList.add('show');
+}
 
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
