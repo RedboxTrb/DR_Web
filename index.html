@@ -485,6 +485,42 @@ footer{padding:52px 60px 28px;}
 .auth-social-btn{font-size:12.5px;border-radius:9px;padding:10px 14px;}
 
 /* Smooth hover transitions everywhere */
+/* Lesion segmentation (FLM-Net) */
+.lz-card{background:var(--white);border:1px solid var(--g200);border-radius:14px;padding:18px 20px;margin-top:16px;}
+.lz-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.lz-title{font-size:12px;font-weight:700;color:var(--teal-d);text-transform:uppercase;letter-spacing:.4px;}
+.lz-tag{font-size:10px;font-weight:700;color:var(--teal);background:rgba(34,183,163,.1);border:1px solid rgba(34,183,163,.25);border-radius:20px;padding:3px 9px;letter-spacing:.3px;}
+.lz-legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-bottom:16px;}
+.lz-legend-item{display:inline-flex;align-items:center;gap:6px;font-size:12px;}
+.lz-dot{width:10px;height:10px;border-radius:3px;display:inline-block;flex:none;vertical-align:middle;}
+.lz-legend-code{font-weight:700;color:var(--navy);}
+.lz-legend-name{color:var(--g500);}
+.lz-loading{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--g500);padding:20px 0;}
+.lz-spinner{width:14px;height:14px;border:2px solid var(--g200);border-top-color:var(--teal);border-radius:50%;animation:lzspin .8s linear infinite;flex:none;}
+@keyframes lzspin{to{transform:rotate(360deg);}}
+.lz-error{font-size:13px;color:var(--g500);padding:16px 0;}
+.lz-main{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;}
+.lz-overlay-box{flex:1 1 320px;min-width:270px;}
+.lz-overlay-box img{width:100%;max-width:100%;border-radius:12px;display:block;background:var(--navy);}
+.lz-overlay-cap{display:block;font-size:11px;color:var(--g500);margin-top:6px;}
+.lz-stats{flex:1 1 290px;min-width:250px;overflow-x:auto;}
+.lz-table{width:100%;border-collapse:collapse;font-size:12px;}
+.lz-table th{text-align:left;font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.4px;padding:0 8px 8px 0;border-bottom:1px solid var(--g200);}
+.lz-table td{padding:9px 8px 9px 0;color:var(--g600);border-bottom:1px solid var(--g100);white-space:nowrap;}
+.lz-table td:first-child{color:var(--navy);}
+.lz-table td .lz-dot{margin-right:7px;}
+.lz-table tr:last-child td{border-bottom:none;}
+.lz-num{text-align:right;font-variant-numeric:tabular-nums;}
+.lz-time{font-size:11px;color:var(--g400);margin-top:10px;}
+.lz-masks-title{font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.4px;margin:20px 0 10px;}
+.lz-body{min-width:0;}
+.lz-masks{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.lz-mask{min-width:0;}
+.lz-mask-box{background:var(--navy);border-radius:10px;overflow:hidden;aspect-ratio:3/2;}
+.lz-mask-box img{width:100%;height:100%;object-fit:contain;display:block;}
+.lz-mask-empty{width:100%;height:100%;}
+.lz-mask-cap{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--g500);margin-top:6px;}
+@media(max-width:720px){.lz-masks{grid-template-columns:repeat(2,1fr);}.lz-main{flex-direction:column;}}
 .feat-card,.ar-clinic-card,.ar-stage-card,.ar-meta-card{transition:box-shadow .2s,transform .2s,border-color .2s;}
 .feat-card:hover{border-color:var(--g300);}
 
