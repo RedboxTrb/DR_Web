@@ -1714,6 +1714,10 @@ async function analyzeImages() {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     if (!data.success || !data.results || !data.results.length) { showToast('Analysis failed: ' + (data.error || 'Unknown error'), '#F35858'); btn.disabled = false; txt.textContent = 'Retry →'; return; }
+    // Bind the patient details to these results. Scoping them per-result (rather
+    // than leaving them in a global) means a saved report opened later can never
+    // pick up details belonging to a different analysis.
+    data.results.forEach(function (r) { r.patient = _patient; });
     _allResults = data.results;
     _lastResult = { result: data.results[0], numImages: data.num_images, totalTime: data.total_processing_time };
     populateAllResults(data.results, data.total_processing_time);
@@ -2149,15 +2153,17 @@ function exportPDF() {
   const sc = severityColors[grade];
   const riskLabels = ['No', 'Low', 'Moderate', 'High', 'Very high'];
 
-  // Patient details, if any were entered. Omitted entirely when blank.
+  // Patient details belonging to THIS analysis. Omitted entirely when none were
+  // entered, and absent on saved reports, which carry no patient data.
+  const pat = result.patient;
   let patientSection = '';
-  if (_patient) {
+  if (pat) {
     const cell = function (label, val) {
       return val ? `<div><span>${label}</span><b>${escHtml(val)}</b></div>` : '';
     };
-    const cells = cell('Patient name', _patient.name) + cell('Patient ID', _patient.pid)
-                + cell('Age', _patient.age) + cell('Sex', _patient.sex)
-                + cell('Eye', _patient.eye) + cell('Referred by', _patient.ref);
+    const cells = cell('Patient name', pat.name) + cell('Patient ID', pat.pid)
+                + cell('Age', pat.age) + cell('Sex', pat.sex)
+                + cell('Eye', pat.eye) + cell('Referred by', pat.ref);
     if (cells) patientSection = `<div class="sec">Patient</div><div class="pt">${cells}</div>`;
   }
 
@@ -2189,7 +2195,8 @@ function exportPDF() {
       const b = (lz.masks || {})[l.code];
       return b ? `<figure><div class="cap">${l.code} — ${l.name}</div><img src="data:image/png;base64,${b}"></figure>` : '';
     }).join('');
-    lesionSection = `<div class="sec">Lesion Segmentation — FLA-Net</div>
+    lesionSection = `<div class="lzsec">
+    <div class="sec">Lesion Segmentation — FLA-Net</div>
     <div class="legend">${legend}</div>
     <table>
       <tr><th>Lesion</th><th class="num">Pixels</th><th class="num">% of image</th></tr>
@@ -2198,6 +2205,7 @@ function exportPDF() {
     <div class="imgs">
       ${lz.overlay ? `<figure><div class="cap">Combined lesion overlay</div><img src="data:image/png;base64,${lz.overlay}"></figure>` : ''}
       ${maskImgs}
+    </div>
     </div>`;
   }
 
@@ -2245,7 +2253,10 @@ function exportPDF() {
   .imgs img{width:100%;display:block;border-radius:8px;border:1px solid #DDE0EA;background:#0C1024;}
   .cap{font-size:9.5px;font-weight:700;color:#4A5070;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px;}
   .foot{margin-top:24px;border-top:1px solid #DDE0EA;padding-top:10px;font-size:10.5px;color:#4A5070;line-height:1.55;}
-  @media print{.wrap{padding:0;}.sec{page-break-after:avoid;}.imgs,table,.hero{page-break-inside:avoid;}}</style></head><body><div class="wrap">
+  /* Start lesion findings on their own page so the colour key stays with the
+     table and images it describes, instead of stranding at the foot of page 1. */
+  .lzsec{page-break-before:always;break-before:page;}
+  @media print{.wrap{padding:0;}.sec{page-break-after:avoid;}.legend{page-break-after:avoid;}.imgs,table,.hero{page-break-inside:avoid;}}</style></head><body><div class="wrap">
   <div class="head">
     <div class="brand">
       <div class="mark">C</div>
