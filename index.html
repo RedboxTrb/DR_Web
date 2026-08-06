@@ -168,11 +168,18 @@ footer{background:var(--navy);padding:40px 60px 22px;border-top:1px solid var(--
 .analyze-btn{width:100%;background:var(--teal);color:var(--white);font-size:16px;font-weight:700;padding:16px;border-radius:14px;border:none;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:24px;}
 .analyze-btn:hover{background:var(--teal-d);}
 .analyze-btn:disabled{background:var(--g200);color:var(--g400);cursor:not-allowed;}
-.upload-features{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:24px;}
+.upload-features{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-bottom:24px;}
 .uf-card{background:var(--white);border:1px solid var(--g200);border-radius:14px;padding:20px;}
 .uf-badge{display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:12px;letter-spacing:.3px;}
 .uf-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;}
 .uf-desc{font-size:12px;color:var(--g500);line-height:1.6;}
+.patient-box{background:var(--white);border:1px solid var(--g200);border-radius:14px;padding:18px 20px;margin-bottom:20px;}
+.pb-title{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:14px;text-transform:uppercase;letter-spacing:.4px;}
+.pb-title span{font-weight:500;color:var(--g400);text-transform:none;letter-spacing:0;font-size:11px;margin-left:8px;}
+.pb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;}
+.pb-grid label{display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:600;color:var(--g500);}
+.pb-grid input,.pb-grid select{font-family:inherit;font-size:13px;color:var(--navy);background:var(--offwhite);border:1px solid var(--g200);border-radius:9px;padding:9px 11px;outline:none;}
+.pb-grid input:focus,.pb-grid select:focus{border-color:var(--teal);background:var(--white);}
 .upload-disclaimer{background:rgba(250,189,49,.06);border:1px solid rgba(250,189,49,.25);border-radius:12px;padding:16px 20px;font-size:12px;color:var(--g500);line-height:1.6;}
 .disclaimer-title{font-size:12px;font-weight:700;color:var(--amber);margin-bottom:4px;}
 input[type=file]{display:none;}
@@ -1005,7 +1012,7 @@ footer{padding:52px 60px 28px;}
   </nav>
   <div class="upload-hero">
     <h1>Analyze <span>Retinal Images</span></h1>
-    <p>Upload one or more fundus photographs for AI-powered DR grading, vessel segmentation, and explainable overlays.</p>
+    <p>Upload one or more fundus photographs for AI-powered DR grading, vessel and lesion segmentation, and explainable overlays.</p>
   </div>
   <div class="upload-body">
     <div class="upload-container">
@@ -1020,6 +1027,17 @@ footer{padding:52px 60px 28px;}
         <div class="dz-formats">Supported: JPG, PNG, TIFF · Max 20MB per image · Multiple images supported</div>
       </div>
       <input type="file" id="file-input" accept="image/*" multiple onchange="handleFiles(this.files)">
+      <div class="patient-box">
+        <div class="pb-title">Report Details <span>optional — printed on the exported report, never uploaded</span></div>
+        <div class="pb-grid">
+          <label>Patient name<input type="text" id="pt-name" placeholder="e.g. A. Sharma" autocomplete="off"></label>
+          <label>Patient ID<input type="text" id="pt-id" placeholder="e.g. MRN-10482" autocomplete="off"></label>
+          <label>Age<input type="text" id="pt-age" placeholder="e.g. 58" autocomplete="off"></label>
+          <label>Sex<select id="pt-sex"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select></label>
+          <label>Eye<select id="pt-eye"><option value="">—</option><option>OD (right)</option><option>OS (left)</option><option>Both</option></select></label>
+          <label>Referred by<input type="text" id="pt-ref" placeholder="e.g. Dr. R. Verma" autocomplete="off"></label>
+        </div>
+      </div>
       <button class="analyze-btn" id="analyze-btn" disabled onclick="analyzeImages()">
         <span id="analyze-btn-text">Select images to analyze</span>
       </button>
@@ -1033,6 +1051,11 @@ footer{padding:52px 60px 28px;}
           <span class="uf-badge" style="background:rgba(250,189,49,.12);color:#7a5500;">EXPLAINABLE</span>
           <div class="uf-title">Vessel Map Overlays</div>
           <div class="uf-desc">Visualise segmented blood vessel maps alongside your fundus image.</div>
+        </div>
+        <div class="uf-card">
+          <span class="uf-badge" style="background:rgba(243,88,88,.12);color:#a12f2f;">FLA-Net</span>
+          <div class="uf-title">Lesion Segmentation</div>
+          <div class="uf-desc">Maps microaneurysms, haemorrhages and hard &amp; soft exudates onto your fundus image.</div>
         </div>
         <div class="uf-card">
           <span class="uf-badge" style="background:rgba(56,204,135,.12);color:#0a6a3a;">BATCH MODE</span>
@@ -1392,6 +1415,22 @@ let _currentUser = null;
 let _uploadedFiles = [];
 let _lastResult = null;
 let _allResults = [];
+// Patient details are captured at analysis time and used only to render the
+// exported report. They are never sent to the backend or persisted.
+let _patient = null;
+
+function escHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+  });
+}
+
+function readPatientDetails() {
+  function v(id) { const el = document.getElementById(id); return el ? (el.value || '').trim() : ''; }
+  const p = { name: v('pt-name'), pid: v('pt-id'), age: v('pt-age'),
+              sex: v('pt-sex'), eye: v('pt-eye'), ref: v('pt-ref') };
+  return Object.keys(p).some(function (k) { return p[k]; }) ? p : null;
+}
 
 function getToken() { return localStorage.getItem('csr_token'); }
 function setToken(t) { localStorage.setItem('csr_token', t); }
@@ -1661,6 +1700,7 @@ function updateAnalyzeBtn() {
 // ── API: Analyze ──────────────────────────────────────────────────────────────
 async function analyzeImages() {
   if (_uploadedFiles.length === 0) return;
+  _patient = readPatientDetails();
   const btn = document.getElementById('analyze-btn');
   const txt = document.getElementById('analyze-btn-text');
   btn.disabled = true; txt.textContent = 'Analyzing…';
@@ -2106,6 +2146,21 @@ function exportPDF() {
   const grade = cls.grade;
   const pct = (cls.confidence * 100).toFixed(1);
   const severityColors = ['#38CC87','#FABD31','#FABD31','#F35858','#F35858'];
+  const sc = severityColors[grade];
+  const riskLabels = ['No', 'Low', 'Moderate', 'High', 'Very high'];
+
+  // Patient details, if any were entered. Omitted entirely when blank.
+  let patientSection = '';
+  if (_patient) {
+    const cell = function (label, val) {
+      return val ? `<div><span>${label}</span><b>${escHtml(val)}</b></div>` : '';
+    };
+    const cells = cell('Patient name', _patient.name) + cell('Patient ID', _patient.pid)
+                + cell('Age', _patient.age) + cell('Sex', _patient.sex)
+                + cell('Eye', _patient.eye) + cell('Referred by', _patient.ref);
+    if (cells) patientSection = `<div class="sec">Patient</div><div class="pt">${cells}</div>`;
+  }
+
   const recs = [
     'Continue annual eye screenings to monitor eye health.',
     'Schedule a follow-up with an ophthalmologist within 12 months.',
@@ -2132,63 +2187,104 @@ function exportPDF() {
     }).join('');
     const maskImgs = LESION_TYPES.map(function (l) {
       const b = (lz.masks || {})[l.code];
-      return b ? `<div><div class="cap">${l.code} — ${l.name}</div><img src="data:image/png;base64,${b}"></div>` : '';
+      return b ? `<figure><div class="cap">${l.code} — ${l.name}</div><img src="data:image/png;base64,${b}"></figure>` : '';
     }).join('');
-    lesionSection = `<h2>Lesion Segmentation — FLA-Net</h2>
+    lesionSection = `<div class="sec">Lesion Segmentation — FLA-Net</div>
     <div class="legend">${legend}</div>
-    <table class="ltable">
+    <table>
       <tr><th>Lesion</th><th class="num">Pixels</th><th class="num">% of image</th></tr>
       ${rows}
     </table>
     <div class="imgs">
-      ${lz.overlay ? `<div><div class="cap">Combined lesion overlay</div><img src="data:image/png;base64,${lz.overlay}"></div>` : ''}
+      ${lz.overlay ? `<figure><div class="cap">Combined lesion overlay</div><img src="data:image/png;base64,${lz.overlay}"></figure>` : ''}
       ${maskImgs}
     </div>`;
   }
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>DR Report – ChakshurakhsakAI</title>
-  <style>:root{color-scheme:light;}
-  body{font-family:Inter,Arial,sans-serif;max-width:760px;margin:40px auto;padding:0 24px;color:#0C1024;background:#fff;}
-  h1{font-size:26px;font-weight:800;margin-bottom:4px;}
-  .sub{color:#6B7090;font-size:13px;margin-bottom:28px;}
-  .badge{display:inline-block;padding:6px 16px;border-radius:20px;font-weight:700;font-size:14px;background:${severityColors[grade]}22;color:${severityColors[grade]};border:1px solid ${severityColors[grade]}55;margin-bottom:20px;}
-  table{width:100%;border-collapse:collapse;margin-bottom:24px;}
-  td{padding:10px 14px;border-bottom:1px solid #DDE0EA;font-size:13px;}
-  td:first-child{font-weight:600;width:180px;color:#4A5070;}
-  .rec{background:#F0F1F5;border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.6;margin-bottom:24px;}
-  img{max-width:220px;border-radius:10px;margin:6px;}
-  .imgs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;}
-  .footer{color:#9096B0;font-size:11px;margin-top:32px;border-top:1px solid #DDE0EA;padding-top:12px;}
-  h2{font-size:16px;font-weight:700;margin:30px 0 10px;}
-  .legend{font-size:12px;color:#4A5070;margin-bottom:14px;}
-  .legend span{margin-right:18px;white-space:nowrap;}
-  .dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:middle;}
-  .ltable td:first-child{width:auto;font-weight:400;color:#0C1024;}
-  .ltable th{text-align:left;font-size:11px;font-weight:700;color:#6B7090;text-transform:uppercase;letter-spacing:.4px;padding:0 14px 8px;border-bottom:1px solid #DDE0EA;}
+  <style>@page{size:A4;margin:14mm;}
+  :root{color-scheme:light;}
+  *{box-sizing:border-box;}
+  body{font-family:Inter,'Segoe UI',Arial,sans-serif;margin:0;background:#fff;color:#0C1024;font-size:13px;line-height:1.55;}
+  .wrap{max-width:780px;margin:0 auto;padding:26px 24px;}
+  .head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;border-bottom:2px solid #22B7A3;padding-bottom:13px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .mark{width:30px;height:30px;border-radius:8px;background:#22B7A3;color:#fff;font-weight:800;font-size:15px;line-height:30px;text-align:center;}
+  .bn{font-size:15px;font-weight:800;letter-spacing:-.2px;}
+  .bs{font-size:9px;color:#9096B0;letter-spacing:.6px;text-transform:uppercase;}
+  .hr-r{text-align:right;}
+  .dt{font-size:17px;font-weight:800;letter-spacing:-.3px;}
+  .dm{font-size:10px;color:#9096B0;}
+  .sec{font-size:9.5px;font-weight:700;color:#6B7090;text-transform:uppercase;letter-spacing:.7px;margin:22px 0 9px;padding-bottom:5px;border-bottom:1px solid #DDE0EA;}
+  .pt{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 18px;}
+  .pt span{display:block;font-size:9px;color:#9096B0;text-transform:uppercase;letter-spacing:.4px;}
+  .pt b{font-size:12.5px;font-weight:600;}
+  .hero{display:flex;align-items:center;gap:16px;background:${sc}0D;border:1px solid ${sc}40;border-left:4px solid ${sc};border-radius:12px;padding:15px 18px;}
+  .hg{font-size:23px;font-weight:800;color:${sc};line-height:1.1;}
+  .hs{font-size:11.5px;color:#4A5070;}
+  .conf{margin-left:auto;min-width:145px;}
+  .cl{font-size:9px;color:#6B7090;text-transform:uppercase;letter-spacing:.4px;}
+  .cv{font-size:15px;font-weight:800;color:${sc};}
+  .bar{height:5px;background:#E7E9F0;border-radius:3px;overflow:hidden;margin-top:3px;}
+  .bar i{display:block;height:100%;background:${sc};}
+  .rec{background:#F0F1F5;border-radius:10px;padding:12px 16px;font-size:12.5px;margin-top:12px;}
+  table{width:100%;border-collapse:collapse;}
+  td,th{font-size:12px;padding:8px 12px 8px 0;border-bottom:1px solid #EDEFF4;}
+  th{text-align:left;font-size:9px;font-weight:700;color:#9096B0;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #DDE0EA;}
+  .kv td:first-child{color:#6B7090;font-weight:600;width:170px;}
   .num{text-align:right;}
-  .cap{font-size:11px;font-weight:600;color:#6B7090;margin-bottom:4px;}
-  @media print{body{margin:20px;}h2{page-break-after:avoid;}.imgs,table{page-break-inside:avoid;}}</style></head><body>
-  <h1>DR Analysis Report</h1>
-  <div class="sub">Generated by ChakshurakhsakAI · ${new Date().toLocaleString()}</div>
-  <div class="badge">Grade ${grade} — ${cls.severity}</div>
-  <table>
-    <tr><td>DR Grade</td><td>Grade ${grade} / 4</td></tr>
-    <tr><td>Severity</td><td>${cls.severity}</td></tr>
+  tr:last-child td{border-bottom:none;}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:11.5px;color:#4A5070;margin-bottom:12px;}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:middle;}
+  .imgs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px;}
+  .imgs figure{margin:0;}
+  .imgs img{width:100%;display:block;border-radius:8px;border:1px solid #DDE0EA;background:#0C1024;}
+  .cap{font-size:9px;font-weight:600;color:#6B7090;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px;}
+  .foot{margin-top:24px;border-top:1px solid #DDE0EA;padding-top:10px;font-size:9.5px;color:#9096B0;line-height:1.5;}
+  @media print{.wrap{padding:0;}.sec{page-break-after:avoid;}.imgs,table,.hero{page-break-inside:avoid;}}</style></head><body><div class="wrap">
+  <div class="head">
+    <div class="brand">
+      <div class="mark">C</div>
+      <div><div class="bn">ChakshuRakshak AI</div><div class="bs">Diabetic Retinopathy Screening</div></div>
+    </div>
+    <div class="hr-r">
+      <div class="dt">DR Analysis Report</div>
+      <div class="dm">${new Date().toLocaleString()}</div>
+    </div>
+  </div>
+  ${patientSection}
+  <div class="sec">Screening Result</div>
+  <div class="hero">
+    <div>
+      <div class="hg">Grade ${grade}</div>
+      <div class="hs">${escHtml(cls.severity || '')} · ${riskLabels[grade]} risk</div>
+    </div>
+    <div class="conf">
+      <div class="cl">Model confidence</div>
+      <div class="cv">${pct}%</div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+    </div>
+  </div>
+  <div class="rec"><strong>Recommendation:</strong> ${recs[grade]}</div>
+  <div class="sec">Classification Detail</div>
+  <table class="kv">
+    <tr><td>DR Grade</td><td>Grade ${grade} of 4</td></tr>
+    <tr><td>Severity</td><td>${escHtml(cls.severity || '')}</td></tr>
     <tr><td>Confidence</td><td>${pct}%</td></tr>
-    ${cls.stage1_result ? `<tr><td>Stage 1</td><td>${cls.stage1_result}</td></tr>` : ''}
-    ${cls.stage2_result ? `<tr><td>Stage 2</td><td>${cls.stage2_result}</td></tr>` : ''}
-    ${cls.stage3_result ? `<tr><td>Stage 3</td><td>${cls.stage3_result}</td></tr>` : ''}
+    ${cls.stage1_result ? `<tr><td>Stage 1 · Detection</td><td>${escHtml(cls.stage1_result)}</td></tr>` : ''}
+    ${cls.stage2_result ? `<tr><td>Stage 2 · Severity</td><td>${escHtml(cls.stage2_result)}</td></tr>` : ''}
+    ${cls.stage3_result ? `<tr><td>Stage 3 · Fine Grade</td><td>${escHtml(cls.stage3_result)}</td></tr>` : ''}
     <tr><td>Processing Time</td><td>${(result.processing_time || totalTime || 0).toFixed(2)}s</td></tr>
   </table>
-  <div class="rec"><strong>Recommendation:</strong> ${recs[grade]}</div>
+  <div class="sec">Imaging</div>
   <div class="imgs">
-    ${result.original_image ? `<div><div style="font-size:11px;font-weight:600;color:#6B7090;margin-bottom:4px;">Original</div><img src="data:image/png;base64,${result.original_image}"></div>` : ''}
-    ${result.vessel_map ? `<div><div style="font-size:11px;font-weight:600;color:#6B7090;margin-bottom:4px;">Vessel Map</div><img src="data:image/png;base64,${result.vessel_map}"></div>` : ''}
-    ${result.binary_vessel_map ? `<div><div style="font-size:11px;font-weight:600;color:#6B7090;margin-bottom:4px;">Binary Vessel</div><img src="data:image/png;base64,${result.binary_vessel_map}"></div>` : ''}
+    ${result.original_image ? `<figure><div class="cap">Original</div><img src="data:image/png;base64,${result.original_image}"></figure>` : ''}
+    ${result.vessel_map ? `<figure><div class="cap">Vessel Map</div><img src="data:image/png;base64,${result.vessel_map}"></figure>` : ''}
+    ${result.binary_vessel_map ? `<figure><div class="cap">Binary Vessel</div><img src="data:image/png;base64,${result.binary_vessel_map}"></figure>` : ''}
   </div>
   ${lesionSection}
-  <div class="footer">This report is generated by an AI screening tool and is not a medical diagnosis. Please consult a qualified ophthalmologist for clinical evaluation. · www.chakshurakshakai.com</div>
-  </body></html>`;
+  <div class="foot">This report is generated by an AI screening tool and is not a medical diagnosis. Please consult a qualified ophthalmologist for clinical evaluation.<br>www.chakshurakshakai.com</div>
+  </div></body></html>`;
   const w = window.open('', '_blank');
   w.document.write(html);
   w.document.close();
