@@ -485,7 +485,7 @@ footer{padding:52px 60px 28px;}
 .auth-social-btn{font-size:12.5px;border-radius:9px;padding:10px 14px;}
 
 /* Smooth hover transitions everywhere */
-/* Lesion segmentation (FLM-Net) */
+/* Lesion segmentation (FLA-Net) */
 .lz-card{background:var(--white);border:1px solid var(--g200);border-radius:14px;padding:18px 20px;margin-top:16px;}
 .lz-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
 .lz-title{font-size:12px;font-weight:700;color:var(--teal-d);text-transform:uppercase;letter-spacing:.4px;}
@@ -1743,7 +1743,7 @@ function buildResultHTML(result, idx) {
   '</div>';
 }
 
-// ── Lesion segmentation (FLM-Net) ─────────────────────────────────────────────
+// ── Lesion segmentation (FLA-Net) ─────────────────────────────────────────────
 // Lesion masks are produced asynchronously: /api/predict returns a job id and we
 // poll /api/lesions/<id> until it is ready, so the grade renders immediately.
 
@@ -1767,7 +1767,7 @@ function buildLesionPanelHTML(result, idx) {
   return '<div class="lz-card" id="lesion-panel-' + idx + '">' +
     '<div class="lz-head">' +
       '<span class="lz-title">Lesion Segmentation</span>' +
-      '<span class="lz-tag">FLM-Net</span>' +
+      '<span class="lz-tag">FLA-Net</span>' +
     '</div>' +
     lesionLegendHTML() +
     '<div class="lz-body"><div class="lz-loading">' +
