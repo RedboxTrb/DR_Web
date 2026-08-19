@@ -1427,6 +1427,23 @@ function escHtml(s) {
   });
 }
 
+// Images arrive base64-encoded and may be PNG (reports saved before the switch, or an older
+// backend) or WebP (current backend). Detect from the leading bytes rather than assuming, so
+// the page renders correctly against either and old saved reports keep working.
+//   PNG  -> \x89PNG      -> "iVBORw0KGgo"
+//   WebP -> "RIFF"....   -> "UklGR"
+//   JPEG -> \xFF\xD8\xFF -> "/9j/"
+function imgMime(b64) {
+  if (!b64) return 'image/png';
+  if (b64.lastIndexOf('UklGR', 0) === 0) return 'image/webp';
+  if (b64.lastIndexOf('/9j/', 0) === 0) return 'image/jpeg';
+  return 'image/png';
+}
+
+function dataUrl(b64) {
+  return 'data:' + imgMime(b64) + ';base64,' + b64;
+}
+
 function readPatientDetails() {
   function v(id) { const el = document.getElementById(id); return el ? (el.value || '').trim() : ''; }
   const p = { name: v('pt-name'), pid: v('pt-id'), age: v('pt-age'),
@@ -1742,7 +1759,7 @@ function buildResultHTML(result, idx) {
   var procTime  = (result.processing_time || 0).toFixed(2);
 
   function imgSrc(b64) {
-    if (b64) return '<img src="data:image/png;base64,' + b64 + '" style="width:100%;height:100%;object-fit:contain;border-radius:14px;display:block;">';
+    if (b64) return '<img src="' + dataUrl(b64) + '" style="width:100%;height:100%;object-fit:contain;border-radius:14px;display:block;">';
     return '<div class="ar-fundus"></div>';
   }
 
@@ -1847,7 +1864,7 @@ function renderLesionResult(idx, data) {
   var masks = LESION_TYPES.map(function(l) {
     var b64 = (data.masks || {})[l.code];
     var img = b64
-      ? '<img src="data:image/png;base64,' + b64 + '" alt="' + l.name + ' mask">'
+      ? '<img src="' + dataUrl(b64) + '" alt="' + l.name + ' mask">'
       : '<div class="lz-mask-empty"></div>';
     return '<div class="lz-mask">' +
              '<div class="lz-mask-box">' + img + '</div>' +
@@ -1859,7 +1876,7 @@ function renderLesionResult(idx, data) {
   body.innerHTML =
     '<div class="lz-main">' +
       '<div class="lz-overlay-box">' +
-        (data.overlay ? '<img src="data:image/png;base64,' + data.overlay + '" alt="Lesion overlay">' : '') +
+        (data.overlay ? '<img src="' + dataUrl(data.overlay) + '" alt="Lesion overlay">' : '') +
         '<span class="lz-overlay-cap">Combined lesion overlay</span>' +
       '</div>' +
       '<div class="lz-stats">' +
@@ -1995,7 +2012,7 @@ async function loadReportDetail(reportId) {
       { name: 'Stage 3 · Fine Grade',   result: rep.stage3_result, show: !!rep.stage3_result }
     ].filter(s => s.show).map(s => `<div class="ar-stage-card"><div class="ar-stage-row"><span class="ar-stage-name">${s.name}</span><span class="ar-stage-badge teal-badge">${s.result || '—'}</span></div></div>`).join('');
     const imgHtml = rep.original_image
-      ? `<img src="data:image/png;base64,${rep.original_image}" style="width:100%;height:100%;object-fit:contain;border-radius:14px;display:block;">`
+      ? `<img src="${dataUrl(rep.original_image)}" style="width:100%;height:100%;object-fit:contain;border-radius:14px;display:block;">`
       : `<div class="ar-fundus"></div>`;
     const dateStr = new Date(rep.created_at + 'Z').toLocaleString();
 
@@ -2195,7 +2212,7 @@ function exportPDF() {
     }).join('');
     const maskImgs = LESION_TYPES.map(function (l) {
       const b = (lz.masks || {})[l.code];
-      return b ? `<figure><div class="cap">${l.code} — ${l.name}</div><img src="data:image/png;base64,${b}"></figure>` : '';
+      return b ? `<figure><div class="cap">${l.code} — ${l.name}</div><img src="${dataUrl(b)}"></figure>` : '';
     }).join('');
     lesionSection = `<div class="lzsec">
     <div class="sec">Lesion Segmentation — FLA-Net</div>
@@ -2205,7 +2222,7 @@ function exportPDF() {
       ${rows}
     </table>
     <div class="imgs">
-      ${lz.overlay ? `<figure><div class="cap">Combined lesion overlay</div><img src="data:image/png;base64,${lz.overlay}"></figure>` : ''}
+      ${lz.overlay ? `<figure><div class="cap">Combined lesion overlay</div><img src="${dataUrl(lz.overlay)}"></figure>` : ''}
       ${maskImgs}
     </div>
     </div>`;
@@ -2295,9 +2312,9 @@ function exportPDF() {
   </table>
   <div class="sec">Imaging</div>
   <div class="imgs">
-    ${result.original_image ? `<figure><div class="cap">Original</div><img src="data:image/png;base64,${result.original_image}"></figure>` : ''}
-    ${result.vessel_map ? `<figure><div class="cap">Vessel Map</div><img src="data:image/png;base64,${result.vessel_map}"></figure>` : ''}
-    ${result.binary_vessel_map ? `<figure><div class="cap">Binary Vessel</div><img src="data:image/png;base64,${result.binary_vessel_map}"></figure>` : ''}
+    ${result.original_image ? `<figure><div class="cap">Original</div><img src="${dataUrl(result.original_image)}"></figure>` : ''}
+    ${result.vessel_map ? `<figure><div class="cap">Vessel Map</div><img src="${dataUrl(result.vessel_map)}"></figure>` : ''}
+    ${result.binary_vessel_map ? `<figure><div class="cap">Binary Vessel</div><img src="${dataUrl(result.binary_vessel_map)}"></figure>` : ''}
   </div>
   ${lesionSection}
   <div class="foot">This report is generated by an AI screening tool and is not a medical diagnosis. Please consult a qualified ophthalmologist for clinical evaluation.<br>www.chakshurakshakai.com</div>
