@@ -1387,7 +1387,7 @@ footer{padding:52px 60px 28px;}
       <a onclick="showPage('reports')" style="color:var(--teal);">← My Reports</a>
     </div>
     <div style="display:flex;gap:10px;">
-      <button class="ar-btn-ghost" onclick="exportPDF()">Export PDF</button>
+      <button class="ar-btn-ghost" onclick="exportSavedReport()">Export PDF</button>
       <button class="ar-btn-primary" onclick="showPage('reports')">← Back to Reports</button>
     </div>
   </nav>
@@ -1410,7 +1410,7 @@ footer{padding:52px 60px 28px;}
 
 // Static ngrok domain, pinned in C:\ngrok\ngrok.yml on the GPU box — this hostname
 // is now stable across tunnel restarts and does not need updating after a reboot.
-const BACKEND_URL = 'https://confidant-junkman-lumber.ngrok-free.dev';
+const BACKEND_URL = 'https://unschematized-ungummed-korey.ngrok-free.dev';
 
 // ── Auth state ────────────────────────────────────────────────────────────────
 let _currentUser = null;
@@ -1459,9 +1459,13 @@ function clearToken() { localStorage.removeItem('csr_token'); localStorage.remov
 function cacheUser(u) { try { localStorage.setItem('csr_user', JSON.stringify(u)); } catch {} }
 function getCachedUser() { try { return JSON.parse(localStorage.getItem('csr_user')); } catch { return null; } }
 
+// ngrok's free tier answers browser requests with an HTML warning page instead of the
+// API response unless this header is present. Every backend call must send it.
+const NGROK_HEADER = { 'ngrok-skip-browser-warning': '1' };
+
 function authHeaders(includeContentType) {
   const t = getToken();
-  const h = {};
+  const h = Object.assign({}, NGROK_HEADER);
   if (t) h['Authorization'] = 'Bearer ' + t;
   if (includeContentType) h['Content-Type'] = 'application/json';
   return h;
@@ -1473,7 +1477,7 @@ function authUrl(path) {
   return BACKEND_URL + path + (t ? '?_t=' + encodeURIComponent(t) : '');
 }
 function authFetch(path) {
-  return fetch(authUrl(path));
+  return fetch(authUrl(path), { headers: NGROK_HEADER });
 }
 
 async function loadCurrentUser() {
@@ -1725,7 +1729,7 @@ async function analyzeImages() {
   btn.disabled = true; txt.textContent = 'Analyzing…';
   const formData = new FormData();
   _uploadedFiles.forEach(f => formData.append('images', f));
-  const headers = {};
+  const headers = Object.assign({}, NGROK_HEADER);
   const t = getToken();
   if (t) headers['Authorization'] = 'Bearer ' + t;
   try {
@@ -1772,7 +1776,7 @@ function buildResultHTML(result, idx) {
     return '<div class="ar-stage-card"><div class="ar-stage-row"><span class="ar-stage-name">' + sd.name + '</span><span class="ar-stage-badge teal-badge">' + (sd.res || '\u2014') + '</span></div>' + (sd.conf ? '<span class="ar-stage-conf">' + sd.conf + '</span>' : '') + '</div>';
   }).join('');
 
-  var saveBtn = idx > 0 ? '<button class="ar-btn-ghost" style="margin-top:8px;" onclick="saveReportAtIndex(' + idx + ')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2.5A.5.5 0 0 1 2.5 2h7l2.5 2.5V11.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-9Z" stroke="currentColor" stroke-width="1.3"/><path d="M5 2v3h4V2M4 12V8h6v4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Save this report</button>' : '';
+  var saveBtn = '';
 
   var divider = idx > 0 ? '<div class="ar-result-divider"><span>Image ' + (idx + 1) + ' \u00b7 ' + imageName + '</span></div>' : '';
 
@@ -1933,15 +1937,17 @@ function populateAllResults(results, totalTime) {
   startLesionPolling(results);
 }
 
+
 async function saveReportAtIndex(idx) {
   var r = _allResults[idx];
-  if (!r) return;
-  var prevLastResult = _lastResult;
+  if (!r || !_currentUser) return;
   var fname = _uploadedFiles[idx] ? _uploadedFiles[idx].name : ('image_' + (idx+1) + '.jpg');
-  _lastResult = { result: r, numImages: 1, totalTime: r.processing_time || 0 };
-  _uploadedFiles[0] = _uploadedFiles[idx] || _uploadedFiles[0];
-  await saveReport();
-  _lastResult = prevLastResult;
+  try {
+    await postReport(r, fname, newBatchId(), r.processing_time || 0);
+    showToast('Report saved to My Reports!');
+  } catch (err) {
+    showToast('Could not save report: ' + err.message, '#F35858');
+  }
 }
 
 // ── Reports ───────────────────────────────────────────────────────────────────
@@ -1962,14 +1968,30 @@ async function loadReports() {
     const gradeColors = ['#38CC87','#FABD31','#FABD31','#F35858','#F35858'];
     const gradeBg     = ['rgba(56,204,135,.12)','rgba(250,189,49,.12)','rgba(250,189,49,.12)','rgba(243,88,88,.12)','rgba(243,88,88,.12)'];
 
-    listEl.innerHTML = d.reports.map(rep => {
-      const date = new Date(rep.created_at + 'Z').toLocaleString();
-      const pct  = (rep.confidence * 100).toFixed(1);
-      return `<div class="report-row" onclick="loadReportDetail(${rep.id})">
+    // Images saved together share a batch_id: show them as one report, headed by
+    // the most severe image so the worse eye is what you see in the list.
+    const groups = [];
+    const byBatch = {};
+    d.reports.forEach(function (rep) {
+      if (rep.batch_id) {
+        if (!byBatch[rep.batch_id]) { byBatch[rep.batch_id] = []; groups.push(byBatch[rep.batch_id]); }
+        byBatch[rep.batch_id].push(rep);
+      } else {
+        groups.push([rep]);
+      }
+    });
+
+    listEl.innerHTML = groups.map(group => {
+      const head = group.slice().sort((a, b) => b.grade - a.grade || b.confidence - a.confidence)[0];
+      const date = new Date(head.created_at + 'Z').toLocaleString();
+      const pct  = (head.confidence * 100).toFixed(1);
+      const n    = group.length;
+      const openId = Math.min.apply(null, group.map(r => r.id));
+      return `<div class="report-row" onclick="loadReportDetail(${openId})">
         <div class="report-row-left">
-          <div class="report-grade-badge" style="background:${gradeBg[rep.grade]};color:${gradeColors[rep.grade]};">G${rep.grade}</div>
+          <div class="report-grade-badge" style="background:${gradeBg[head.grade]};color:${gradeColors[head.grade]};">G${head.grade}</div>
           <div>
-            <div class="report-severity">${rep.severity}</div>
+            <div class="report-severity">${escHtml(head.severity)}${n > 1 ? ` <span style="font-weight:600;color:var(--g400);font-size:12px;">· ${n} images${n > 1 ? ', most severe shown' : ''}</span>` : ''}</div>
             <div class="report-date">${date}</div>
           </div>
         </div>
@@ -1987,72 +2009,111 @@ async function loadReports() {
   }
 }
 
+// The saved report currently on screen, kept so Export prints this report and not
+// whatever was analysed last.
+let _savedReport = null;
+
 async function loadReportDetail(reportId) {
   showPage('report-detail');
   const content = document.getElementById('report-detail-content');
   content.innerHTML = '<div style="text-align:center;padding:60px;color:var(--g400);">Loading report...</div>';
+  _savedReport = null;
 
   try {
     const r = await authFetch('/api/reports/' + reportId);
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
     const rep = d.report;
-    const cls = { grade: rep.grade, severity: rep.severity, confidence: rep.confidence, stage1_result: rep.stage1_result, stage2_result: rep.stage2_result, stage3_result: rep.stage3_result };
-    const gradeColor = rep.grade === 0 ? 'var(--green)' : rep.grade <= 2 ? 'var(--amber)' : 'var(--red)';
-    const pct = (rep.confidence * 100).toFixed(1);
+    // Older backends and older reports carry a single image and no `images` list.
+    const images = (rep.images && rep.images.length) ? rep.images : [{
+      id: rep.id, grade: rep.grade, severity: rep.severity, confidence: rep.confidence,
+      stage1_result: rep.stage1_result, stage2_result: rep.stage2_result, stage3_result: rep.stage3_result,
+      processing_time: rep.processing_time, image_label: null, original_image: rep.original_image
+    }];
+    const n = images.length;
+    _savedReport = { rep: rep, images: images };
+
     const bgMap  = ['rgba(56,204,135,.06)','rgba(250,189,49,.06)','rgba(250,189,49,.06)','rgba(243,88,88,.06)','rgba(243,88,88,.06)'];
     const bdrMap = ['rgba(56,204,135,.25)','rgba(250,189,49,.25)','rgba(250,189,49,.25)','rgba(243,88,88,.25)','rgba(243,88,88,.25)'];
     const descs = ['No signs of diabetic retinopathy detected. Retina appears healthy.','Mild non-proliferative DR. Microaneurysms present.','Moderate non-proliferative DR. More widespread retinal changes observed.','Severe non-proliferative DR. Significant vascular abnormalities detected.','Proliferative DR. Neovascularization present — immediate attention required.'];
     const recs  = ['Continue annual eye screenings to monitor eye health.','Schedule a follow-up with an ophthalmologist within 12 months.','Consult an ophthalmologist within 3–6 months. Optimise blood glucose control.','Urgent referral to a retina specialist recommended. Risk of vision loss without treatment.','Immediate referral to a retina specialist required. High risk of severe vision loss.'];
-    const riskLabel = ['None','Low','Moderate','High','Very High'][rep.grade];
-    const riskColor = ['var(--green)','var(--amber)','var(--amber)','var(--red)','var(--red)'][rep.grade];
-    const stagesHtml = [
-      { name: 'Stage 1 · DR Detection', result: rep.stage1_result, show: true },
-      { name: 'Stage 2 · Severity',     result: rep.stage2_result, show: !!rep.stage2_result },
-      { name: 'Stage 3 · Fine Grade',   result: rep.stage3_result, show: !!rep.stage3_result }
-    ].filter(s => s.show).map(s => `<div class="ar-stage-card"><div class="ar-stage-row"><span class="ar-stage-name">${s.name}</span><span class="ar-stage-badge teal-badge">${s.result || '—'}</span></div></div>`).join('');
-    const imgHtml = rep.original_image
-      ? `<img src="${dataUrl(rep.original_image)}" style="width:100%;height:100%;object-fit:contain;border-radius:14px;display:block;">`
-      : `<div class="ar-fundus"></div>`;
+    const riskLabels = ['None','Low','Moderate','High','Very High'];
+    const riskColors = ['var(--green)','var(--amber)','var(--amber)','var(--red)','var(--red)'];
     const dateStr = new Date(rep.created_at + 'Z').toLocaleString();
 
-    content.innerHTML = `
-      <div class="ar-header-card">
-        <div><div class="ar-title">Report #${rep.id}</div><div class="ar-subtitle success">${dateStr}</div></div>
-        <div class="ar-header-actions">
-          <button class="ar-btn-ghost" onclick="exportPDF()">Export</button>
-          <button class="ar-btn-primary" onclick="showPage('reports')">← Back to Reports</button>
-        </div>
-      </div>
+    const block = function (im, idx) {
+      const g = im.grade;
+      const gradeColor = g === 0 ? 'var(--green)' : g <= 2 ? 'var(--amber)' : 'var(--red)';
+      const pct = (im.confidence * 100).toFixed(1);
+      const label = im.image_label || ('Image ' + (idx + 1));
+      const stagesHtml = [
+        { name: 'Stage 1 · DR Detection', result: im.stage1_result, show: true },
+        { name: 'Stage 2 · Severity',     result: im.stage2_result, show: !!im.stage2_result },
+        { name: 'Stage 3 · Fine Grade',   result: im.stage3_result, show: !!im.stage3_result }
+      ].filter(st => st.show).map(st => `<div class="ar-stage-card"><div class="ar-stage-row"><span class="ar-stage-name">${st.name}</span><span class="ar-stage-badge teal-badge">${escHtml(st.result || '—')}</span></div></div>`).join('');
+      const imgHtml = im.original_image
+        ? `<img src="${dataUrl(im.original_image)}" style="width:100%;height:100%;object-fit:contain;border-radius:14px;display:block;">`
+        : `<div class="ar-fundus"></div>`;
+      const divider = n > 1 ? `<div class="ar-result-divider"><span>Image ${idx + 1} of ${n} · ${escHtml(label)}</span></div>` : '';
+      return `${divider}
       <div class="ar-images-card">
         <div class="ar-image-panels" style="grid-template-columns:1fr;">
           <div class="ar-img-panel">
-            <div class="ar-img-label-row"><span class="ar-img-label">Original Image</span><span class="ar-img-badge">#${rep.id}</span></div>
+            <div class="ar-img-label-row"><span class="ar-img-label">Original Image</span><span class="ar-img-badge">${escHtml(label)}</span></div>
             <div class="ar-img-box" style="aspect-ratio:1.5;">${imgHtml}</div>
           </div>
         </div>
       </div>
       <div class="ar-results-row">
-        <div class="ar-diag-card" style="background:${bgMap[rep.grade]};border:1px solid ${bdrMap[rep.grade]};">
-          <div class="ar-diag-header"><span class="ar-diag-title">${rep.severity}</span></div>
-          <div class="ar-diag-sub">${descs[rep.grade] || ''}</div>
+        <div class="ar-diag-card" style="background:${bgMap[g]};border:1px solid ${bdrMap[g]};">
+          <div class="ar-diag-header"><span class="ar-diag-title">${escHtml(im.severity)}</span></div>
+          <div class="ar-diag-sub">${descs[g] || ''}</div>
           <div class="ar-conf-row"><span class="ar-conf-label">Confidence</span><span class="ar-conf-val" style="color:${gradeColor};">${pct}%</span></div>
           <div class="ar-conf-track"><div class="ar-conf-fill" style="width:${pct}%;background:${gradeColor};"></div></div>
         </div>
         <div class="ar-meta-col">
-          <div class="ar-meta-card"><div class="ar-meta-label">Grade</div><div class="ar-meta-val">Grade ${rep.grade}</div></div>
-          <div class="ar-meta-card"><div class="ar-meta-label">Risk Level</div><div class="ar-meta-val" style="color:${riskColor};">${riskLabel}</div></div>
+          <div class="ar-meta-card"><div class="ar-meta-label">Grade</div><div class="ar-meta-val">Grade ${g}</div></div>
+          <div class="ar-meta-card"><div class="ar-meta-label">Risk Level</div><div class="ar-meta-val" style="color:${riskColors[g]};">${riskLabels[g]}</div></div>
         </div>
         <div class="ar-right-col">
           <div class="ar-cascade-card"><div class="ar-cascade-title">Cascade Stages</div>${stagesHtml}</div>
-          <div class="ar-rec-card"><div class="ar-rec-title">Recommendation</div><div class="ar-rec-text">${recs[rep.grade] || recs[0]}</div></div>
-          <div class="ar-proc-card"><div class="ar-proc-label">Processing Time</div><div class="ar-proc-val">${(rep.processing_time || 0).toFixed(2)}s</div></div>
+          <div class="ar-rec-card"><div class="ar-rec-title">Recommendation</div><div class="ar-rec-text">${recs[g] || recs[0]}</div></div>
+          <div class="ar-proc-card"><div class="ar-proc-label">Processing Time</div><div class="ar-proc-val">${(im.processing_time || 0).toFixed(2)}s</div></div>
+        </div>
+      </div>`;
+    };
+
+    content.innerHTML = `
+      <div class="ar-header-card">
+        <div><div class="ar-title">Report #${rep.id}</div><div class="ar-subtitle success">${dateStr}${n > 1 ? ' · ' + n + ' images' : ''}</div></div>
+        <div class="ar-header-actions">
+          <button class="ar-btn-ghost" onclick="exportSavedReport()">Export</button>
+          <button class="ar-btn-primary" onclick="showPage('reports')">← Back to Reports</button>
         </div>
       </div>
+      ${images.map(block).join('')}
       <div class="ar-disclaimer"><strong>Medical Disclaimer:</strong> This analysis is for screening purposes only and should not replace professional medical diagnosis.</div>`;
   } catch(err) {
-    content.innerHTML = '<div style="text-align:center;padding:60px;color:var(--red);">Failed to load report: ' + err.message + '</div>';
+    content.innerHTML = '<div style="text-align:center;padding:60px;color:var(--red);">Failed to load report: ' + escHtml(err.message) + '</div>';
   }
+}
+
+// Export the saved report on screen, with every image it holds. Saved reports keep
+// the original image and the grading; vessel maps and lesion masks are not stored.
+function exportSavedReport() {
+  if (!_savedReport) { showToast('Report is still loading.', '#F35858'); return; }
+  const results = _savedReport.images.map(function (im) {
+    return {
+      classification: {
+        grade: im.grade, severity: im.severity, confidence: im.confidence,
+        stage1_result: im.stage1_result, stage2_result: im.stage2_result, stage3_result: im.stage3_result
+      },
+      processing_time: im.processing_time,
+      original_image: im.original_image,
+      image_id: im.image_label
+    };
+  });
+  exportPDF(results, 0);
 }
 
 // ── Auth form switching ───────────────────────────────────────────────────────
@@ -2082,18 +2143,59 @@ function showToast(msg, color) {
 }
 
 // ── Save Report ───────────────────────────────────────────────────────────────
+
+// One report row per image, all sharing a batch_id so they reopen as one report.
+function newBatchId() {
+  return 'b' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+async function postReport(result, filename, batchId, totalTime) {
+  const cls = result.classification;
+  const resp = await fetch(BACKEND_URL + '/api/reports/save', {
+    method: 'POST',
+    headers: authHeaders(true),
+    body: JSON.stringify({
+      grade:             cls.grade,
+      severity:          cls.severity,
+      confidence:        cls.confidence,
+      stage1_result:     cls.stage1_result,
+      stage2_result:     cls.stage2_result,
+      stage3_result:     cls.stage3_result,
+      processing_time:   result.processing_time || totalTime || 0,
+      original_image:    result.original_image,
+      original_filename: filename || 'image.jpg',
+      batch_id:          batchId
+    })
+  });
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+}
+
+function currentAnalysisForSave() {
+  const results = (_allResults && _allResults.length) ? _allResults
+                : (_lastResult ? [_lastResult.result] : []);
+  return results.map(function (r, i) {
+    return { result: r, filename: (_uploadedFiles[i] && _uploadedFiles[i].name) || r.image_id || ('image_' + (i + 1) + '.jpg') };
+  });
+}
+
 async function saveReport() {
   if (!_lastResult) { showToast('No analysis to save.', '#F35858'); return; }
+  const items = currentAnalysisForSave();
 
   if (!_currentUser) {
-    // Guest: store result in sessionStorage, redirect to auth
+    // Guest: keep the whole analysis in sessionStorage, save it after login
     try {
       sessionStorage.setItem('pending_save', JSON.stringify({
-        result: _lastResult.result,
-        totalTime: _lastResult.totalTime,
-        filename: _uploadedFiles[0] ? _uploadedFiles[0].name : 'image.jpg'
+        items: items, totalTime: _lastResult.totalTime
       }));
-    } catch {}
+    } catch {
+      // too large for sessionStorage: keep at least the first image
+      try {
+        sessionStorage.setItem('pending_save', JSON.stringify({
+          items: items.slice(0, 1), totalTime: _lastResult.totalTime
+        }));
+      } catch {}
+    }
     showToast('Log in to save this report to your account.');
     setTimeout(() => showPage('auth'), 900);
     return;
@@ -2102,26 +2204,13 @@ async function saveReport() {
   const btns = document.querySelectorAll('#save-report-btn, #save-report-card-btn');
   btns.forEach(b => { b.disabled = true; b.textContent = 'Saving…'; });
 
-  const r = _lastResult.result;
-  const cls = r.classification;
+  const batchId = newBatchId();
   try {
-    const resp = await fetch(BACKEND_URL + '/api/reports/save', {
-      method: 'POST',
-      headers: authHeaders(true),
-      body: JSON.stringify({
-        grade:           cls.grade,
-        severity:        cls.severity,
-        confidence:      cls.confidence,
-        stage1_result:   cls.stage1_result,
-        stage2_result:   cls.stage2_result,
-        stage3_result:   cls.stage3_result,
-        processing_time: r.processing_time || _lastResult.totalTime || 0,
-        original_image:  r.original_image,
-        original_filename: _uploadedFiles[0] ? _uploadedFiles[0].name : 'image.jpg'
-      })
-    });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    showToast('Report saved to My Reports!');
+    for (const it of items) {
+      await postReport(it.result, it.filename, batchId, _lastResult.totalTime);
+    }
+    showToast(items.length > 1 ? ('Report with ' + items.length + ' images saved to My Reports!')
+                               : 'Report saved to My Reports!');
     btns.forEach(b => {
       b.textContent = 'Saved ✓';
       b.style.color = 'var(--green)';
@@ -2133,43 +2222,35 @@ async function saveReport() {
   }
 }
 
+
 async function checkPendingSave() {
   const pending = sessionStorage.getItem('pending_save');
   if (!pending || !_currentUser) return;
   sessionStorage.removeItem('pending_save');
   try {
     const p = JSON.parse(pending);
-    const cls = p.result.classification;
-    const resp = await fetch(BACKEND_URL + '/api/reports/save', {
-      method: 'POST',
-      headers: authHeaders(true),
-      body: JSON.stringify({
-        grade:           cls.grade,
-        severity:        cls.severity,
-        confidence:      cls.confidence,
-        stage1_result:   cls.stage1_result,
-        stage2_result:   cls.stage2_result,
-        stage3_result:   cls.stage3_result,
-        processing_time: p.result.processing_time || p.totalTime || 0,
-        original_image:  p.result.original_image,
-        original_filename: p.filename || 'image.jpg'
-      })
-    });
-    if (resp.ok) {
-      showToast('Your report has been saved to My Reports!');
-      showPage('reports');
+    // older pending saves held a single result
+    const items = p.items || [{ result: p.result, filename: p.filename }];
+    const batchId = newBatchId();
+    for (const it of items) {
+      await postReport(it.result, it.filename, batchId, p.totalTime);
     }
+    showToast('Your report has been saved to My Reports!');
+    showPage('reports');
   } catch {}
 }
 
-function exportPDF() {
-  if (!_lastResult) { showToast('No analysis to export yet.', '#F35858'); return; }
+function exportPDF(savedResults, savedTotalTime) {
+  // Saved reports pass their own results; otherwise export the live analysis.
+  const fromSaved = Array.isArray(savedResults) && savedResults.length > 0;
+  if (!fromSaved && !_lastResult) { showToast('No analysis to export yet.', '#F35858'); return; }
 
   // Every image from this analysis, not just the first. _allResults holds them
   // all; _lastResult is only ever results[0] and exporting from it silently
   // dropped the second eye.
-  const results = (_allResults && _allResults.length) ? _allResults : [_lastResult.result];
-  const totalTime = _lastResult.totalTime;
+  const results = fromSaved ? savedResults
+                : ((_allResults && _allResults.length) ? _allResults : [_lastResult.result]);
+  const totalTime = fromSaved ? (savedTotalTime || 0) : _lastResult.totalTime;
   const n = results.length;
 
   const severityColors = ['#38CC87','#FABD31','#FABD31','#F35858','#F35858'];
@@ -2183,6 +2264,7 @@ function exportPDF() {
   ];
 
   const imageLabel = function (result, idx) {
+    if (fromSaved) return result.image_id || ('Image ' + (idx + 1));
     const f = _uploadedFiles[idx];
     if (f && f.name) return f.name;
     if (result.image_id) return result.image_id;
