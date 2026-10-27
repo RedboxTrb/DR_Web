@@ -528,6 +528,29 @@ footer{padding:52px 60px 28px;}
 .lz-mask-empty{width:100%;height:100%;}
 .lz-mask-cap{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--g500);margin-top:6px;}
 @media(max-width:720px){.lz-masks{grid-template-columns:repeat(2,1fr);}.lz-main{flex-direction:column;}}
+/* ConfECBL screening: DR / no DR / another disease */
+.sc-card{background:var(--white);border:1px solid var(--g200);border-radius:14px;padding:18px 20px;margin-top:16px;}
+.sc-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.sc-title{font-size:12px;font-weight:700;color:var(--teal-d);text-transform:uppercase;letter-spacing:.4px;}
+.sc-tag{font-size:10px;font-weight:700;color:var(--teal);background:rgba(34,183,163,.1);border:1px solid rgba(34,183,163,.25);border-radius:20px;padding:3px 9px;letter-spacing:.3px;}
+.sc-grid{display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr);gap:22px;align-items:start;}
+.sc-img{width:100%;aspect-ratio:1;object-fit:contain;border-radius:12px;display:block;background:#080808;}
+.sc-views{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--g500);margin-top:10px;}
+.sc-views label{display:inline-flex;align-items:center;gap:5px;cursor:pointer;}
+.sc-leg{font-size:11px;color:var(--g500);margin-top:6px;min-height:16px;line-height:1.7;}
+.sc-verdict{font-size:16px;font-weight:700;line-height:1.4;padding:12px 14px;border-radius:10px;margin-bottom:10px;}
+.sc-verdict.dr{background:rgba(243,88,88,.08);color:var(--red);}
+.sc-verdict.other{background:rgba(250,189,49,.12);color:#9a6a00;}
+.sc-verdict.clear{background:rgba(56,204,135,.1);color:#1c8a5a;}
+.sc-detail{font-size:12px;color:var(--g500);margin-bottom:4px;}
+.sc-sub{font-size:12px;font-weight:700;color:var(--navy);margin:16px 0 6px;}
+.sc-row{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:13px;}
+.sc-name{width:72px;flex:none;color:var(--navy);}
+.sc-bar{flex:1;height:9px;background:var(--g200);border-radius:5px;overflow:hidden;}
+.sc-bar i{display:block;height:100%;background:var(--teal);border-radius:5px;}
+.sc-num{width:38px;flex:none;text-align:right;font-variant-numeric:tabular-nums;color:var(--g600);}
+.sc-note{font-size:11px;color:var(--g500);margin-top:14px;line-height:1.55;}
+@media(max-width:720px){.sc-grid{grid-template-columns:1fr;}.ar-results-row{grid-template-columns:minmax(0,1fr);}.ar-meta-col{flex-direction:row;}.ar-meta-col .ar-meta-card{flex:1;}}
 .feat-card,.ar-clinic-card,.ar-stage-card,.ar-meta-card{transition:box-shadow .2s,transform .2s,border-color .2s;}
 .feat-card:hover{border-color:var(--g300);}
 
@@ -1762,6 +1785,12 @@ function buildResultHTML(result, idx) {
   var imageName = result.image_id || ('Image ' + (idx + 1));
   var procTime  = (result.processing_time || 0).toFixed(2);
 
+  // No DR per the ConfECBL screening: that card is the whole result (no cascade ran).
+  if (result.cascade_skipped && result.screening) {
+    var skipDivider = idx > 0 ? '<div class="ar-result-divider"><span>Image ' + (idx + 1) + ' · ' + escHtml(imageName) + '</span></div>' : '';
+    return skipDivider + screenedOutBlockHTML(result.screening, result.original_image, idx, true, result.processing_time);
+  }
+
   function imgSrc(b64) {
     if (b64) return '<img src="' + dataUrl(b64) + '" style="width:100%;height:100%;object-fit:contain;border-radius:14px;display:block;">';
     return '<div class="ar-fundus"></div>';
@@ -1806,8 +1835,107 @@ function buildResultHTML(result, idx) {
         saveBtn +
       '</div>' +
     '</div>' +
+    screeningCardHTML(result.screening, result.original_image, idx, true) +
     buildLesionPanelHTML(result, idx) +
   '</div>';
+}
+
+// ── ConfECBL screening (DR / no DR / another disease) ─────────────────────────
+// Every image is screened first. `screening` carries the verdict and scores; when no DR
+// is found the cascade is skipped (result.cascade_skipped) and this card is the result.
+
+var DR_RECS = ['Continue annual eye screenings to monitor eye health.','Schedule a follow-up with an ophthalmologist within 12 months.','Consult an ophthalmologist within 3–6 months. Optimise blood glucose control.','Urgent referral to a retina specialist recommended. Risk of vision loss without treatment.','Immediate referral to a retina specialist required. High risk of severe vision loss.'];
+var SCREEN_NOTE = 'Research/screening tool — final diagnosis by an ophthalmologist.';
+var SCREEN_LEGENDS = {
+  orig: '',
+  lesion: '<b style="color:#ff2828">&#9632;</b> MA <b style="color:#ff8c00">&#9632;</b> HE <b style="color:#e6c800">&#9632;</b> EX <b style="color:#50c8ff">&#9632;</b> SE',
+  conf: '<b style="color:#c850ff">&#9632;</b> AMD <b style="color:#00dc78">&#9632;</b> Myopia <b style="color:#ff3ca0">&#9632;</b> RVO <b style="color:#969696">&#9632;</b> Scar <b style="color:#bbb">&#9633;</b> Other'
+};
+
+function screeningColor(scr) {
+  return !scr ? 'var(--green)' : scr.verdict_level === 'dr' ? 'var(--red)' : scr.verdict_level === 'other' ? 'var(--amber)' : 'var(--green)';
+}
+
+function screeningRecommendation(scr) {
+  if (scr && scr.verdict_level === 'other') {
+    return 'No diabetic retinopathy detected, but the image suggests ' + scr.top_confounder +
+           '. This is outside the scope of DR screening — refer to an ophthalmologist or retina specialist for evaluation.';
+  }
+  return DR_RECS[0];
+}
+
+function screenBarsHTML(labels, vals) {
+  return labels.map(function (n, i) {
+    var v = Math.max(0, Math.min(1, Number(vals[i]) || 0));
+    return '<div class="sc-row"><span class="sc-name">' + escHtml(n) + '</span>' +
+           '<div class="sc-bar"><i style="width:' + (v * 100).toFixed(1) + '%"></i></div>' +
+           '<span class="sc-num">' + v.toFixed(2) + '</span></div>';
+  }).join('');
+}
+
+// imgB64: the original image. live=true enables the overlay toggle (overlays are never
+// stored with saved reports, so a saved report shows the original only).
+function screeningCardHTML(scr, imgB64, idx, live) {
+  if (!scr) return '';
+  var P = live ? 'sc' : 'scs';
+  var ov = (live && scr.overlays) || {};
+  var hasOv = !!(ov.lesion && ov.conf);
+  var views = '';
+  if (hasOv) {
+    views = '<div class="sc-views">' + [['orig', 'Original'], ['lesion', 'DR lesions'], ['conf', 'Other-disease signs']].map(function (v) {
+      return '<label><input type="radio" name="' + P + '-view-' + idx + '" value="' + v[0] + '"' + (v[0] === 'orig' ? ' checked' : '') +
+             ' onchange="setScreeningView(' + idx + ',\'' + v[0] + '\')"> ' + v[1] + '</label>';
+    }).join('') + '</div><div class="sc-leg" id="' + P + '-leg-' + idx + '"></div>';
+  }
+  var img = imgB64
+    ? '<img class="sc-img" id="' + P + '-img-' + idx + '" src="' + dataUrl(imgB64) + '" alt="Fundus image">'
+    : '<div class="sc-img" id="' + P + '-img-' + idx + '"></div>';
+  return '<div class="sc-card" id="' + P + '-panel-' + idx + '">' +
+    '<div class="sc-head"><span class="sc-title">DR vs Other-Disease Screening</span><span class="sc-tag">ConfECBL</span></div>' +
+    '<div class="sc-grid">' +
+      '<div>' + img + views + '</div>' +
+      '<div>' +
+        '<div class="sc-verdict ' + escHtml(scr.verdict_level) + '">' + escHtml(scr.verdict) + '</div>' +
+        '<div class="sc-detail">Referable DR prob ' + Number(scr.referable).toFixed(3) + ' · DME prob ' + Number(scr.dme_prob).toFixed(3) + ' · model ' + escHtml(scr.model || 'ConfECBL') + '</div>' +
+        '<div class="sc-sub">Confounder scores</div>' + screenBarsHTML(scr.conf_labels, scr.Q) +
+        '<div class="sc-sub">DR lesions (presence)</div>' + screenBarsHTML(scr.lesion_labels, scr.P_dr) +
+        '<div class="sc-note">' + SCREEN_NOTE + '</div>' +
+      '</div>' +
+    '</div></div>';
+}
+
+function setScreeningView(idx, view) {
+  var r = _allResults[idx];
+  var img = document.getElementById('sc-img-' + idx);
+  var leg = document.getElementById('sc-leg-' + idx);
+  if (!r || !img || !r.screening) return;
+  var b64 = view === 'orig' ? r.original_image : (r.screening.overlays || {})[view];
+  if (b64) img.src = dataUrl(b64);
+  if (leg) leg.innerHTML = SCREEN_LEGENDS[view] || '';
+}
+
+// Result block for an image with no DR: the screening card is the result, followed by the
+// recommendation. No vessel maps, cascade stages or lesion segmentation exist for it.
+function screenedOutBlockHTML(scr, imgB64, idx, live, procTime) {
+  var color = screeningColor(scr);
+  return '<div class="ar-result-block">' +
+    screeningCardHTML(scr, imgB64, idx, live) +
+    '<div class="ar-results-row" style="margin-top:16px;">' +
+      '<div class="ar-rec-card"><div class="ar-rec-title">Recommendation</div><div class="ar-rec-text">' + escHtml(screeningRecommendation(scr)) + '</div></div>' +
+      '<div class="ar-meta-col">' +
+        '<div class="ar-meta-card"><div class="ar-meta-label">Grade</div><div class="ar-meta-val">Grade 0</div></div>' +
+        '<div class="ar-meta-card"><div class="ar-meta-label">DR Risk</div><div class="ar-meta-val" style="color:' + color + ';">None</div></div>' +
+      '</div>' +
+      '<div class="ar-right-col"><div class="ar-proc-card"><div class="ar-proc-label">Processing Time</div><div class="ar-proc-val">' + Number(procTime || 0).toFixed(2) + 's</div></div></div>' +
+    '</div></div>';
+}
+
+// The screening object without its display-only overlay images, for saving.
+function screeningForSave(scr) {
+  if (!scr) return null;
+  var c = Object.assign({}, scr);
+  delete c.overlays;
+  return c;
 }
 
 // ── Lesion segmentation (FLA-Net) ─────────────────────────────────────────────
@@ -2028,7 +2156,8 @@ async function loadReportDetail(reportId) {
     const images = (rep.images && rep.images.length) ? rep.images : [{
       id: rep.id, grade: rep.grade, severity: rep.severity, confidence: rep.confidence,
       stage1_result: rep.stage1_result, stage2_result: rep.stage2_result, stage3_result: rep.stage3_result,
-      processing_time: rep.processing_time, image_label: null, original_image: rep.original_image
+      processing_time: rep.processing_time, image_label: null, original_image: rep.original_image,
+      screening: rep.screening || null
     }];
     const n = images.length;
     _savedReport = { rep: rep, images: images };
@@ -2055,6 +2184,10 @@ async function loadReportDetail(reportId) {
         ? `<img src="${dataUrl(im.original_image)}" style="width:100%;height:100%;object-fit:contain;border-radius:14px;display:block;">`
         : `<div class="ar-fundus"></div>`;
       const divider = n > 1 ? `<div class="ar-result-divider"><span>Image ${idx + 1} of ${n} · ${escHtml(label)}</span></div>` : '';
+      // No DR per the screening: that card was the whole result, so it is the whole saved result.
+      if (im.screening && im.screening.cascade_skipped) {
+        return divider + screenedOutBlockHTML(im.screening, im.original_image, idx, false, im.processing_time);
+      }
       return `${divider}
       <div class="ar-images-card">
         <div class="ar-image-panels" style="grid-template-columns:1fr;">
@@ -2080,7 +2213,8 @@ async function loadReportDetail(reportId) {
           <div class="ar-rec-card"><div class="ar-rec-title">Recommendation</div><div class="ar-rec-text">${recs[g] || recs[0]}</div></div>
           <div class="ar-proc-card"><div class="ar-proc-label">Processing Time</div><div class="ar-proc-val">${(im.processing_time || 0).toFixed(2)}s</div></div>
         </div>
-      </div>`;
+      </div>
+      ${screeningCardHTML(im.screening, im.original_image, idx, false)}`;
     };
 
     content.innerHTML = `
@@ -2110,7 +2244,9 @@ function exportSavedReport() {
       },
       processing_time: im.processing_time,
       original_image: im.original_image,
-      image_id: im.image_label
+      image_id: im.image_label,
+      screening: im.screening || null,
+      cascade_skipped: !!(im.screening && im.screening.cascade_skipped)
     };
   });
   exportPDF(results, 0);
@@ -2164,7 +2300,8 @@ async function postReport(result, filename, batchId, totalTime) {
       processing_time:   result.processing_time || totalTime || 0,
       original_image:    result.original_image,
       original_filename: filename || 'image.jpg',
-      batch_id:          batchId
+      batch_id:          batchId,
+      screening:         screeningForSave(result.screening)
     })
   });
   if (!resp.ok) throw new Error('HTTP ' + resp.status);
@@ -2290,6 +2427,7 @@ function exportPDF(savedResults, savedTotalTime) {
   // is visible without paging through the report.
   let summarySection = '';
   if (n > 1) {
+    const anyScr = results.some(function (r) { return r.screening; });
     const rows = results.map(function (result, idx) {
       const c = result.classification;
       const sc = severityColors[c.grade];
@@ -2297,12 +2435,13 @@ function exportPDF(savedResults, savedTotalTime) {
         <td>${escHtml(imageLabel(result, idx))}</td>
         <td><b style="color:${sc}">Grade ${c.grade}</b></td>
         <td>${escHtml(c.severity || '')}</td>
+        ${anyScr ? `<td>${result.screening ? escHtml(result.screening.verdict) : '—'}</td>` : ''}
         <td class="num">${(c.confidence * 100).toFixed(1)}%</td>
       </tr>`;
     }).join('');
     summarySection = `<div class="sec">Summary — ${n} images</div>
     <table>
-      <tr><th>Image</th><th>Grade</th><th>Severity</th><th class="num">Confidence</th></tr>
+      <tr><th>Image</th><th>Grade</th><th>Severity</th>${anyScr ? '<th>Screening</th>' : ''}<th class="num">Confidence</th></tr>
       ${rows}
     </table>`;
   }
@@ -2311,7 +2450,35 @@ function exportPDF(savedResults, savedTotalTime) {
     const cls = result.classification;
     const grade = cls.grade;
     const pct = (cls.confidence * 100).toFixed(1);
-    const sc = severityColors[grade];
+    // ConfECBL screening: when it found no DR the cascade never ran, so the screening
+    // verdict is the headline and there are no stage rows or vessel maps to show.
+    const scr = result.screening || null;
+    const skipped = !!(scr && scr.cascade_skipped);
+    const sc = (skipped && scr.verdict_level === 'other') ? '#FABD31' : severityColors[grade];
+
+    let screeningSection = '';
+    if (scr) {
+      const tbl = function (labels, vals) {
+        return '<table><tr><th>' + 'Finding' + '</th><th class="num">Score</th></tr>' + labels.map(function (nm, i) {
+          return `<tr><td>${escHtml(nm)}</td><td class="num">${Number(vals[i]).toFixed(2)}</td></tr>`;
+        }).join('') + '</table>';
+      };
+      const ov = scr.overlays || {};
+      const ovImgs = (ov.lesion || ov.conf) ? `<div class="imgs">
+        ${result.original_image ? `<figure><div class="cap">Original</div><img src="${dataUrl(result.original_image)}"></figure>` : ''}
+        ${ov.lesion ? `<figure><div class="cap">DR lesions</div><img src="${dataUrl(ov.lesion)}"></figure>` : ''}
+        ${ov.conf ? `<figure><div class="cap">Other-disease signs</div><img src="${dataUrl(ov.conf)}"></figure>` : ''}
+      </div>` : '';
+      screeningSection = `<div class="sec">DR vs Other-Disease Screening — ConfECBL</div>
+      <div class="rec" style="margin-top:0"><strong>${escHtml(scr.verdict)}</strong><br>
+        Referable DR probability ${Number(scr.referable).toFixed(3)} · DME probability ${Number(scr.dme_prob).toFixed(3)}</div>
+      <div class="two">
+        <div><div class="cap" style="margin-top:12px">Confounder scores</div>${tbl(scr.conf_labels, scr.Q)}</div>
+        <div><div class="cap" style="margin-top:12px">DR lesions (presence)</div>${tbl(scr.lesion_labels, scr.P_dr)}</div>
+      </div>
+      ${ovImgs}
+      <div class="cap" style="margin-top:10px;text-transform:none;font-weight:600">${SCREEN_NOTE}</div>`;
+    }
 
     // Lesion segmentation, if it finished before the export. Omitted entirely
     // when unavailable, matching how the stage rows below are rendered.
@@ -2359,7 +2526,7 @@ function exportPDF(savedResults, savedTotalTime) {
     <div class="hero">
       <div>
         <div class="hg">Grade ${grade}</div>
-        <div class="hs">${escHtml(cls.severity || '')} · ${riskLabels[grade]} risk</div>
+        <div class="hs">${skipped ? escHtml(scr.verdict) : escHtml(cls.severity || '') + ' · ' + riskLabels[grade] + ' risk'}</div>
       </div>
       <div class="conf">
         <div class="cl">Model confidence</div>
@@ -2367,15 +2534,16 @@ function exportPDF(savedResults, savedTotalTime) {
         <div class="bar"><i style="width:${pct}%"></i></div>
       </div>
     </div>
-    <div class="rec"><strong>Recommendation:</strong> ${recs[grade]}</div>
+    <div class="rec"><strong>Recommendation:</strong> ${skipped ? escHtml(screeningRecommendation(scr)) : recs[grade]}</div>
     <div class="sec">Classification Detail</div>
     <table class="kv">
       <tr><td>DR Grade</td><td>Grade ${grade} of 4</td></tr>
       <tr><td>Severity</td><td>${escHtml(cls.severity || '')}</td></tr>
       <tr><td>Confidence</td><td>${pct}%</td></tr>
-      ${cls.stage1_result ? `<tr><td>Stage 1 · Detection</td><td>${escHtml(cls.stage1_result)}</td></tr>` : ''}
-      ${cls.stage2_result ? `<tr><td>Stage 2 · Severity</td><td>${escHtml(cls.stage2_result)}</td></tr>` : ''}
-      ${cls.stage3_result ? `<tr><td>Stage 3 · Fine Grade</td><td>${escHtml(cls.stage3_result)}</td></tr>` : ''}
+      ${skipped ? '<tr><td>Pipeline</td><td>ConfECBL screening only (no DR detected, grading cascade not run)</td></tr>' : ''}
+      ${!skipped && cls.stage1_result ? `<tr><td>Stage 1 · Detection</td><td>${escHtml(cls.stage1_result)}</td></tr>` : ''}
+      ${!skipped && cls.stage2_result ? `<tr><td>Stage 2 · Severity</td><td>${escHtml(cls.stage2_result)}</td></tr>` : ''}
+      ${!skipped && cls.stage3_result ? `<tr><td>Stage 3 · Fine Grade</td><td>${escHtml(cls.stage3_result)}</td></tr>` : ''}
       <tr><td>Processing Time</td><td>${(result.processing_time || totalTime || 0).toFixed(2)}s</td></tr>
     </table>
     <div class="sec">Imaging</div>
@@ -2384,6 +2552,7 @@ function exportPDF(savedResults, savedTotalTime) {
       ${result.vessel_map ? `<figure><div class="cap">Vessel Map</div><img src="${dataUrl(result.vessel_map)}"></figure>` : ''}
       ${result.binary_vessel_map ? `<figure><div class="cap">Binary Vessel</div><img src="${dataUrl(result.binary_vessel_map)}"></figure>` : ''}
     </div>
+    ${screeningSection}
     ${lesionSection}
     </section>`;
   };
@@ -2430,6 +2599,7 @@ function exportPDF(savedResults, savedTotalTime) {
      printing, background colour does not. */
   .dot{font-style:normal;font-size:13px;line-height:0;margin-right:6px;vertical-align:middle;}
   .imgs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px;}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
   .imgs figure{margin:0;}
   .imgs img{width:100%;display:block;border-radius:8px;border:1px solid #DDE0EA;background:#0C1024;}
   .cap{font-size:9.5px;font-weight:700;color:#4A5070;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px;}
@@ -2465,7 +2635,8 @@ function exportPDF(savedResults, savedTotalTime) {
 function shareResult() {
   if (!_lastResult) { showToast('No analysis to share yet.', '#F35858'); return; }
   const cls = _lastResult.result.classification;
-  const text = `ChakshurakhsakAI DR Analysis\nGrade ${cls.grade} – ${cls.severity}\nConfidence: ${(cls.confidence*100).toFixed(1)}%\n\nTry it at: https://www.chakshurakshakai.com`;
+  const scr = _lastResult.result.screening;
+  const text = `ChakshurakhsakAI DR Analysis\nGrade ${cls.grade} – ${cls.severity}\nConfidence: ${(cls.confidence*100).toFixed(1)}%` + (scr ? `\nScreening: ${scr.verdict}` : '') + `\n\nTry it at: https://www.chakshurakshakai.com`;
   navigator.clipboard.writeText(text).then(() => {
     showToast('Result summary copied to clipboard!');
   }).catch(() => {
