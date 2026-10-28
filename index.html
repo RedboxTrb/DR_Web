@@ -1879,10 +1879,16 @@ function screeningCardHTML(scr, imgB64, idx, live) {
   if (!scr) return '';
   var P = live ? 'sc' : 'scs';
   var ov = (live && scr.overlays) || {};
-  var hasOv = !!(ov.lesion && ov.conf);
+  var hasOv = !!(ov.lesion || ov.conf);
   var views = '';
+  if (live && !hasOv) {
+    // Live result with nothing marked: say so instead of offering identical copies of the photo.
+    views = '<div class="sc-leg">No DR lesions or other-disease signs were marked by the model.</div>';
+  }
   if (hasOv) {
-    views = '<div class="sc-views">' + [['orig', 'Original'], ['lesion', 'DR lesions'], ['conf', 'Other-disease signs']].map(function (v) {
+    views = '<div class="sc-views">' + [['orig', 'Original'], ['lesion', 'DR lesions'], ['conf', 'Other-disease signs']].filter(function (v) {
+      return v[0] === 'orig' || !!ov[v[0]];
+    }).map(function (v) {
       return '<label><input type="radio" name="' + P + '-view-' + idx + '" value="' + v[0] + '"' + (v[0] === 'orig' ? ' checked' : '') +
              ' onchange="setScreeningView(' + idx + ',\'' + v[0] + '\')"> ' + v[1] + '</label>';
     }).join('') + '</div><div class="sc-leg" id="' + P + '-leg-' + idx + '"></div>';
@@ -2469,7 +2475,7 @@ function exportPDF(savedResults, savedTotalTime) {
       };
       const ov = scr.overlays || {};
       const ovImgs = (skipped || ov.lesion || ov.conf) ? `<div class="imgs">
-        ${result.original_image ? `<figure><div class="cap">Original</div><img src="${dataUrl(result.original_image)}"></figure>` : ''}
+        ${skipped && result.original_image ? `<figure><div class="cap">Original</div><img src="${dataUrl(result.original_image)}"></figure>` : ''}
         ${ov.lesion ? `<figure><div class="cap">DR lesions</div><img src="${dataUrl(ov.lesion)}"></figure>` : ''}
         ${ov.conf ? `<figure><div class="cap">Other-disease signs</div><img src="${dataUrl(ov.conf)}"></figure>` : ''}
       </div>` : '';
@@ -2481,6 +2487,7 @@ function exportPDF(savedResults, savedTotalTime) {
         <div><div class="cap" style="margin-top:12px">DR lesions (presence)</div>${tbl(scr.lesion_labels, scr.P_dr)}</div>
       </div>
       ${ovImgs}
+      ${skipped && scr.overlays && !ov.lesion && !ov.conf ? '<div class="cap" style="margin-top:8px;text-transform:none;font-weight:600">No DR lesions or other-disease signs were marked by the model.</div>' : ''}
       <div class="cap" style="margin-top:10px;text-transform:none;font-weight:600">${SCREEN_NOTE}</div>`;
     }
 
