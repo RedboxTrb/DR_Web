@@ -1139,7 +1139,7 @@ footer{padding:52px 60px 28px;}
       </button>
       <div class="upload-features">
         <div class="uf-card">
-          <span class="uf-badge" style="background:rgba(34,183,163,.12);color:#107a6e;">CASCADE</span>
+          <span class="uf-badge" style="background:rgba(34,183,163,.12);color:#107a6e;">DR GRADING</span>
           <div class="uf-title">5-Stage DR Grading</div>
           <div class="uf-desc">No DR through to PDR, with a confidence score for every reading.</div>
         </div>
@@ -2374,7 +2374,7 @@ function buildResultHTML(result, idx) {
         '<div class="ar-meta-card"><div class="ar-meta-label">Risk Level</div><div class="ar-meta-val" style="color:' + riskColor + ';">' + riskLabel + '</div></div>' +
       '</div>' +
       '<div class="ar-right-col">' +
-        '<div class="ar-cascade-card"><div class="ar-cascade-title">Cascade Stages</div>' + stagesHTML + '</div>' +
+        '<div class="ar-cascade-card"><div class="ar-cascade-title">Grading Stages</div>' + stagesHTML + '</div>' +
         '<div class="ar-rec-card"><div class="ar-rec-title"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1"/><path d="M4.5 8.5a3 3 0 010-6" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>Recommendation</div><div class="ar-rec-text">' + (recs[grade] || recs[0]) + '</div></div>' +
         '<div class="ar-proc-card"><div class="ar-proc-label"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1"/><path d="M6.5 3.5v3l2 1.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>Processing Time</div><div class="ar-proc-val">' + procTime + 's</div></div>' +
         saveBtn +
@@ -2652,7 +2652,7 @@ async function loadReportDetail(reportId) {
           <div class="ar-meta-card"><div class="ar-meta-label">Risk Level</div><div class="ar-meta-val" style="color:${riskColors[g]};">${riskLabels[g]}</div></div>
         </div>
         <div class="ar-right-col">
-          <div class="ar-cascade-card"><div class="ar-cascade-title">Cascade Stages</div>${stagesHtml}</div>
+          <div class="ar-cascade-card"><div class="ar-cascade-title">Grading Stages</div>${stagesHtml}</div>
           <div class="ar-rec-card"><div class="ar-rec-title">Recommendation</div><div class="ar-rec-text">${recs[g] || recs[0]}</div></div>
           <div class="ar-proc-card"><div class="ar-proc-label">Processing Time</div><div class="ar-proc-val">${(im.processing_time || 0).toFixed(2)}s</div></div>
         </div>
