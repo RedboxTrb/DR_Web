@@ -635,7 +635,9 @@ footer{padding:52px 60px 28px;}
 .dm-box .sc-tag{color:var(--dme-d);background:var(--dme-bg);border-color:var(--dme-bd);}
 .dm-box .sc-bar i{background:var(--dme);}
 .bm-box .patient-box{margin:14px 0 0;}
-.bm-actions{display:flex;justify-content:flex-end;margin-top:14px;}
+.kd-flat{background:none;border:none;padding:0;margin:0 0 20px;}
+.kd-flat .sc-card{margin-top:0;}
+.bm-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;margin-top:14px;}
 .dm-steps{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px;}
 .dm-steps td{padding:5px 0;border-bottom:1px solid var(--g100);color:var(--g600);}
 .dm-steps td:last-child{text-align:right;font-variant-numeric:tabular-nums;color:var(--navy);font-weight:600;}
@@ -1010,7 +1012,7 @@ footer{padding:52px 60px 28px;}
     <div class="hm-perks">
       <div class="hm-perk"><b>Maps you can check</b><span>Every result comes with the overlay it rests on &mdash; vessels, lesions or exudates &mdash; on your own image.</span></div>
       <div class="hm-perk"><b>A report for each analysis</b><span>Add patient details and download a printable PDF report for DR, DME or the multi-disease screen.</span></div>
-      <div class="hm-perk"><b>No account needed</b><span>Run any analysis as a guest. Sign in only if you want your DR reports saved.</span></div>
+      <div class="hm-perk"><b>No account needed</b><span>Run any analysis as a guest. Sign in only if you want your reports saved.</span></div>
     </div>
     <div class="hm-soon">
       <span class="hm-soon-label">Coming soon</span>
@@ -1321,7 +1323,7 @@ footer{padding:52px 60px 28px;}
           <button class="bm-run" id="dme-run" type="button" disabled onclick="runDmeModel()">Grade DME &rarr;</button>
         </div>
         <div id="dme-result"></div>
-        <div class="bm-note">This analysis runs on its own, with its own image and its own report. It is not part of the DR grade or the DR report, and is not saved with your reports.</div>
+        <div class="bm-note">This analysis runs on its own, with its own image and its own report. It is separate from the DR grade and the DR report.</div>
       </div>
       <div class="upload-disclaimer">
         <div class="disclaimer-title">⚠ Research Tool — Not a Medical Device</div>
@@ -1407,7 +1409,7 @@ footer{padding:52px 60px 28px;}
           <button class="bm-run" id="bm-run" type="button" disabled onclick="runBetaModel()">Run beta model &rarr;</button>
         </div>
         <div id="bm-result"></div>
-        <div class="bm-note"><b>Beta.</b> This module runs on its own, with its own image and its own report. It does not touch the DR analysis, its grade or the DR report, and is not saved with your reports.</div>
+        <div class="bm-note"><b>Beta.</b> This module runs on its own, with its own image and its own report. It does not touch the DR analysis, its grade or the DR report.</div>
       </div>
       <div class="upload-disclaimer">
         <div class="disclaimer-title">⚠ Research Tool — Not a Medical Device</div>
@@ -1817,6 +1819,7 @@ async function runBetaModel() {
     var d = await r.json();
     if (!d.success) throw new Error(d.error || 'Screening failed');
     _betaScreening = d.screening;
+    _betaTime = Number(d.processing_time) || 0;
     out.innerHTML = betaPanelHTML(d.screening, d.image_id || _betaFile.name, d.processing_time);
   } catch (e) {
     _betaScreening = null;
@@ -1835,7 +1838,10 @@ function betaBarsHTML(labels, vals) {
   }).join('');
 }
 
-function betaPanelHTML(scr, filename, procTime) {
+// opts.saved renders a report from My Reports: its own image, no overlays (they are
+// not stored) and no action buttons (the detail page has its own Export).
+function betaPanelHTML(scr, filename, procTime, opts) {
+  opts = opts || {};
   var ov = scr.overlays || {};
   var views = [['orig', 'Original'], ['lesion', 'DR lesions'], ['conf', 'Other-disease signs']]
     .filter(function (v) { return v[0] === 'orig' || !!ov[v[0]]; });
@@ -1848,12 +1854,16 @@ function betaPanelHTML(scr, filename, procTime) {
                ' onchange="setBetaView(\'' + v[0] + '\')"> ' + v[1] + '</label>';
       }).join('') + '</div><div class="sc-leg" id="bm-leg"></div>'
     : '<div class="sc-leg">No DR lesions or other-disease signs were marked by the model.</div>';
+  if (opts.saved) toggle = '<div class="sc-leg">Overlays are not kept with saved reports.</div>';
+  var actions = opts.saved ? '' :
+    '<div class="bm-actions">' + saveBtnHTML('screen') +
+    '<button class="bm-run" type="button" onclick="exportBetaReport()">Download report &rarr;</button></div>';
   return '<div class="sc-card">' +
     '<div class="sc-head"><span class="sc-title">Multi-Disease Screening</span>' +
       '<span class="sc-tag">' + escHtml(scr.model || 'ConfECBL') + '</span>' +
       '<span class="bm-time">' + escHtml(filename) + ' &middot; ' + Number(procTime || 0).toFixed(2) + ' s</span></div>' +
     '<div class="sc-grid">' +
-      '<div><img class="sc-img" id="bm-img" src="' + _betaObjUrl + '" alt="The image screened by the beta model">' + toggle + '</div>' +
+      '<div><img class="sc-img" id="bm-img" src="' + (opts.img || _betaObjUrl) + '" alt="The image screened by the beta model">' + toggle + '</div>' +
       '<div>' +
         '<div class="sc-verdict ' + escHtml(scr.verdict_level) + '">' + escHtml(scr.verdict) + '</div>' +
         '<div class="sc-detail">Referable DR prob ' + Number(scr.referable).toFixed(3) +
@@ -1867,7 +1877,7 @@ function betaPanelHTML(scr, filename, procTime) {
         '<div class="sc-note">' + BETA_NOTE + '</div>' +
       '</div>' +
     '</div>' +
-    '<div class="bm-actions"><button class="bm-run" type="button" onclick="exportBetaReport()">Download report &rarr;</button></div>' +
+    actions +
     '</div>';
 }
 
@@ -1917,6 +1927,7 @@ async function runDmeModel() {
     var d = await r.json();
     if (!d.success) throw new Error(d.error || 'DME grading failed');
     _dmeResult = d.dme;
+    _dmeTime = Number(d.processing_time) || 0;
     out.innerHTML = dmePanelHTML(d.dme, d.image_id || _dmeFile.name, d.processing_time);
   } catch (e) {
     _dmeResult = null;
@@ -1926,7 +1937,8 @@ async function runDmeModel() {
   btn.innerHTML = 'Grade again &rarr;';
 }
 
-function dmePanelHTML(dme, filename, procTime) {
+function dmePanelHTML(dme, filename, procTime, opts) {
+  opts = opts || {};
   var grade = Number(dme.grade) || 0;
   var level = grade === 0 ? 'clear' : (grade === 1 ? 'other' : 'dr');
   var toggle = dme.overlay
@@ -1957,7 +1969,7 @@ function dmePanelHTML(dme, filename, procTime) {
       '<span class="sc-tag">' + escHtml(dme.model || 'GRACE-Net') + '</span>' +
       '<span class="bm-time">' + escHtml(filename) + ' &middot; ' + Number(procTime || 0).toFixed(2) + ' s</span></div>' +
     '<div class="sc-grid">' +
-      '<div><img class="sc-img" id="dme-img" src="' + _dmeObjUrl + '" alt="The image graded for macular edema">' + toggle +
+      '<div><img class="sc-img" id="dme-img" src="' + (opts.img || _dmeObjUrl) + '" alt="The image graded for macular edema">' + toggle +
         '<div class="sc-leg">' + (dme.overlay ? 'Hard-exudate area: ' + (Number(dme.ex_area || 0) * 100).toFixed(2) + '% of the image' : '') + '</div></div>' +
       '<div>' +
         '<div class="sc-verdict ' + level + '">' + escHtml(dme.grade_name) + ' &middot; grade ' + grade + '</div>' +
@@ -1970,7 +1982,8 @@ function dmePanelHTML(dme, filename, procTime) {
         '<div class="sc-note">Research use only, and not part of the DR report. Final diagnosis by an ophthalmologist.</div>' +
       '</div>' +
     '</div>' +
-    '<div class="bm-actions"><button class="bm-run" type="button" onclick="exportDmeReport()">Download report &rarr;</button></div>' +
+    (opts.saved ? '' : '<div class="bm-actions">' + saveBtnHTML('dme') +
+      '<button class="bm-run" type="button" onclick="exportDmeReport()">Download report &rarr;</button></div>') +
     '</div>';
 }
 
@@ -2548,6 +2561,7 @@ async function loadReports() {
       const pct  = (head.confidence * 100).toFixed(1);
       const n    = group.length;
       const openId = Math.min.apply(null, group.map(r => r.id));
+      if (head.kind && head.kind !== 'dr') return kindRowHTML(head);
       return `<div class="report-row" onclick="loadReportDetail(${openId})">
         <div class="report-row-left">
           <div class="report-grade-badge" style="background:${gradeBg[head.grade]};color:${gradeColors[head.grade]};">G${head.grade}</div>
@@ -2585,6 +2599,7 @@ async function loadReportDetail(reportId) {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
     const rep = d.report;
+    if (rep.kind && rep.kind !== 'dr') { renderKindDetail(rep, content); return; }
     // Older backends and older reports carry a single image and no `images` list.
     const images = (rep.images && rep.images.length) ? rep.images : [{
       id: rep.id, grade: rep.grade, severity: rep.severity, confidence: rep.confidence,
@@ -2663,6 +2678,8 @@ async function loadReportDetail(reportId) {
 // the original image and the grading; vessel maps and lesion masks are not stored.
 function exportSavedReport() {
   if (!_savedReport) { showToast('Report is still loading.', '#F35858'); return; }
+  if (_savedReport.kind === 'dme') return exportDmeReport(_savedReport);
+  if (_savedReport.kind === 'screen') return exportBetaReport(_savedReport);
   const results = _savedReport.images.map(function (im) {
     return {
       classification: {
@@ -2790,6 +2807,12 @@ async function checkPendingSave() {
   sessionStorage.removeItem('pending_save');
   try {
     const p = JSON.parse(pending);
+    if (p.kind_report) {
+      await postKindReport(p.kind_report);
+      showToast('Your report has been saved to My Reports!');
+      showPage('reports');
+      return;
+    }
     // older pending saves held a single result
     const items = p.items || [{ result: p.result, filename: p.filename }];
     const batchId = newBatchId();
@@ -2799,6 +2822,141 @@ async function checkPendingSave() {
     showToast('Your report has been saved to My Reports!');
     showPage('reports');
   } catch {}
+}
+
+// ── Saving DME and multi-disease reports to My Reports ───────────────────────
+// The backend says which report kinds it can store (GET /api/health ->
+// report_kinds). Until it lists 'dme' / 'screen', no Save button is shown and
+// nothing is posted, so an older backend never receives a row it would misread as DR.
+var _reportKinds = ['dr'];
+var _dmeTime = 0;
+var _betaTime = 0;
+
+async function loadReportKinds() {
+  try {
+    const r = await fetch(BACKEND_URL + '/api/health', { headers: NGROK_HEADER });
+    const d = await r.json();
+    if (Array.isArray(d.report_kinds)) _reportKinds = d.report_kinds;
+  } catch (e) {}
+}
+window.addEventListener('load', loadReportKinds);
+
+function saveBtnHTML(kind) {
+  if (_reportKinds.indexOf(kind) < 0) return '';
+  return '<button class="bm-browse" type="button" id="' + kind + '-save" onclick="saveKindReport(\'' + kind + '\')">Save to My Reports</button>';
+}
+
+// The original, scaled down to at most `max` px on the long side, as base64 JPEG,
+// so a saved report stays small. Overlays are not stored, as for DR reports.
+function imageFileToJpegB64(file, max) {
+  return new Promise(function (resolve, reject) {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = function () {
+      const k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.naturalWidth * k);
+      c.height = Math.round(img.naturalHeight * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL('image/jpeg', 0.88).split(',')[1]);
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('Could not read the image')); };
+    img.src = url;
+  });
+}
+
+async function buildKindPayload(kind) {
+  const isDme = kind === 'dme';
+  const res = isDme ? _dmeResult : _betaScreening;
+  const file = isDme ? _dmeFile : _betaFile;
+  if (!res || !file) return null;
+  const details = Object.assign({}, res);
+  delete details[isDme ? 'overlay' : 'overlays'];
+  return {
+    kind:              kind,
+    grade:             Number(res.grade) || 0,
+    severity:          isDme ? res.grade_name : res.verdict,
+    confidence:        Number(isDme ? res.dme_prob : res.referable) || 0,
+    processing_time:   isDme ? _dmeTime : _betaTime,
+    original_image:    await imageFileToJpegB64(file, 1024),
+    original_filename: file.name,
+    batch_id:          newBatchId(),
+    details:           details
+  };
+}
+
+async function postKindReport(payload) {
+  const resp = await fetch(BACKEND_URL + '/api/reports/save', {
+    method: 'POST', headers: authHeaders(true), body: JSON.stringify(payload)
+  });
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+}
+
+async function saveKindReport(kind) {
+  const btn = document.getElementById(kind + '-save');
+  let payload;
+  try { payload = await buildKindPayload(kind); } catch (e) { showToast(e.message, '#F35858'); return; }
+  if (!payload) return;
+  if (!_currentUser) {
+    try { sessionStorage.setItem('pending_save', JSON.stringify({ kind_report: payload })); } catch (e) {}
+    showToast('Log in to save this report to your account.');
+    setTimeout(() => showPage('auth'), 900);
+    return;
+  }
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  try {
+    await postKindReport(payload);
+    showToast('Report saved to My Reports!');
+    if (btn) btn.textContent = 'Saved ✓';
+  } catch (err) {
+    showToast('Could not save report: ' + err.message, '#F35858');
+    if (btn) { btn.disabled = false; btn.textContent = 'Save to My Reports'; }
+  }
+}
+
+function kindRowHTML(rep) {
+  const isDme = rep.kind === 'dme';
+  const g = Number(rep.grade) || 0;
+  const col = isDme ? (['#38CC87', '#FABD31', '#F35858'][g] || '#F35858') : '#6B5BD2';
+  const bg = isDme ? (['rgba(56,204,135,.12)', 'rgba(250,189,49,.12)', 'rgba(243,88,88,.12)'][g] || 'rgba(243,88,88,.12)')
+                   : 'rgba(107,91,210,.12)';
+  const right = isDme ? (Number(rep.confidence) * 100).toFixed(1) + '% DME prob'
+                      : 'Referable DR ' + Number(rep.confidence).toFixed(2);
+  return `<div class="report-row" onclick="loadReportDetail(${rep.id})">
+        <div class="report-row-left">
+          <div class="report-grade-badge" style="background:${bg};color:${col};font-size:11px;">${isDme ? 'DME' : 'MD'}</div>
+          <div>
+            <div class="report-severity">${escHtml(rep.severity)} <span style="font-weight:600;color:var(--g400);font-size:12px;">· ${isDme ? 'Macular edema' : 'Multi-disease · beta'}</span></div>
+            <div class="report-date">${new Date(rep.created_at + 'Z').toLocaleString()}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:20px;">
+          <div class="report-conf">${right}</div>
+          <div class="report-arrow">›</div>
+        </div>
+      </div>`;
+}
+
+function renderKindDetail(rep, content) {
+  const isDme = rep.kind === 'dme';
+  let det = rep.details || {};
+  if (typeof det === 'string') { try { det = JSON.parse(det); } catch (e) { det = {}; } }
+  const img = rep.original_image ? dataUrl(rep.original_image) : '';
+  const fname = rep.original_filename || (rep.images && rep.images[0] && rep.images[0].image_label) || ('Report #' + rep.id);
+  _savedReport = { kind: rep.kind, res: det, img: img, filename: fname };
+  const panel = isDme ? dmePanelHTML(det, fname, rep.processing_time, { img: img, saved: true })
+                      : betaPanelHTML(det, fname, rep.processing_time, { img: img, saved: true });
+  content.innerHTML = `
+      <div class="ar-header-card">
+        <div><div class="ar-title">Report #${rep.id} · ${isDme ? 'Diabetic Macular Edema' : 'Multi-Disease Screening (beta)'}</div><div class="ar-subtitle success">${new Date(rep.created_at + 'Z').toLocaleString()}</div></div>
+        <div class="ar-header-actions">
+          <button class="ar-btn-ghost" onclick="exportSavedReport()">Export</button>
+          <button class="ar-btn-primary" onclick="showPage('reports')">← Back to Reports</button>
+        </div>
+      </div>
+      <div class="bm-box kd-flat${isDme ? ' dm-box' : ''}">${panel}</div>
+      <div class="ar-disclaimer"><strong>Medical Disclaimer:</strong> This analysis is for screening purposes only and should not replace professional medical diagnosis.</div>`;
 }
 
 // ── Report pieces shared by the DR, DME and multi-disease reports ────────────
@@ -2910,10 +3068,13 @@ function reportBarsHTML(labels, vals) {
 }
 
 // ── DME report (GRACE-Net) ───────────────────────────────────────────────────
-async function exportDmeReport() {
-  const dme = _dmeResult;
-  if (!dme || !_dmeFile) { showToast('No DME result to export yet.', '#F35858'); return; }
-  const original = await fileToDataUrl(_dmeFile);
+// saved: { res, img, filename } from My Reports; omitted for the live result.
+async function exportDmeReport(saved) {
+  const dme = saved ? saved.res : _dmeResult;
+  if (!dme || (!saved && !_dmeFile)) { showToast('No DME result to export yet.', '#F35858'); return; }
+  const original = saved ? saved.img : await fileToDataUrl(_dmeFile);
+  const fname = saved ? saved.filename : _dmeFile.name;
+  const patient = saved ? null : readPatientDetails('dme-pt-');
   const grade = Number(dme.grade) || 0;
   const sc = ['#38CC87', '#FABD31', '#F35858'][grade] || '#F35858';
   const recs = [
@@ -2926,7 +3087,7 @@ async function exportDmeReport() {
   const lpNames = { MA: 'Microaneurysms (MA)', HE: 'Haemorrhages (HE)', EX: 'Hard exudates (EX)', SE: 'Soft exudates (SE)' };
   const st = dme.steps || {};
   const p1 = function (v) { return Array.isArray(v) && v.length > 1 ? Number(v[1]).toFixed(3) : '—'; };
-  const inner = `${reportPatientHTML(readPatientDetails('dme-pt-'))}
+  const inner = `${reportPatientHTML(patient)}
   <section class="rpt" style="--sc:${sc};--scbg:${sc}0D;--scbd:${sc}40">
     <div class="sec">Result</div>
     <div class="hero">
@@ -2947,7 +3108,7 @@ async function exportDmeReport() {
     <table>${reportBarsHTML(lpKeys.map(function (k) { return lpNames[k]; }), lpKeys.map(function (k) { return lp[k]; }))}</table>` : ''}
     <div class="sec">Detail</div>
     <table class="kv">
-      <tr><td>Image</td><td>${escHtml(_dmeFile.name)}</td></tr>
+      <tr><td>Image</td><td>${escHtml(fname)}</td></tr>
       <tr><td>Hard exudates present</td><td>${Number(dme.ex_presence || 0).toFixed(3)}</td></tr>
       <tr><td>Hard-exudate area</td><td>${(Number(dme.ex_area || 0) * 100).toFixed(2)}% of the image</td></tr>
       ${dme.steps ? `<tr><td>Direct P(DME)</td><td>${p1(st.direct)}</td></tr>
@@ -2957,7 +3118,7 @@ async function exportDmeReport() {
     </table>
     <div class="sec">Imaging</div>
     <div class="imgs">
-      <figure><div class="cap">Original</div><img src="${original}"></figure>
+      ${original ? `<figure><div class="cap">Original</div><img src="${original}"></figure>` : ''}
       ${dme.overlay ? `<figure><div class="cap">Hard exudates</div><img src="${dme.overlay}"></figure>` : ''}
     </div>
   </section>`;
@@ -2965,13 +3126,15 @@ async function exportDmeReport() {
 }
 
 // ── Multi-disease report (ConfECBL, beta) ────────────────────────────────────
-async function exportBetaReport() {
-  const scr = _betaScreening;
-  if (!scr || !_betaFile) { showToast('No screening result to export yet.', '#F35858'); return; }
-  const original = await fileToDataUrl(_betaFile);
+async function exportBetaReport(saved) {
+  const scr = saved ? saved.res : _betaScreening;
+  if (!scr || (!saved && !_betaFile)) { showToast('No screening result to export yet.', '#F35858'); return; }
+  const original = saved ? saved.img : await fileToDataUrl(_betaFile);
+  const fname = saved ? saved.filename : _betaFile.name;
+  const patient = saved ? null : readPatientDetails('bm-pt-');
   const sc = { dr: '#F35858', other: '#FABD31', clear: '#38CC87' }[scr.verdict_level] || '#6B5BD2';
   const ov = scr.overlays || {};
-  const inner = `${reportPatientHTML(readPatientDetails('bm-pt-'))}
+  const inner = `${reportPatientHTML(patient)}
   <section class="rpt" style="--sc:${sc};--scbg:${sc}0D;--scbd:${sc}40">
     <div class="sec">Result · Beta</div>
     <div class="hero">
@@ -2986,7 +3149,7 @@ async function exportBetaReport() {
     <table>${reportBarsHTML(scr.lesion_labels, scr.P_dr)}</table>
     <div class="sec">Detail</div>
     <table class="kv">
-      <tr><td>Image</td><td>${escHtml(_betaFile.name)}</td></tr>
+      <tr><td>Image</td><td>${escHtml(fname)}</td></tr>
       <tr><td>Referable DR probability</td><td>${Number(scr.referable || 0).toFixed(3)}</td></tr>
       <tr><td>DME probability</td><td>${Number(scr.dme_prob || 0).toFixed(3)}</td></tr>
       <tr><td>This model's DR grade</td><td>${escHtml(scr.grade_name || '')} (ICDR ${Number(scr.grade)})</td></tr>
@@ -2994,7 +3157,7 @@ async function exportBetaReport() {
     <div class="rnote">This module grades DR on its own. A DR grade for clinical use comes from the DR analysis and its report, not from this beta screen.</div>
     <div class="sec">Imaging</div>
     <div class="imgs">
-      <figure><div class="cap">Original</div><img src="${original}"></figure>
+      ${original ? `<figure><div class="cap">Original</div><img src="${original}"></figure>` : ''}
       ${ov.lesion ? `<figure><div class="cap">DR lesions</div><img src="${dataUrl(ov.lesion)}"></figure>` : ''}
       ${ov.conf ? `<figure><div class="cap">Other-disease signs</div><img src="${dataUrl(ov.conf)}"></figure>` : ''}
     </div>
