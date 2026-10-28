@@ -635,6 +635,22 @@ footer{padding:52px 60px 28px;}
 .dm-box .sc-tag{color:var(--dme-d);background:var(--dme-bg);border-color:var(--dme-bd);}
 .dm-box .sc-bar i{background:var(--dme);}
 .bm-box .patient-box{margin:14px 0 0;}
+.mm-thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px;margin-top:12px;}
+.mm-thumbs:empty{display:none;}
+.mm-thumbs figure{margin:0;}
+.mm-thumbs img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:9px;display:block;background:#0A0E0D;}
+.mm-thumbs span{display:block;font-size:10px;color:var(--g500);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mm-sum{background:var(--white);border:1px solid var(--g200);border-radius:14px;padding:16px 18px;margin-top:18px;overflow-x:auto;}
+.mm-sum table{width:100%;border-collapse:collapse;font-size:13px;}
+.mm-sum th{text-align:left;font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;padding:6px 10px 8px 0;border-bottom:1px solid var(--g200);}
+.mm-sum td{padding:9px 10px 9px 0;border-bottom:1px solid var(--g100);color:var(--g600);}
+.mm-sum td b{color:var(--navy);}
+.mm-sum .num{text-align:right;font-variant-numeric:tabular-nums;}
+.mm-row{cursor:pointer;}
+.mm-row:hover td{background:var(--offwhite);}
+.mm-bad{color:#A12F2F;}
+.mm-div{display:flex;align-items:center;gap:12px;margin:26px 0 0;font-size:12px;font-weight:700;color:var(--navy);}
+.mm-div::after{content:'';flex:1;height:1px;background:var(--g200);}
 .kd-flat{background:none;border:none;padding:0;margin:0 0 20px;}
 .kd-flat .sc-card{margin-top:0;}
 .bm-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;margin-top:14px;}
@@ -1093,13 +1109,13 @@ footer{padding:52px 60px 28px;}
       <button type="button" class="ch-card ch-dme hm-card" onclick="showPage('dme')">
         <span class="ch-badge">DME</span>
         <span class="ch-title">Diabetic Macular Edema</span>
-        <span class="ch-desc">Grades the image as no DME, or hard exudates away from or near the fovea, with the probability of each grade, per-lesion scores and an overlay of the exudates it marked.</span>
+        <span class="ch-desc">Grades each image as no DME, or hard exudates away from or near the fovea, with the probability of each grade, per-lesion scores and an overlay of the exudates it marked. Several images at once.</span>
         <span class="ch-go">Start DME analysis &rarr;</span>
       </button>
       <button type="button" class="ch-card ch-beta hm-card" onclick="showPage('beta')">
         <span class="ch-badge">BETA</span>
         <span class="ch-title">Multi-Disease Screening</span>
-        <span class="ch-desc">A research preview that looks past diabetic retinopathy &mdash; AMD, myopic changes, retinal vein occlusion and chorioretinal scarring &mdash; with referable-DR and DME probabilities.</span>
+        <span class="ch-desc">A research preview that looks past diabetic retinopathy &mdash; AMD, myopic changes, retinal vein occlusion and chorioretinal scarring &mdash; with referable-DR and DME probabilities. Several images at once.</span>
         <span class="ch-go">Try the beta &rarr;</span>
       </button>
     </div>
@@ -1314,13 +1330,13 @@ footer{padding:52px 60px 28px;}
         <button type="button" class="ch-card ch-dme" onclick="showPage('dme')">
           <span class="ch-badge">DME</span>
           <span class="ch-title">Diabetic Macular Edema</span>
-          <span class="ch-desc">Grades one fundus photograph as no DME, or hard exudates away from or near the fovea, with per-lesion scores and a hard-exudate overlay. GRACE-Net.</span>
+          <span class="ch-desc">Grades each fundus photograph as no DME, or hard exudates away from or near the fovea, with per-lesion scores and a hard-exudate overlay. Several images at once. GRACE-Net.</span>
           <span class="ch-go">Start DME analysis &rarr;</span>
         </button>
         <button type="button" class="ch-card ch-beta" onclick="showPage('beta')">
           <span class="ch-badge">BETA</span>
           <span class="ch-title">Multi-Disease Screening</span>
-          <span class="ch-desc">A research preview that looks past DR &mdash; AMD, myopic changes, retinal vein occlusion and chorioretinal scarring &mdash; on one fundus photograph. ConfECBL.</span>
+          <span class="ch-desc">A research preview that looks past DR &mdash; AMD, myopic changes, retinal vein occlusion and chorioretinal scarring &mdash; on one or several fundus photographs. ConfECBL.</span>
           <span class="ch-go">Try the beta &rarr;</span>
         </button>
       </div>
@@ -1384,7 +1400,7 @@ footer{padding:52px 60px 28px;}
   </nav>
   <div class="upload-hero">
     <h1>Diabetic <span>Macular Edema</span></h1>
-    <p>Upload one fundus photograph to grade diabetic macular edema from the hard exudates the model finds and how close they lie to the fovea.</p>
+    <p>Upload one or more fundus photographs to grade diabetic macular edema from the hard exudates the model finds and how close they lie to the fovea.</p>
     <a class="ch-back" onclick="showPage('choose')">&larr; Choose a different analysis</a>
   </div>
   <div class="upload-body">
@@ -1394,13 +1410,14 @@ footer{padding:52px 60px 28px;}
           <span class="bm-title">DME Grading</span>
           <span class="bm-sub">GRACE-Net</span>
         </div>
-        <p class="bm-text">Reports one of three grades &mdash; no DME, exudates away from the fovea, or exudates near the fovea &mdash; with the probability of each, presence scores for MA, HE, EX and SE, and an overlay of the hard exudates it marked.</p>
+        <p class="bm-text">For each image, reports one of three grades &mdash; no DME, exudates away from the fovea, or exudates near the fovea &mdash; with the probability of each, presence scores for MA, HE, EX and SE, and an overlay of the hard exudates it marked.</p>
         <div class="bm-dz" onclick="document.getElementById('dme-input').click()">
-          <div class="bm-dz-title">Pick a fundus image</div>
-          <div class="bm-dz-sub">One fundus photograph &middot; JPG or PNG</div>
+          <div class="bm-dz-title">Pick fundus images</div>
+          <div class="bm-dz-sub">One or more fundus photographs &middot; JPG or PNG</div>
           <button class="bm-browse" type="button" onclick="event.stopPropagation();document.getElementById('dme-input').click()">Browse Files</button>
         </div>
-        <input type="file" id="dme-input" accept="image/*" onchange="dmePickFile(this.files)">
+        <input type="file" id="dme-input" accept="image/*" multiple onchange="dmePickFile(this.files)">
+        <div class="mm-thumbs" id="dme-thumbs"></div>
         <div class="patient-box">
           <div class="pb-title">Report Details <span>optional — printed on the report, never uploaded</span></div>
           <div class="pb-grid">
@@ -1466,7 +1483,7 @@ footer{padding:52px 60px 28px;}
   </nav>
   <div class="upload-hero">
     <h1>Multi-Disease <span>Screening</span> <span class="bm-beta ch-hero-beta">BETA</span></h1>
-    <p>A research preview that screens one fundus photograph for conditions outside diabetic retinopathy.</p>
+    <p>A research preview that screens one or more fundus photographs for conditions outside diabetic retinopathy.</p>
     <a class="ch-back" onclick="showPage('choose')">&larr; Choose a different analysis</a>
   </div>
   <div class="upload-body">
@@ -1480,13 +1497,14 @@ footer{padding:52px 60px 28px;}
           <span class="bm-beta">BETA</span>
           <span class="bm-sub">research preview &middot; ConfECBL</span>
         </div>
-        <p class="bm-text">Screens one fundus image, chosen here, for conditions outside diabetic retinopathy &mdash; AMD, myopic changes, retinal vein occlusion and chorioretinal scarring &mdash; and reports referable-DR and macular-edema probability with per-lesion scores for MA, HE, EX and SE.</p>
+        <p class="bm-text">Screens each fundus image chosen here for conditions outside diabetic retinopathy &mdash; AMD, myopic changes, retinal vein occlusion and chorioretinal scarring &mdash; and reports referable-DR and macular-edema probability with per-lesion scores for MA, HE, EX and SE.</p>
         <div class="bm-dz" onclick="document.getElementById('bm-input').click()">
-          <div class="bm-dz-title">Pick an image for the beta model</div>
-          <div class="bm-dz-sub">One fundus photograph &middot; JPG or PNG<br>Runs separately from the DR analysis &mdash; no other image is sent.</div>
+          <div class="bm-dz-title">Pick images for the beta model</div>
+          <div class="bm-dz-sub">One or more fundus photographs &middot; JPG or PNG<br>Runs separately from the DR analysis &mdash; no other image is sent.</div>
           <button class="bm-browse" type="button" onclick="event.stopPropagation();document.getElementById('bm-input').click()">Browse Files</button>
         </div>
-        <input type="file" id="bm-input" accept="image/*" onchange="betaPickFile(this.files)">
+        <input type="file" id="bm-input" accept="image/*" multiple onchange="betaPickFile(this.files)">
+        <div class="mm-thumbs" id="bm-thumbs"></div>
         <div class="patient-box">
           <div class="pb-title">Report Details <span>optional — printed on the report, never uploaded</span></div>
           <div class="pb-grid">
@@ -1868,9 +1886,6 @@ let _patient = null;
 // analysis state, saves a report or touches the exported PDF: a grade in a report
 // always comes from /api/predict, never from this.
 
-var _betaFile = null;       // the File the user picked for this module
-var _betaObjUrl = null;     // blob URL, so the panel can show that file
-var _betaScreening = null;  // last result, kept for the overlay toggle
 
 var BETA_LEGENDS = {
   orig:   '',
@@ -1882,45 +1897,6 @@ var BETA_NOTE = 'Beta module — research use only, and separate from the DR rep
 // From the home-page strip: the module has its own page.
 function openBetaModule() {
   showPage('beta');
-}
-
-function betaPickFile(files) {
-  var f = files && files[0];
-  if (!f) return;
-  if (_betaObjUrl) URL.revokeObjectURL(_betaObjUrl);
-  _betaFile = f;
-  _betaObjUrl = URL.createObjectURL(f);
-  _betaScreening = null;
-  document.getElementById('bm-file').innerHTML =
-    'Chosen: <b>' + escHtml(f.name) + '</b> &middot; ' + (f.size / 1048576).toFixed(1) + ' MB';
-  var btn = document.getElementById('bm-run');
-  btn.disabled = false;
-  btn.innerHTML = 'Run beta model &rarr;';
-  document.getElementById('bm-result').innerHTML = '';
-}
-
-async function runBetaModel() {
-  if (!_betaFile) return;
-  var btn = document.getElementById('bm-run');
-  var out = document.getElementById('bm-result');
-  btn.disabled = true;
-  btn.textContent = 'Running...';
-  out.innerHTML = '<div class="bm-wait">Screening the image with the multi-disease model...</div>';
-  try {
-    var fd = new FormData();
-    fd.append('image', _betaFile);
-    var r = await fetch(BACKEND_URL + '/api/screen', { method: 'POST', headers: NGROK_HEADER, body: fd });
-    var d = await r.json();
-    if (!d.success) throw new Error(d.error || 'Screening failed');
-    _betaScreening = d.screening;
-    _betaTime = Number(d.processing_time) || 0;
-    out.innerHTML = betaPanelHTML(d.screening, d.image_id || _betaFile.name, d.processing_time);
-  } catch (e) {
-    _betaScreening = null;
-    out.innerHTML = '<div class="bm-err">' + escHtml(e.message || String(e)) + '</div>';
-  }
-  btn.disabled = false;
-  btn.innerHTML = 'Run again &rarr;';
 }
 
 function betaBarsHTML(labels, vals) {
@@ -1973,6 +1949,7 @@ function betaNonDr(scr) {
 
 function betaPanelHTML(scr, filename, procTime, opts) {
   opts = opts || {};
+  var idx = opts.idx;
   var ov = opts.saved ? {} : (scr.overlays || {});
   var lv = MDX_LEVEL[scr.verdict_level] || MDX_LEVEL.other;
   var sub = scr.verdict_sub || scr.advice || scr.recommendation || lv.sub;
@@ -1980,7 +1957,7 @@ function betaPanelHTML(scr, filename, procTime, opts) {
   var tabs = [['orig', 'Original'], ['lesion', 'DR lesions'], ['conf', 'Other diseases']].map(function (t) {
     var ok = t[0] === 'orig' || !!ov[t[0]];
     return '<button type="button" class="mdx-tab' + (t[0] === 'orig' ? ' on' : '') + '" data-v="' + t[0] + '"' +
-      (ok ? ' onclick="setBetaView(\'' + t[0] + '\')"' : ' disabled title="' +
+      (ok ? ' onclick="setBetaView(' + idx + ', \'' + t[0] + '\')"' : ' disabled title="' +
         (opts.saved ? 'Overlays are not kept with saved reports' : 'Nothing marked by the model') + '"') +
       '>' + t[1] + '</button>';
   }).join('');
@@ -1988,18 +1965,15 @@ function betaPanelHTML(scr, filename, procTime, opts) {
     return '<div class="mdx-g' + (i === grade ? ' on' : '') + '"' + (i === grade ? ' style="--ac:' + lv.c + '"' : '') +
       '><b>' + i + '</b><span>' + n + '</span></div>';
   }).join('');
-  var actions = opts.saved ? '' :
-    '<div class="bm-actions">' + saveBtnHTML('screen') +
-    '<button class="bm-run" type="button" onclick="exportBetaReport()">Download report &rarr;</button></div>';
-  return '<div class="mdx">' +
+  return '<div class="mdx" id="screen-panel-' + idx + '">' +
     '<div class="mdx-meta"><span class="sc-tag">' + escHtml(scr.model || 'ConfECBL') + '</span>' +
       '<span class="bm-time">' + escHtml(filename) + ' &middot; ' + Number(procTime || 0).toFixed(2) + ' s</span></div>' +
     '<div class="mdx-grid">' +
       '<div class="mdx-card mdx-imgcard">' +
         '<div class="mdx-h">Fundus image</div>' +
-        '<div class="mdx-imgbox"><img id="bm-img" src="' + (opts.img || _betaObjUrl) + '" alt="The image screened by the beta model"></div>' +
+        '<div class="mdx-imgbox"><img id="bm-img-' + idx + '" src="' + opts.img + '" alt="The image screened by the beta model"></div>' +
         '<div class="mdx-tabs">' + tabs + '</div>' +
-        '<div class="sc-leg" id="bm-leg"></div>' +
+        '<div class="sc-leg" id="bm-leg-' + idx + '"></div>' +
       '</div>' +
       '<div class="mdx-right">' +
         '<div class="mdx-verdict" style="--ac:' + lv.c + '"><span class="mdx-vdot"></span><div>' +
@@ -2019,16 +1993,16 @@ function betaPanelHTML(scr, filename, procTime, opts) {
       '</div>' +
     '</div>' +
     '<div class="sc-note">' + BETA_NOTE + '</div>' +
-    actions +
     '</div>';
 }
 
-function setBetaView(view) {
-  var img = document.getElementById('bm-img');
-  var leg = document.getElementById('bm-leg');
-  if (!img || !_betaScreening) return;
-  var b64 = (_betaScreening.overlays || {})[view];
-  img.src = (view === 'orig' || !b64) ? _betaObjUrl : dataUrl(b64);
+function setBetaView(idx, view) {
+  var it = MODS.screen.items[idx];
+  var img = document.getElementById('bm-img-' + idx);
+  var leg = document.getElementById('bm-leg-' + idx);
+  if (!img || !it || !it.res) return;
+  var b64 = (it.res.overlays || {})[view];
+  img.src = (view === 'orig' || !b64) ? it.url : dataUrl(b64);
   if (leg) leg.innerHTML = BETA_LEGENDS[view] || '';
   var box = img.closest('.mdx');
   if (box) box.querySelectorAll('.mdx-tab').forEach(function (t) { t.classList.toggle('on', t.getAttribute('data-v') === view); });
@@ -2038,57 +2012,15 @@ function setBetaView(view) {
 // Same shape as the beta module: its own image, its own request to /api/dme, its own
 // panel. Nothing here touches the DR analysis state, saved reports or the PDF.
 
-var _dmeFile = null;
-var _dmeObjUrl = null;
-var _dmeResult = null;
-
-function dmePickFile(files) {
-  var f = files && files[0];
-  if (!f) return;
-  if (_dmeObjUrl) URL.revokeObjectURL(_dmeObjUrl);
-  _dmeFile = f;
-  _dmeObjUrl = URL.createObjectURL(f);
-  _dmeResult = null;
-  document.getElementById('dme-file').innerHTML =
-    'Chosen: <b>' + escHtml(f.name) + '</b> &middot; ' + (f.size / 1048576).toFixed(1) + ' MB';
-  var btn = document.getElementById('dme-run');
-  btn.disabled = false;
-  btn.innerHTML = 'Grade DME &rarr;';
-  document.getElementById('dme-result').innerHTML = '';
-}
-
-async function runDmeModel() {
-  if (!_dmeFile) return;
-  var btn = document.getElementById('dme-run');
-  var out = document.getElementById('dme-result');
-  btn.disabled = true;
-  btn.textContent = 'Grading...';
-  out.innerHTML = '<div class="bm-wait">Grading macular edema with GRACE-Net...</div>';
-  try {
-    var fd = new FormData();
-    fd.append('image', _dmeFile);
-    var r = await fetch(BACKEND_URL + '/api/dme', { method: 'POST', headers: NGROK_HEADER, body: fd });
-    var d = await r.json();
-    if (!d.success) throw new Error(d.error || 'DME grading failed');
-    _dmeResult = d.dme;
-    _dmeTime = Number(d.processing_time) || 0;
-    out.innerHTML = dmePanelHTML(d.dme, d.image_id || _dmeFile.name, d.processing_time);
-  } catch (e) {
-    _dmeResult = null;
-    out.innerHTML = '<div class="bm-err">' + escHtml(e.message || String(e)) + '</div>';
-  }
-  btn.disabled = false;
-  btn.innerHTML = 'Grade again &rarr;';
-}
-
 function dmePanelHTML(dme, filename, procTime, opts) {
   opts = opts || {};
+  var idx = opts.idx;
   var grade = Number(dme.grade) || 0;
   var level = grade === 0 ? 'clear' : (grade === 1 ? 'other' : 'dr');
   var toggle = dme.overlay
     ? '<div class="sc-views">' +
-        '<label><input type="radio" name="dme-view" value="orig" checked onchange="setDmeView(\'orig\')"> Original</label>' +
-        '<label><input type="radio" name="dme-view" value="ex" onchange="setDmeView(\'ex\')"> Hard exudates</label>' +
+        '<label><input type="radio" name="dme-view-' + idx + '" value="orig" checked onchange="setDmeView(' + idx + ', \'orig\')"> Original</label>' +
+        '<label><input type="radio" name="dme-view-' + idx + '" value="ex" onchange="setDmeView(' + idx + ', \'ex\')"> Hard exudates</label>' +
       '</div>'
     : '';
   var lp = dme.lesion_presence || {};
@@ -2108,12 +2040,12 @@ function dmePanelHTML(dme, filename, procTime, opts) {
       '<div class="sc-detail" style="margin-top:6px;">The two predictions ' +
         (dme.consistent ? 'agree.' : '<b>disagree</b> &mdash; review this image carefully.') + '</div>'
     : '';
-  return '<div class="sc-card">' +
+  return '<div class="sc-card" id="dme-panel-' + idx + '">' +
     '<div class="sc-head"><span class="sc-title">Macular Edema Grading</span>' +
       '<span class="sc-tag">' + escHtml(dme.model || 'GRACE-Net') + '</span>' +
       '<span class="bm-time">' + escHtml(filename) + ' &middot; ' + Number(procTime || 0).toFixed(2) + ' s</span></div>' +
     '<div class="sc-grid">' +
-      '<div><img class="sc-img" id="dme-img" src="' + (opts.img || _dmeObjUrl) + '" alt="The image graded for macular edema">' + toggle +
+      '<div><img class="sc-img" id="dme-img-' + idx + '" src="' + opts.img + '" alt="The image graded for macular edema">' + toggle +
         '<div class="sc-leg">' + (dme.overlay ? 'Hard-exudate area: ' + (Number(dme.ex_area || 0) * 100).toFixed(2) + '% of the image' : '') + '</div></div>' +
       '<div>' +
         '<div class="sc-verdict ' + level + '">' + escHtml(dme.grade_name) + ' &middot; grade ' + grade + '</div>' +
@@ -2126,16 +2058,125 @@ function dmePanelHTML(dme, filename, procTime, opts) {
         '<div class="sc-note">Research use only, and not part of the DR report. Final diagnosis by an ophthalmologist.</div>' +
       '</div>' +
     '</div>' +
-    (opts.saved ? '' : '<div class="bm-actions">' + saveBtnHTML('dme') +
-      '<button class="bm-run" type="button" onclick="exportDmeReport()">Download report &rarr;</button></div>') +
     '</div>';
 }
 
-function setDmeView(view) {
-  var img = document.getElementById('dme-img');
-  if (!img || !_dmeResult) return;
-  img.src = (view === 'ex' && _dmeResult.overlay) ? _dmeResult.overlay : _dmeObjUrl;
+function setDmeView(idx, view) {
+  var it = MODS.dme.items[idx];
+  var img = document.getElementById('dme-img-' + idx);
+  if (!img || !it || !it.res) return;
+  img.src = (view === 'ex' && it.res.overlay) ? it.res.overlay : it.url;
 }
+
+// ── DME and multi-disease pages: one or more images, run one after another ───
+// Each item is { file, url (blob URL for display), res, time, err }.
+var MODS = {
+  dme: {
+    items: [], input: 'dme-input', chip: 'dme-file', run: 'dme-run', out: 'dme-result', thumbs: 'dme-thumbs',
+    api: '/api/dme', key: 'dme', btn1: 'Grade DME', btnN: 'Grade {n} images', again: 'Grade again',
+    wait: 'Grading', fail: 'DME grading failed'
+  },
+  screen: {
+    items: [], input: 'bm-input', chip: 'bm-file', run: 'bm-run', out: 'bm-result', thumbs: 'bm-thumbs',
+    api: '/api/screen', key: 'screening', btn1: 'Run beta model', btnN: 'Run on {n} images', again: 'Run again',
+    wait: 'Screening', fail: 'Screening failed'
+  }
+};
+
+function modRunLabel(m, again) {
+  const n = m.items.length;
+  return (again ? m.again : (n > 1 ? m.btnN.replace('{n}', n) : m.btn1)) + ' &rarr;';
+}
+
+function modPick(kind, files) {
+  const m = MODS[kind];
+  const list = Array.from(files || []);
+  if (!list.length) return;
+  m.items.forEach(function (it) { URL.revokeObjectURL(it.url); });
+  m.items = list.map(function (f) { return { file: f, url: URL.createObjectURL(f), res: null, time: 0, err: null }; });
+  const mb = (list.reduce(function (a, f) { return a + f.size; }, 0) / 1048576).toFixed(1);
+  document.getElementById(m.chip).innerHTML = list.length > 1
+    ? 'Chosen: <b>' + list.length + ' images</b> &middot; ' + mb + ' MB'
+    : 'Chosen: <b>' + escHtml(list[0].name) + '</b> &middot; ' + mb + ' MB';
+  document.getElementById(m.thumbs).innerHTML = list.length > 1 ? m.items.map(function (it) {
+    return '<figure><img src="' + it.url + '" alt=""><span>' + escHtml(it.file.name) + '</span></figure>';
+  }).join('') : '';
+  const btn = document.getElementById(m.run);
+  btn.disabled = false;
+  btn.innerHTML = modRunLabel(m, false);
+  document.getElementById(m.out).innerHTML = '';
+}
+
+async function modRun(kind) {
+  const m = MODS[kind];
+  if (!m.items.length) return;
+  const btn = document.getElementById(m.run);
+  const out = document.getElementById(m.out);
+  const n = m.items.length;
+  btn.disabled = true;
+  btn.textContent = m.wait + '...';
+  for (let i = 0; i < n; i++) {
+    const it = m.items[i];
+    it.res = null; it.err = null;
+    out.innerHTML = '<div class="bm-wait">' + m.wait + (n > 1 ? ' image ' + (i + 1) + ' of ' + n + ' &mdash; ' : ' ') +
+      escHtml(it.file.name) + '...</div>';
+    try {
+      const fd = new FormData();
+      fd.append('image', it.file);
+      const r = await fetch(BACKEND_URL + m.api, { method: 'POST', headers: NGROK_HEADER, body: fd });
+      const d = await r.json();
+      if (!d.success) throw new Error(d.error || m.fail);
+      it.res = d[m.key];
+      it.time = Number(d.processing_time) || 0;
+    } catch (e) {
+      it.err = e.message || String(e);
+    }
+  }
+  out.innerHTML = modResultsHTML(kind);
+  btn.disabled = false;
+  btn.innerHTML = modRunLabel(m, true);
+}
+
+function modResultsHTML(kind) {
+  const m = MODS[kind];
+  const n = m.items.length;
+  const ok = m.items.filter(function (it) { return it.res; }).length;
+  const panels = m.items.map(function (it, i) {
+    const head = n > 1 ? '<div class="mm-div"><span>Image ' + (i + 1) + ' of ' + n + ' &middot; ' + escHtml(it.file.name) + '</span></div>' : '';
+    if (!it.res) return head + '<div class="bm-err">' + escHtml(it.file.name) + ': ' + escHtml(it.err || 'No result') + '</div>';
+    const opts = { idx: i, img: it.url };
+    return head + (kind === 'dme' ? dmePanelHTML(it.res, it.file.name, it.time, opts)
+                                  : betaPanelHTML(it.res, it.file.name, it.time, opts));
+  }).join('');
+  const actions = ok ? '<div class="bm-actions">' + saveBtnHTML(kind) +
+    '<button class="bm-run" type="button" onclick="' + (kind === 'dme' ? 'exportDmeReport()' : 'exportBetaReport()') + '">' +
+    (ok > 1 ? 'Download report (' + ok + ' images)' : 'Download report') + ' &rarr;</button></div>' : '';
+  return (n > 1 ? modSummaryHTML(kind) : '') + panels + actions;
+}
+
+// With several images, a table of every result first, each row jumping to its panel.
+function modSummaryHTML(kind) {
+  const m = MODS[kind];
+  const isDme = kind === 'dme';
+  const rows = m.items.map(function (it, i) {
+    const go = ' onclick="document.getElementById(\'' + kind + '-panel-' + i + '\').scrollIntoView({behavior:\'smooth\',block:\'start\'})"';
+    if (!it.res) return '<tr class="mm-row"><td>' + escHtml(it.file.name) + '</td><td colspan="3" class="mm-bad">' + escHtml(it.err || 'No result') + '</td></tr>';
+    const r = it.res;
+    return '<tr class="mm-row"' + go + '><td>' + escHtml(it.file.name) + '</td>' + (isDme
+      ? '<td><b>' + escHtml(r.grade_name) + '</b></td><td>Grade ' + (Number(r.grade) || 0) + '</td><td class="num">' + (Number(r.dme_prob || 0) * 100).toFixed(1) + '%</td>'
+      : '<td><b>' + escHtml(r.verdict) + '</b></td><td class="num">' + (Number(r.referable || 0) * 100).toFixed(1) + '%</td><td class="num">' + (betaNonDr(r) * 100).toFixed(1) + '%</td>') +
+      '</tr>';
+  }).join('');
+  const head = isDme ? '<th>Image</th><th>Result</th><th>Grade</th><th class="num">DME prob</th>'
+                     : '<th>Image</th><th>Verdict</th><th class="num">Referable DR</th><th class="num">Non-DR</th>';
+  return '<div class="mm-sum"><div class="mdx-h">Summary &middot; ' + m.items.length + ' images</div>' +
+    '<table><tr>' + head + '</tr>' + rows + '</table></div>';
+}
+
+function dmePickFile(files) { modPick('dme', files); }
+function runDmeModel() { return modRun('dme'); }
+function betaPickFile(files) { modPick('screen', files); }
+function runBetaModel() { return modRun('screen'); }
 
 function escHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) {
@@ -2951,9 +2992,10 @@ async function checkPendingSave() {
   sessionStorage.removeItem('pending_save');
   try {
     const p = JSON.parse(pending);
-    if (p.kind_report) {
-      await postKindReport(p.kind_report);
-      showToast('Your report has been saved to My Reports!');
+    const kindReports = p.kind_reports || (p.kind_report ? [p.kind_report] : null);
+    if (kindReports) {
+      for (const k of kindReports) await postKindReport(k);
+      showToast(kindReports.length > 1 ? 'Your reports have been saved to My Reports!' : 'Your report has been saved to My Reports!');
       showPage('reports');
       return;
     }
@@ -2973,8 +3015,6 @@ async function checkPendingSave() {
 // report_kinds). Until it lists 'dme' / 'screen', no Save button is shown and
 // nothing is posted, so an older backend never receives a row it would misread as DR.
 var _reportKinds = ['dr'];
-var _dmeTime = 0;
-var _betaTime = 0;
 
 async function loadReportKinds() {
   try {
@@ -2987,7 +3027,9 @@ window.addEventListener('load', loadReportKinds);
 
 function saveBtnHTML(kind) {
   if (_reportKinds.indexOf(kind) < 0) return '';
-  return '<button class="bm-browse" type="button" id="' + kind + '-save" onclick="saveKindReport(\'' + kind + '\')">Save to My Reports</button>';
+  const n = MODS[kind].items.filter(function (it) { return it.res; }).length;
+  return '<button class="bm-browse" type="button" id="' + kind + '-save" onclick="saveKindReport(\'' + kind + '\')">' +
+    (n > 1 ? 'Save all to My Reports' : 'Save to My Reports') + '</button>';
 }
 
 // The original, scaled down to at most `max` px on the long side, as base64 JPEG,
@@ -3010,11 +3052,10 @@ function imageFileToJpegB64(file, max) {
   });
 }
 
-async function buildKindPayload(kind) {
+// One saved report per image.
+async function buildKindPayload(kind, it) {
   const isDme = kind === 'dme';
-  const res = isDme ? _dmeResult : _betaScreening;
-  const file = isDme ? _dmeFile : _betaFile;
-  if (!res || !file) return null;
+  const res = it.res;
   const details = Object.assign({}, res);
   delete details[isDme ? 'overlay' : 'overlays'];
   return {
@@ -3022,9 +3063,9 @@ async function buildKindPayload(kind) {
     grade:             Number(res.grade) || 0,
     severity:          isDme ? res.grade_name : res.verdict,
     confidence:        Number(isDme ? res.dme_prob : res.referable) || 0,
-    processing_time:   isDme ? _dmeTime : _betaTime,
-    original_image:    await imageFileToJpegB64(file, 1024),
-    original_filename: file.name,
+    processing_time:   it.time || 0,
+    original_image:    await imageFileToJpegB64(it.file, 1024),
+    original_filename: it.file.name,
     batch_id:          newBatchId(),
     details:           details
   };
@@ -3039,23 +3080,35 @@ async function postKindReport(payload) {
 
 async function saveKindReport(kind) {
   const btn = document.getElementById(kind + '-save');
-  let payload;
-  try { payload = await buildKindPayload(kind); } catch (e) { showToast(e.message, '#F35858'); return; }
-  if (!payload) return;
+  const items = MODS[kind].items.filter(function (it) { return it.res; });
+  if (!items.length) return;
+  const label = btn ? btn.textContent : 'Save to My Reports';
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  const payloads = [];
+  try {
+    for (const it of items) payloads.push(await buildKindPayload(kind, it));
+  } catch (e) {
+    showToast(e.message, '#F35858');
+    if (btn) { btn.disabled = false; btn.textContent = label; }
+    return;
+  }
   if (!_currentUser) {
-    try { sessionStorage.setItem('pending_save', JSON.stringify({ kind_report: payload })); } catch (e) {}
-    showToast('Log in to save this report to your account.');
+    try { sessionStorage.setItem('pending_save', JSON.stringify({ kind_reports: payloads })); }
+    catch (e) {
+      try { sessionStorage.setItem('pending_save', JSON.stringify({ kind_reports: payloads.slice(0, 1) })); } catch (e2) {}
+    }
+    showToast('Log in to save ' + (payloads.length > 1 ? 'these reports' : 'this report') + ' to your account.');
+    if (btn) { btn.disabled = false; btn.textContent = label; }
     setTimeout(() => showPage('auth'), 900);
     return;
   }
-  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
   try {
-    await postKindReport(payload);
-    showToast('Report saved to My Reports!');
+    for (const p of payloads) await postKindReport(p);
+    showToast(payloads.length > 1 ? payloads.length + ' reports saved to My Reports!' : 'Report saved to My Reports!');
     if (btn) btn.textContent = 'Saved ✓';
   } catch (err) {
     showToast('Could not save report: ' + err.message, '#F35858');
-    if (btn) { btn.disabled = false; btn.textContent = 'Save to My Reports'; }
+    if (btn) { btn.disabled = false; btn.textContent = label; }
   }
 }
 
@@ -3089,8 +3142,8 @@ function renderKindDetail(rep, content) {
   const img = rep.original_image ? dataUrl(rep.original_image) : '';
   const fname = rep.original_filename || (rep.images && rep.images[0] && rep.images[0].image_label) || ('Report #' + rep.id);
   _savedReport = { kind: rep.kind, res: det, img: img, filename: fname };
-  const panel = isDme ? dmePanelHTML(det, fname, rep.processing_time, { img: img, saved: true })
-                      : betaPanelHTML(det, fname, rep.processing_time, { img: img, saved: true });
+  const panel = isDme ? dmePanelHTML(det, fname, rep.processing_time, { idx: 's', img: img, saved: true })
+                      : betaPanelHTML(det, fname, rep.processing_time, { idx: 's', img: img, saved: true });
   content.innerHTML = `
       <div class="ar-header-card">
         <div><div class="ar-title">Report #${rep.id} · ${isDme ? 'Diabetic Macular Edema' : 'Multi-Disease Screening (beta)'}</div><div class="ar-subtitle success">${new Date(rep.created_at + 'Z').toLocaleString()}</div></div>
@@ -3212,13 +3265,36 @@ function reportBarsHTML(labels, vals) {
 }
 
 // ── DME report (GRACE-Net) ───────────────────────────────────────────────────
-// saved: { res, img, filename } from My Reports; omitted for the live result.
+// The images to print: the saved one ({ res, img, filename } from My Reports), or
+// every image on the page that has a result.
+async function reportItems(kind, saved) {
+  if (saved) return [{ res: saved.res, img: saved.img, name: saved.filename }];
+  const out = [];
+  for (const it of MODS[kind].items) {
+    if (it.res) out.push({ res: it.res, img: await fileToDataUrl(it.file), name: it.file.name });
+  }
+  return out;
+}
+
+function reportImageHeading(x, i, n) {
+  return n > 1 ? `<div class="sec">Image ${i + 1} of ${n} — ${escHtml(x.name)}</div>` : '';
+}
+
 async function exportDmeReport(saved) {
-  const dme = saved ? saved.res : _dmeResult;
-  if (!dme || (!saved && !_dmeFile)) { showToast('No DME result to export yet.', '#F35858'); return; }
-  const original = saved ? saved.img : await fileToDataUrl(_dmeFile);
-  const fname = saved ? saved.filename : _dmeFile.name;
+  const list = await reportItems('dme', saved);
+  if (!list.length) { showToast('No DME result to export yet.', '#F35858'); return; }
+  const n = list.length;
   const patient = saved ? null : readPatientDetails('dme-pt-');
+  const summary = n > 1 ? `<div class="sec">Summary — ${n} images</div><table>
+    <tr><th>Image</th><th>Result</th><th>Grade</th><th class="num">DME probability</th></tr>
+    ${list.map(function (x) { return `<tr><td>${escHtml(x.name)}</td><td><b>${escHtml(x.res.grade_name || '')}</b></td><td>${Number(x.res.grade) || 0}</td><td class="num">${(Number(x.res.dme_prob || 0) * 100).toFixed(1)}%</td></tr>`; }).join('')}
+  </table>` : '';
+  const inner = reportPatientHTML(patient) + summary + list.map(function (x, i) { return dmeReportSection(x, i, n); }).join('');
+  openReportWindow(reportPageHTML('DME Report', 'Diabetic Macular Edema Grading', 'DME Analysis Report', inner));
+}
+
+function dmeReportSection(x, idx, n) {
+  const dme = x.res, original = x.img, fname = x.name;
   const grade = Number(dme.grade) || 0;
   const sc = ['#38CC87', '#FABD31', '#F35858'][grade] || '#F35858';
   const recs = [
@@ -3231,8 +3307,8 @@ async function exportDmeReport(saved) {
   const lpNames = { MA: 'Microaneurysms (MA)', HE: 'Haemorrhages (HE)', EX: 'Hard exudates (EX)', SE: 'Soft exudates (SE)' };
   const st = dme.steps || {};
   const p1 = function (v) { return Array.isArray(v) && v.length > 1 ? Number(v[1]).toFixed(3) : '—'; };
-  const inner = `${reportPatientHTML(patient)}
-  <section class="rpt" style="--sc:${sc};--scbg:${sc}0D;--scbd:${sc}40">
+  return `<section class="rpt" style="--sc:${sc};--scbg:${sc}0D;--scbd:${sc}40">
+    ${reportImageHeading(x, idx, n)}
     <div class="sec">Result</div>
     <div class="hero">
       <div>
@@ -3266,20 +3342,28 @@ async function exportDmeReport(saved) {
       ${dme.overlay ? `<figure><div class="cap">Hard exudates</div><img src="${dme.overlay}"></figure>` : ''}
     </div>
   </section>`;
-  openReportWindow(reportPageHTML('DME Report', 'Diabetic Macular Edema Grading', 'DME Analysis Report', inner));
 }
 
 // ── Multi-disease report (ConfECBL, beta) ────────────────────────────────────
 async function exportBetaReport(saved) {
-  const scr = saved ? saved.res : _betaScreening;
-  if (!scr || (!saved && !_betaFile)) { showToast('No screening result to export yet.', '#F35858'); return; }
-  const original = saved ? saved.img : await fileToDataUrl(_betaFile);
-  const fname = saved ? saved.filename : _betaFile.name;
+  const list = await reportItems('screen', saved);
+  if (!list.length) { showToast('No screening result to export yet.', '#F35858'); return; }
+  const n = list.length;
   const patient = saved ? null : readPatientDetails('bm-pt-');
+  const summary = n > 1 ? `<div class="sec">Summary — ${n} images</div><table>
+    <tr><th>Image</th><th>Verdict</th><th class="num">Referable DR</th><th class="num">Non-DR</th></tr>
+    ${list.map(function (x) { return `<tr><td>${escHtml(x.name)}</td><td><b>${escHtml(x.res.verdict || '')}</b></td><td class="num">${(Number(x.res.referable || 0) * 100).toFixed(1)}%</td><td class="num">${(betaNonDr(x.res) * 100).toFixed(1)}%</td></tr>`; }).join('')}
+  </table>` : '';
+  const inner = reportPatientHTML(patient) + summary + list.map(function (x, i) { return betaReportSection(x, i, n); }).join('');
+  openReportWindow(reportPageHTML('Multi-Disease Report', 'Multi-Disease Screening · Beta', 'Multi-Disease Screening Report', inner));
+}
+
+function betaReportSection(x, idx, n) {
+  const scr = x.res, original = x.img, fname = x.name;
   const sc = { dr: '#F35858', other: '#FABD31', clear: '#38CC87' }[scr.verdict_level] || '#6B5BD2';
   const ov = scr.overlays || {};
-  const inner = `${reportPatientHTML(patient)}
-  <section class="rpt" style="--sc:${sc};--scbg:${sc}0D;--scbd:${sc}40">
+  return `<section class="rpt" style="--sc:${sc};--scbg:${sc}0D;--scbd:${sc}40">
+    ${reportImageHeading(x, idx, n)}
     <div class="sec">Result · Beta</div>
     <div class="hero">
       <div>
@@ -3306,7 +3390,6 @@ async function exportBetaReport(saved) {
       ${ov.conf ? `<figure><div class="cap">Other-disease signs</div><img src="${dataUrl(ov.conf)}"></figure>` : ''}
     </div>
   </section>`;
-  openReportWindow(reportPageHTML('Multi-Disease Report', 'Multi-Disease Screening · Beta', 'Multi-Disease Screening Report', inner));
 }
 
 function exportPDF(savedResults, savedTotalTime) {
