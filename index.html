@@ -663,6 +663,46 @@ footer{padding:52px 60px 28px;}
 .hm-soon-label{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-right:6px;}
 .hm-soon .cs-tag{font-size:11px;font-weight:600;letter-spacing:0;padding:5px 12px;border:1px dashed var(--g300);background:var(--white);}
 @media(max-width:900px){.hm-grid,.hm-perks{grid-template-columns:1fr;}.hm-perks{gap:18px;}}
+/* MULTI-DISEASE RESULT */
+#page-beta .upload-container{max-width:1120px;}
+.mdx{margin-top:18px;}
+.mdx-meta{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.mdx-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start;}
+.mdx-card{background:var(--white);border:1px solid var(--g200);border-radius:16px;padding:18px 20px;}
+.mdx-h{font-size:11px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:14px;}
+.mdx-imgbox{background:#0A0E0D;border-radius:14px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.mdx-imgbox img{width:100%;height:100%;object-fit:contain;display:block;}
+.mdx-tabs{display:inline-flex;gap:4px;background:var(--g100);border-radius:12px;padding:4px;margin-top:14px;flex-wrap:wrap;}
+.mdx-tab{font-family:inherit;font-size:13px;font-weight:600;color:var(--g500);background:none;border:none;border-radius:9px;padding:8px 14px;cursor:pointer;}
+.mdx-tab.on{background:var(--navy);color:var(--white);}
+.mdx-tab:disabled{opacity:.45;cursor:default;}
+.mdx-right{display:flex;flex-direction:column;gap:16px;min-width:0;}
+.mdx-verdict{display:flex;gap:14px;align-items:flex-start;border-radius:16px;padding:18px 20px;background:color-mix(in srgb,var(--ac) 9%,#fff);border:1px solid color-mix(in srgb,var(--ac) 35%,#fff);}
+.mdx-vdot{width:14px;height:14px;border-radius:50%;background:var(--ac);flex:none;margin-top:7px;box-shadow:0 0 0 5px color-mix(in srgb,var(--ac) 18%,#fff);}
+.mdx-vt{font-family:Georgia,'Times New Roman',serif;font-size:23px;font-weight:700;line-height:1.25;color:var(--navy);}
+.mdx-vs{font-size:14px;color:var(--g600);margin-top:4px;}
+.mdx-grades{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;}
+.mdx-g{border:1px solid var(--g200);background:var(--offwhite);border-radius:10px;padding:10px 4px;text-align:center;}
+.mdx-g b{display:block;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:20px;color:var(--navy);}
+.mdx-g span{display:block;font-size:11px;color:var(--g500);margin-top:2px;}
+.mdx-g.on{border:2px solid var(--ac);background:color-mix(in srgb,var(--ac) 9%,#fff);}
+.mdx-g.on b{color:var(--ac);}
+.mdx-fine{font-size:11px;color:var(--g400);margin-top:10px;line-height:1.5;}
+.mdx-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+.mdx-stat{background:var(--white);border:1px solid var(--g200);border-radius:14px;padding:14px 16px;}
+.mdx-stat-l{font-size:12px;color:var(--g500);line-height:1.35;min-height:2.7em;}
+.mdx-stat-v{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:28px;font-weight:700;color:var(--navy);margin:6px 0 10px;}
+.mdx-stat-v small{font-size:13px;color:var(--g500);margin-left:2px;}
+.mdx-bar{flex:1;min-width:0;height:7px;background:var(--g100);border-radius:5px;overflow:hidden;}
+.mdx-bar i{display:block;height:100%;border-radius:5px;}
+.mdx-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;}
+.mdx-row{display:flex;align-items:center;gap:9px;margin:10px 0;font-size:13px;}
+.mdx-dot{width:8px;height:8px;border-radius:50%;flex:none;}
+.mdx-name{width:58px;flex:none;color:var(--navy);}
+.mdx-num{width:36px;flex:none;text-align:right;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:12px;color:var(--g600);}
+@media(max-width:900px){.mdx-grid{grid-template-columns:1fr;}}
+@media(max-width:560px){.mdx-tabs{display:flex;flex-wrap:nowrap;width:100%;}.mdx-tab{flex:1;padding:8px 4px;font-size:12px;white-space:nowrap;}.mdx-stats,.mdx-two{grid-template-columns:1fr;}.mdx-stat-l{min-height:0;}.mdx-grades{gap:5px;}.mdx-g span{font-size:9.5px;}.mdx-g b{font-size:17px;}.mdx-vt{font-size:19px;}}
+
 /* HERO: light background, drawn retina on the right (no photo behind the text) */
 .hero{background:radial-gradient(circle at 78% 42%,rgba(34,183,163,.13),transparent 42%),linear-gradient(180deg,#F8F7F5 0%,#EEF5F2 100%);min-height:calc(100vh - 68px);justify-content:space-between;gap:40px;padding-right:72px;}
 .hero-content{flex:1 1 560px;}
@@ -1894,43 +1934,91 @@ function betaBarsHTML(labels, vals) {
 
 // opts.saved renders a report from My Reports: its own image, no overlays (they are
 // not stored) and no action buttons (the detail page has its own Export).
+var MDX_LESION_COL = { MA: '#E5484D', HE: '#F08A24', EX: '#D9B200', SE: '#3E9BE0' };
+var MDX_COND_COL = { AMD: '#9B5DE5', Myopia: '#22B573', RVO: '#E5489A', Scar: '#8A8F98', Other: '#5B6068' };
+var MDX_LEVEL = {
+  other: { c: '#C98A0C', sub: 'Outside DR scope. Refer to a retina specialist.' },
+  dr:    { c: '#D64545', sub: 'Signs of diabetic retinopathy. Refer to an ophthalmologist.' },
+  clear: { c: '#2E9E6A', sub: 'No referable findings from this model.' }
+};
+var ICDR_NAMES = ['No DR', 'Mild NPDR', 'Moderate NPDR', 'Severe NPDR', 'PDR'];
+
+function mdxRows(labels, vals, colors) {
+  return (labels || []).map(function (n, i) {
+    var v = Math.max(0, Math.min(1, Number((vals || [])[i]) || 0));
+    var c = colors[n] || '#8A8F98';
+    return '<div class="mdx-row"><span class="mdx-dot" style="background:' + c + '"></span>' +
+      '<span class="mdx-name">' + escHtml(n) + '</span>' +
+      '<div class="mdx-bar"><i style="width:' + (v * 100).toFixed(1) + '%;background:' + c + '"></i></div>' +
+      '<span class="mdx-num">' + v.toFixed(2) + '</span></div>';
+  }).join('');
+}
+
+function mdxStat(label, v, color) {
+  v = Math.max(0, Math.min(1, Number(v) || 0));
+  return '<div class="mdx-stat"><div class="mdx-stat-l">' + label + '</div>' +
+    '<div class="mdx-stat-v">' + (v * 100).toFixed(1) + '<small>%</small></div>' +
+    '<div class="mdx-bar"><i style="width:' + (v * 100).toFixed(1) + '%;background:' + color + '"></i></div></div>';
+}
+
+// Probability that at least one non-DR condition is present. Use the model's own
+// figure when it sends one; otherwise combine the per-condition probabilities.
+function betaNonDr(scr) {
+  var f = [scr.non_dr, scr.nondr, scr.abnormal, scr.non_dr_prob].filter(function (x) { return x != null; })[0];
+  if (f != null) return Number(f);
+  var keep = 1;
+  (scr.Q || []).forEach(function (q) { keep *= 1 - Math.max(0, Math.min(1, Number(q) || 0)); });
+  return 1 - keep;
+}
+
 function betaPanelHTML(scr, filename, procTime, opts) {
   opts = opts || {};
-  var ov = scr.overlays || {};
-  var views = [['orig', 'Original'], ['lesion', 'DR lesions'], ['conf', 'Other-disease signs']]
-    .filter(function (v) { return v[0] === 'orig' || !!ov[v[0]]; });
-  // Only one view means the model marked nothing; say so rather than offering copies
-  // of the same photograph under three names.
-  var toggle = views.length > 1
-    ? '<div class="sc-views">' + views.map(function (v) {
-        return '<label><input type="radio" name="bm-view" value="' + v[0] + '"' +
-               (v[0] === 'orig' ? ' checked' : '') +
-               ' onchange="setBetaView(\'' + v[0] + '\')"> ' + v[1] + '</label>';
-      }).join('') + '</div><div class="sc-leg" id="bm-leg"></div>'
-    : '<div class="sc-leg">No DR lesions or other-disease signs were marked by the model.</div>';
-  if (opts.saved) toggle = '<div class="sc-leg">Overlays are not kept with saved reports.</div>';
+  var ov = opts.saved ? {} : (scr.overlays || {});
+  var lv = MDX_LEVEL[scr.verdict_level] || MDX_LEVEL.other;
+  var sub = scr.verdict_sub || scr.advice || scr.recommendation || lv.sub;
+  var grade = Number(scr.grade);
+  var tabs = [['orig', 'Original'], ['lesion', 'DR lesions'], ['conf', 'Other diseases']].map(function (t) {
+    var ok = t[0] === 'orig' || !!ov[t[0]];
+    return '<button type="button" class="mdx-tab' + (t[0] === 'orig' ? ' on' : '') + '" data-v="' + t[0] + '"' +
+      (ok ? ' onclick="setBetaView(\'' + t[0] + '\')"' : ' disabled title="' +
+        (opts.saved ? 'Overlays are not kept with saved reports' : 'Nothing marked by the model') + '"') +
+      '>' + t[1] + '</button>';
+  }).join('');
+  var grades = ICDR_NAMES.map(function (n, i) {
+    return '<div class="mdx-g' + (i === grade ? ' on' : '') + '"' + (i === grade ? ' style="--ac:' + lv.c + '"' : '') +
+      '><b>' + i + '</b><span>' + n + '</span></div>';
+  }).join('');
   var actions = opts.saved ? '' :
     '<div class="bm-actions">' + saveBtnHTML('screen') +
     '<button class="bm-run" type="button" onclick="exportBetaReport()">Download report &rarr;</button></div>';
-  return '<div class="sc-card">' +
-    '<div class="sc-head"><span class="sc-title">Multi-Disease Screening</span>' +
-      '<span class="sc-tag">' + escHtml(scr.model || 'ConfECBL') + '</span>' +
+  return '<div class="mdx">' +
+    '<div class="mdx-meta"><span class="sc-tag">' + escHtml(scr.model || 'ConfECBL') + '</span>' +
       '<span class="bm-time">' + escHtml(filename) + ' &middot; ' + Number(procTime || 0).toFixed(2) + ' s</span></div>' +
-    '<div class="sc-grid">' +
-      '<div><img class="sc-img" id="bm-img" src="' + (opts.img || _betaObjUrl) + '" alt="The image screened by the beta model">' + toggle + '</div>' +
-      '<div>' +
-        '<div class="sc-verdict ' + escHtml(scr.verdict_level) + '">' + escHtml(scr.verdict) + '</div>' +
-        '<div class="sc-detail">Referable DR prob ' + Number(scr.referable).toFixed(3) +
-          ' &middot; DME prob ' + Number(scr.dme_prob).toFixed(3) +
-          ' &middot; model ' + escHtml(scr.model || 'ConfECBL') + '</div>' +
-        '<div class="bm-cmp">This model also grades DR on its own, and here it reports <b>' +
-          escHtml(scr.grade_name) + ' (ICDR ' + Number(scr.grade) + ')</b>. A grade in your report ' +
-          'always comes from the DR analysis, never from this module.</div>' +
-        '<div class="sc-sub">Other conditions</div>' + betaBarsHTML(scr.conf_labels, scr.Q) +
-        '<div class="sc-sub">DR lesions (presence)</div>' + betaBarsHTML(scr.lesion_labels, scr.P_dr) +
-        '<div class="sc-note">' + BETA_NOTE + '</div>' +
+    '<div class="mdx-grid">' +
+      '<div class="mdx-card mdx-imgcard">' +
+        '<div class="mdx-h">Fundus image</div>' +
+        '<div class="mdx-imgbox"><img id="bm-img" src="' + (opts.img || _betaObjUrl) + '" alt="The image screened by the beta model"></div>' +
+        '<div class="mdx-tabs">' + tabs + '</div>' +
+        '<div class="sc-leg" id="bm-leg"></div>' +
+      '</div>' +
+      '<div class="mdx-right">' +
+        '<div class="mdx-verdict" style="--ac:' + lv.c + '"><span class="mdx-vdot"></span><div>' +
+          '<div class="mdx-vt">' + escHtml(scr.verdict) + '</div>' +
+          '<div class="mdx-vs">' + escHtml(sub) + '</div></div></div>' +
+        '<div class="mdx-card"><div class="mdx-h">DR grade &middot; ICDR scale</div><div class="mdx-grades">' + grades + '</div>' +
+          '<div class="mdx-fine">This model&rsquo;s own DR grade. A DR grade in your report always comes from the DR analysis.</div></div>' +
+        '<div class="mdx-stats">' +
+          mdxStat('Referable DR', scr.referable, '#E07A2E') +
+          mdxStat('Diabetic macular edema', scr.dme_prob, '#3E9BE0') +
+          mdxStat('Non-DR abnormality', betaNonDr(scr), '#9B5DE5') +
+        '</div>' +
+        '<div class="mdx-two">' +
+          '<div class="mdx-card"><div class="mdx-h">DR lesions</div>' + mdxRows(scr.lesion_labels, scr.P_dr, MDX_LESION_COL) + '</div>' +
+          '<div class="mdx-card"><div class="mdx-h">Look-alike diseases</div>' + mdxRows(scr.conf_labels, scr.Q, MDX_COND_COL) + '</div>' +
+        '</div>' +
       '</div>' +
     '</div>' +
+    '<div class="sc-note">' + BETA_NOTE + '</div>' +
     actions +
     '</div>';
 }
@@ -1942,6 +2030,8 @@ function setBetaView(view) {
   var b64 = (_betaScreening.overlays || {})[view];
   img.src = (view === 'orig' || !b64) ? _betaObjUrl : dataUrl(b64);
   if (leg) leg.innerHTML = BETA_LEGENDS[view] || '';
+  var box = img.closest('.mdx');
+  if (box) box.querySelectorAll('.mdx-tab').forEach(function (t) { t.classList.toggle('on', t.getAttribute('data-v') === view); });
 }
 
 // ── Diabetic Macular Edema (GRACE-Net) — standalone page ────────────────────
