@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eye Health Assistant · ChakshuRakshakAI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0C1024;--teal:#22B7A3;--teal-d:#1a9088;--coral:#F6815E;
+    --offwhite:#F8F7F5;--white:#FFFFFF;--g100:#F0F1F5;--g200:#DDE0EA;--g300:#BCC0D2;
+    --g400:#9096B0;--g500:#6B7090;--g600:#4A5070;--red:#F35858;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--offwhite);color:var(--navy);display:flex;justify-content:center;}
+  .chat{display:flex;flex-direction:column;width:100%;max-width:760px;height:100%;background:var(--white);border-left:1px solid var(--g200);border-right:1px solid var(--g200);}
+
+  /* Header */
+  .head{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--g200);background:var(--white);}
+  .logo{width:36px;height:36px;border-radius:50%;background:rgba(34,183,163,.12);display:grid;place-items:center;flex:none;}
+  .head-text{flex:1;min-width:0;}
+  .head-title{font-size:15px;font-weight:700;}
+  .head-sub{font-size:11.5px;color:var(--g500);display:flex;align-items:center;gap:6px;}
+  .head-sub i{width:7px;height:7px;border-radius:50%;background:#38CC87;display:inline-block;}
+  .lang{display:flex;background:var(--g100);border-radius:9px;padding:3px;flex:none;}
+  .lang button{font:600 12px 'Inter',sans-serif;border:none;background:none;color:var(--g500);padding:6px 10px;border-radius:7px;cursor:pointer;}
+  .lang button.on{background:var(--white);color:var(--navy);box-shadow:0 1px 3px rgba(12,16,36,.12);}
+  .close{display:none;border:none;background:none;font-size:22px;line-height:1;color:var(--g500);cursor:pointer;padding:4px 6px;}
+  body.embedded .close{display:block;}
+
+  /* Messages */
+  .msgs{flex:1;overflow-y:auto;padding:18px 16px 8px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth;}
+  .row{display:flex;gap:8px;max-width:88%;}
+  .row.user{align-self:flex-end;flex-direction:row-reverse;}
+  .avatar{width:28px;height:28px;border-radius:50%;flex:none;display:grid;place-items:center;background:rgba(34,183,163,.12);margin-top:2px;}
+  .row.user .avatar{display:none;}
+  .bubble{padding:11px 14px;border-radius:16px;font-size:14px;line-height:1.6;word-wrap:break-word;overflow-wrap:anywhere;}
+  .row.bot .bubble{background:var(--g100);border-top-left-radius:6px;}
+  .row.user .bubble{background:var(--teal);color:var(--white);border-top-right-radius:6px;}
+  .row.err .bubble{background:rgba(243,88,88,.08);color:#A12F2F;}
+  .bubble img.att{display:block;max-width:220px;max-height:220px;border-radius:10px;margin-bottom:6px;}
+  .bubble p{margin:0 0 8px;} .bubble p:last-child{margin-bottom:0;}
+  .bubble ul,.bubble ol{margin:4px 0 8px 18px;} .bubble li{margin:2px 0;}
+  .bubble strong{font-weight:700;}
+  .clinic{display:inline-flex;align-items:center;gap:7px;margin-top:10px;font:700 13px 'Inter',sans-serif;color:var(--white);background:var(--navy);border-radius:10px;padding:10px 14px;text-decoration:none;}
+  .clinic:hover{background:#1A2344;}
+  .typing{display:inline-flex;gap:4px;padding:4px 2px;}
+  .typing i{width:7px;height:7px;border-radius:50%;background:var(--g400);animation:blink 1.2s infinite;}
+  .typing i:nth-child(2){animation-delay:.2s;} .typing i:nth-child(3){animation-delay:.4s;}
+  @keyframes blink{0%,80%,100%{opacity:.3;transform:translateY(0);}40%{opacity:1;transform:translateY(-3px);}}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0 4px 36px;}
+  .chip{font:500 12.5px 'Inter',sans-serif;color:var(--teal-d);background:var(--white);border:1px solid rgba(34,183,163,.4);border-radius:20px;padding:7px 12px;cursor:pointer;}
+  .chip:hover{background:rgba(34,183,163,.06);}
+
+  /* Composer */
+  .composer{border-top:1px solid var(--g200);padding:10px 12px 12px;background:var(--white);}
+  .preview{display:none;align-items:center;gap:10px;background:var(--g100);border-radius:10px;padding:6px 8px;margin-bottom:8px;font-size:12px;color:var(--g600);}
+  .preview.show{display:flex;}
+  .preview img{width:40px;height:40px;object-fit:cover;border-radius:7px;}
+  .preview span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .preview button{border:none;background:none;font-size:18px;color:var(--g500);cursor:pointer;padding:0 4px;}
+  .bar{display:flex;align-items:flex-end;gap:6px;background:var(--offwhite);border:1px solid var(--g200);border-radius:14px;padding:6px;}
+  .bar:focus-within{border-color:var(--teal);}
+  .icon{width:38px;height:38px;flex:none;border:none;background:none;border-radius:10px;display:grid;place-items:center;color:var(--g500);cursor:pointer;}
+  .icon:hover{background:var(--g100);color:var(--navy);}
+  .icon:disabled{opacity:.4;cursor:not-allowed;}
+  .icon.listening{background:rgba(243,88,88,.12);color:var(--red);animation:pulse 1.4s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(243,88,88,.45);}70%{box-shadow:0 0 0 8px rgba(243,88,88,0);}100%{box-shadow:0 0 0 0 rgba(243,88,88,0);}}
+  textarea{flex:1;min-width:0;resize:none;border:none;background:none;outline:none;font:400 14.5px/1.5 'Inter',sans-serif;color:var(--navy);padding:8px 4px;max-height:140px;}
+  .send{width:38px;height:38px;flex:none;border:none;border-radius:10px;background:var(--teal);color:var(--white);display:grid;place-items:center;cursor:pointer;}
+  .send:hover{background:var(--teal-d);}
+  .send:disabled{background:var(--g200);color:var(--g400);cursor:not-allowed;}
+  .foot{font-size:10.5px;color:var(--g400);text-align:center;margin-top:8px;line-height:1.5;}
+  @media (prefers-reduced-motion:reduce){.typing i,.icon.listening{animation:none;}}
+</style>
+</head>
+<body>
+<div class="chat">
+  <header class="head">
+    <div class="logo" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 36 36"><path d="M27 9 A12 12 0 1 0 27 27" fill="none" stroke="#0C1024" stroke-width="3.5" stroke-linecap="round"/><circle cx="19" cy="18" r="4" fill="#22B7A3"/></svg>
+    </div>
+    <div class="head-text">
+      <div class="head-title">Eye Health Assistant</div>
+      <div class="head-sub"><i></i>ChakshuRakshakAI · AI, not a doctor</div>
+    </div>
+    <div class="lang" role="group" aria-label="Voice language">
+      <button type="button" data-lang="en-US" class="on">EN</button>
+      <button type="button" data-lang="hi-IN">हिं</button>
+    </div>
+    <button class="close" type="button" aria-label="Close chat" onclick="parent.postMessage({type:'chakshu-chat-close'},'*')">×</button>
+  </header>
+
+  <main class="msgs" id="msgs" aria-live="polite"></main>
+
+  <footer class="composer">
+    <div class="preview" id="preview">
+      <img id="preview-img" alt="">
+      <span id="preview-name"></span>
+      <button type="button" aria-label="Remove image" onclick="clearImage()">×</button>
+    </div>
+    <div class="bar">
+      <button class="icon" id="attach" type="button" title="Attach a fundus or OCT image" aria-label="Attach image">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05 12.25 20.24a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+      </button>
+      <input type="file" id="file" accept="image/*" hidden>
+      <textarea id="input" rows="1" placeholder="Ask about your eyes… / अपनी आँखों के बारे में पूछें…" aria-label="Message"></textarea>
+      <button class="icon" id="mic" type="button" title="Speak" aria-label="Speak your question">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4M8 22h8"/></svg>
+      </button>
+      <button class="send" id="send" type="button" aria-label="Send" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      </button>
+    </div>
+    <div class="foot">For information only — not a diagnosis. Always consult a certified ophthalmologist.</div>
+  </footer>
+</div>
+
+<script>
+'use strict';
+
+// The page is served by the chatbot service itself, so the API is same-origin.
+const API_URL = 'https://survive-carving-clinking.ngrok-free.dev/api/chat';
+const MAX_SIDE = 2048;             // downscale larger images before upload
+const HISTORY_TURNS = 12;          // earlier messages sent back for context
+const CLINIC_URL = 'https://www.google.com/maps/search/eye+clinic+near+me/';
+const CLINIC_WORDS = /doctor|clinic|डॉक्टर|क्लिनिक/i;
+
+const $ = id => document.getElementById(id);
+const msgs = $('msgs'), input = $('input'), sendBtn = $('send'), micBtn = $('mic');
+let image = null;                  // { dataUrl, name }
+let history = [];                  // [{ role: 'user'|'model', text }]
+let busy = false;
+let lang = 'en-US';
+
+if (window.self !== window.top) document.body.classList.add('embedded');
+
+// ── Rendering ─────────────────────────────────────────────────────────────────
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// A small, safe Markdown subset: the text is escaped first, then **bold**, *italic*,
+// headings, and bulleted / numbered lists are turned into HTML.
+function md(text) {
+  const inline = s => s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+  const out = []; let list = null;
+  const close = () => { if (list) { out.push('</' + list + '>'); list = null; } };
+  esc(text).split('\n').forEach(line => {
+    const t = line.trim();
+    let m;
+    if (!t) { close(); return; }
+    if ((m = t.match(/^[-*•]\s+(.*)/))) { if (list !== 'ul') { close(); out.push('<ul>'); list = 'ul'; } out.push('<li>' + inline(m[1]) + '</li>'); return; }
+    if ((m = t.match(/^\d+[.)]\s+(.*)/))) { if (list !== 'ol') { close(); out.push('<ol>'); list = 'ol'; } out.push('<li>' + inline(m[1]) + '</li>'); return; }
+    close();
+    if ((m = t.match(/^#{1,6}\s+(.*)/))) { out.push('<p><strong>' + inline(m[1]) + '</strong></p>'); return; }
+    out.push('<p>' + inline(t) + '</p>');
+  });
+  close();
+  return out.join('');
+}
+
+const BOT_ICON = '<svg width="16" height="16" viewBox="0 0 36 36"><path d="M27 9 A12 12 0 1 0 27 27" fill="none" stroke="#0C1024" stroke-width="3.5" stroke-linecap="round"/><circle cx="19" cy="18" r="4" fill="#22B7A3"/></svg>';
+
+function addRow(kind, html) {
+  const row = document.createElement('div');
+  row.className = 'row ' + kind;
+  row.innerHTML = '<div class="avatar" aria-hidden="true">' + BOT_ICON + '</div><div class="bubble">' + html + '</div>';
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+  return row;
+}
+
+function addBot(text) {
+  let html = md(text);
+  if (CLINIC_WORDS.test(text)) {
+    html += '<a class="clinic" href="' + CLINIC_URL + '" target="_blank" rel="noopener">📍 Find Eye Clinics Near Me</a>';
+  }
+  return addRow('bot', html);
+}
+
+function welcome() {
+  addRow('bot', md('**Namaste! I am the ChakshuRakshakAI eye-health assistant.**\n' +
+    'Ask me about eye symptoms, diabetic eye care or a fundus / OCT image — type, speak, or attach an image.\n' +
+    'आप हिंदी में भी पूछ सकते हैं।'));
+  const chips = document.createElement('div');
+  chips.className = 'chips';
+  ['What is diabetic retinopathy?', 'मेरी आँखें धुंधली दिखती हैं, क्या करूँ?', 'How often should a diabetic get an eye check?', 'What is macular edema?']
+    .forEach(q => {
+      const b = document.createElement('button');
+      b.className = 'chip'; b.type = 'button'; b.textContent = q;
+      b.onclick = () => { input.value = q; chips.remove(); send(); };
+      chips.appendChild(b);
+    });
+  msgs.appendChild(chips);
+}
+
+// ── Sending ───────────────────────────────────────────────────────────────────
+
+function refreshSend() { sendBtn.disabled = busy || (!input.value.trim() && !image); }
+
+async function send() {
+  const text = input.value.trim();
+  if (busy || (!text && !image)) return;
+  busy = true; refreshSend();
+  document.querySelectorAll('.chips').forEach(c => c.remove());
+
+  addRow('user', (image ? '<img class="att" src="' + image.dataUrl + '" alt="Attached image">' : '') + (text ? md(text) : ''));
+  const payload = { message: text, history: history.slice(-HISTORY_TURNS) };
+  if (image) payload.image = image.dataUrl;
+  input.value = ''; autoGrow(); clearImage();
+
+  const typing = addRow('bot', '<span class="typing"><i></i><i></i><i></i></span>');
+  try {
+    const r = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' }, body: JSON.stringify(payload) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.detail && typeof d.detail === 'string' ? d.detail : 'Something went wrong (' + r.status + ').');
+    typing.remove();
+    addBot(d.reply);
+    history.push({ role: 'user', text: text || '[shared an eye image]' }, { role: 'model', text: d.reply });
+  } catch (e) {
+    typing.remove();
+    addRow('err', esc(e.message || 'Could not reach the assistant. Check your connection and try again.'));
+  }
+  busy = false; refreshSend(); input.focus();
+}
+
+sendBtn.onclick = send;
+input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+function autoGrow() { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 140) + 'px'; }
+input.addEventListener('input', () => { autoGrow(); refreshSend(); });
+
+// ── Image attachment ──────────────────────────────────────────────────────────
+
+$('attach').onclick = () => $('file').click();
+$('file').onchange = e => { const f = e.target.files[0]; if (f) attach(f); e.target.value = ''; };
+
+// Read the image as a data URL; scale very large photos down so uploads stay small.
+function attach(file) {
+  if (!file.type.startsWith('image/')) { addRow('err', 'Please attach an image file (fundus or OCT scan).'); return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      let dataUrl = reader.result;
+      const k = Math.min(1, MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight));
+      if (k < 1 || file.size > 4 * 1024 * 1024 || !/^image\/(jpeg|png|webp)$/.test(file.type)) {
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        dataUrl = c.toDataURL('image/jpeg', 0.9);
+      }
+      image = { dataUrl, name: file.name };
+      $('preview-img').src = dataUrl; $('preview-name').textContent = file.name;
+      $('preview').classList.add('show'); refreshSend();
+    };
+    img.onerror = () => addRow('err', 'This image could not be opened. Try a JPG or PNG.');
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage() { image = null; $('preview').classList.remove('show'); $('preview-img').removeAttribute('src'); refreshSend(); }
+
+// ── Voice input (Web Speech API) ──────────────────────────────────────────────
+
+document.querySelectorAll('.lang button').forEach(b => b.onclick = () => {
+  lang = b.dataset.lang;
+  document.querySelectorAll('.lang button').forEach(x => x.classList.toggle('on', x === b));
+  if (recognition) recognition.lang = lang;
+});
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null, listening = false, baseText = '';
+if (!SR) {
+  micBtn.disabled = true;
+  micBtn.title = 'Voice input is not supported in this browser (try Chrome or Edge).';
+} else {
+  recognition = new SR();
+  recognition.lang = lang;
+  recognition.interimResults = true;
+  recognition.continuous = false;
+  recognition.onresult = e => {
+    let said = '';
+    for (let i = 0; i < e.results.length; i++) said += e.results[i][0].transcript;
+    input.value = (baseText ? baseText + ' ' : '') + said;
+    autoGrow(); refreshSend();
+  };
+  recognition.onerror = e => {
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') addRow('err', 'Microphone permission was denied. Allow the microphone to use voice input.');
+  };
+  recognition.onend = () => { listening = false; micBtn.classList.remove('listening'); micBtn.title = 'Speak'; };
+  micBtn.onclick = () => {
+    if (listening) { recognition.stop(); return; }
+    baseText = input.value.trim();
+    try { recognition.lang = lang; recognition.start(); listening = true; micBtn.classList.add('listening'); micBtn.title = 'Listening… tap to stop'; }
+    catch (e) { /* start() throws if already started */ }
+  };
+}
+
+welcome();
+</script>
+</body>
+</html>

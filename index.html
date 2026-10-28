@@ -3980,13 +3980,13 @@ function findNearbyClinics() {
 })();
 
 // ── Eye-health chatbot (separate service in chatbot/, deployed on Cloud Run) ──
-// Set CHATBOT_URL to the Cloud Run service URL to show the chat button; while it is
-// empty the button stays hidden and nothing is loaded.
-const CHATBOT_URL = '';
+// chat.html is served from this site and answered by MedGemma on our own workstation,
+// so a patient's image never leaves it. Set CHATBOT_URL to '' to hide the button.
+const CHATBOT_URL = '/chat.html';
 
 (function initChatWidget() {
   if (!CHATBOT_URL) return;
-  const origin = new URL(CHATBOT_URL).origin;
+  const origin = new URL(CHATBOT_URL, location.href).origin;
   const btn = document.createElement('button');
   btn.className = 'cw-btn';
   btn.type = 'button';
