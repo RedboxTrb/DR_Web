@@ -630,6 +630,8 @@ footer{padding:52px 60px 28px;}
 .dm-box .sc-title{color:var(--dme-d);}
 .dm-box .sc-tag{color:var(--dme-d);background:var(--dme-bg);border-color:var(--dme-bd);}
 .dm-box .sc-bar i{background:var(--dme);}
+.bm-box .patient-box{margin:14px 0 0;}
+.bm-actions{display:flex;justify-content:flex-end;margin-top:14px;}
 .dm-steps{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px;}
 .dm-steps td{padding:5px 0;border-bottom:1px solid var(--g100);color:var(--g600);}
 .dm-steps td:last-child{text-align:right;font-variant-numeric:tabular-nums;color:var(--navy);font-weight:600;}
@@ -1351,12 +1353,23 @@ footer{padding:52px 60px 28px;}
           <button class="bm-browse" type="button" onclick="event.stopPropagation();document.getElementById('dme-input').click()">Browse Files</button>
         </div>
         <input type="file" id="dme-input" accept="image/*" onchange="dmePickFile(this.files)">
+        <div class="patient-box">
+          <div class="pb-title">Report Details <span>optional — printed on the report, never uploaded</span></div>
+          <div class="pb-grid">
+            <label>Patient name<input type="text" id="dme-pt-name" placeholder="e.g. A. Sharma" autocomplete="off"></label>
+            <label>Patient ID<input type="text" id="dme-pt-id" placeholder="e.g. MRN-10482" autocomplete="off"></label>
+            <label>Age<input type="text" id="dme-pt-age" placeholder="e.g. 58" autocomplete="off"></label>
+            <label>Sex<select id="dme-pt-sex"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select></label>
+            <label>Eye<select id="dme-pt-eye"><option value="">—</option><option>OD (right)</option><option>OS (left)</option><option>Both</option></select></label>
+            <label>Referred by<input type="text" id="dme-pt-ref" placeholder="e.g. Dr. R. Verma" autocomplete="off"></label>
+          </div>
+        </div>
         <div class="bm-foot">
           <span class="bm-file" id="dme-file">No image chosen yet</span>
           <button class="bm-run" id="dme-run" type="button" disabled onclick="runDmeModel()">Grade DME &rarr;</button>
         </div>
         <div id="dme-result"></div>
-        <div class="bm-note">This analysis runs on its own, with its own image. It is not part of the DR grade, is not written into the exported DR report, and is not saved with your reports.</div>
+        <div class="bm-note">This analysis runs on its own, with its own image and its own report. It is not part of the DR grade or the DR report, and is not saved with your reports.</div>
       </div>
       <div class="upload-disclaimer">
         <div class="disclaimer-title">⚠ Research Tool — Not a Medical Device</div>
@@ -1426,12 +1439,23 @@ footer{padding:52px 60px 28px;}
           <button class="bm-browse" type="button" onclick="event.stopPropagation();document.getElementById('bm-input').click()">Browse Files</button>
         </div>
         <input type="file" id="bm-input" accept="image/*" onchange="betaPickFile(this.files)">
+        <div class="patient-box">
+          <div class="pb-title">Report Details <span>optional — printed on the report, never uploaded</span></div>
+          <div class="pb-grid">
+            <label>Patient name<input type="text" id="bm-pt-name" placeholder="e.g. A. Sharma" autocomplete="off"></label>
+            <label>Patient ID<input type="text" id="bm-pt-id" placeholder="e.g. MRN-10482" autocomplete="off"></label>
+            <label>Age<input type="text" id="bm-pt-age" placeholder="e.g. 58" autocomplete="off"></label>
+            <label>Sex<select id="bm-pt-sex"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select></label>
+            <label>Eye<select id="bm-pt-eye"><option value="">—</option><option>OD (right)</option><option>OS (left)</option><option>Both</option></select></label>
+            <label>Referred by<input type="text" id="bm-pt-ref" placeholder="e.g. Dr. R. Verma" autocomplete="off"></label>
+          </div>
+        </div>
         <div class="bm-foot">
           <span class="bm-file" id="bm-file">No image chosen yet</span>
           <button class="bm-run" id="bm-run" type="button" disabled onclick="runBetaModel()">Run beta model &rarr;</button>
         </div>
         <div id="bm-result"></div>
-        <div class="bm-note"><b>Beta.</b> This module runs on its own, with its own image. It does not touch the DR analysis or its grade, is not written into the exported report, and is not saved with your reports.</div>
+        <div class="bm-note"><b>Beta.</b> This module runs on its own, with its own image and its own report. It does not touch the DR analysis, its grade or the DR report, and is not saved with your reports.</div>
       </div>
       <div class="upload-disclaimer">
         <div class="disclaimer-title">⚠ Research Tool — Not a Medical Device</div>
@@ -1805,7 +1829,7 @@ var BETA_LEGENDS = {
   lesion: '<b style="color:#ff2828">&#9632;</b> MA <b style="color:#ff8c00">&#9632;</b> HE <b style="color:#e6c800">&#9632;</b> EX <b style="color:#50c8ff">&#9632;</b> SE',
   conf:   '<b style="color:#c850ff">&#9632;</b> AMD <b style="color:#00dc78">&#9632;</b> Myopia <b style="color:#ff3ca0">&#9632;</b> RVO <b style="color:#969696">&#9632;</b> Scar <b style="color:#bbb">&#9633;</b> Other'
 };
-var BETA_NOTE = 'Beta module — research use only, and not part of the DR report. Final diagnosis by an ophthalmologist.';
+var BETA_NOTE = 'Beta module — research use only, and separate from the DR report. Final diagnosis by an ophthalmologist.';
 
 // From the home-page strip: the module has its own page.
 function openBetaModule() {
@@ -1890,7 +1914,9 @@ function betaPanelHTML(scr, filename, procTime) {
         '<div class="sc-sub">DR lesions (presence)</div>' + betaBarsHTML(scr.lesion_labels, scr.P_dr) +
         '<div class="sc-note">' + BETA_NOTE + '</div>' +
       '</div>' +
-    '</div></div>';
+    '</div>' +
+    '<div class="bm-actions"><button class="bm-run" type="button" onclick="exportBetaReport()">Download report &rarr;</button></div>' +
+    '</div>';
 }
 
 function setBetaView(view) {
@@ -1991,7 +2017,9 @@ function dmePanelHTML(dme, filename, procTime) {
         steps +
         '<div class="sc-note">Research use only, and not part of the DR report. Final diagnosis by an ophthalmologist.</div>' +
       '</div>' +
-    '</div></div>';
+    '</div>' +
+    '<div class="bm-actions"><button class="bm-run" type="button" onclick="exportDmeReport()">Download report &rarr;</button></div>' +
+    '</div>';
 }
 
 function setDmeView(view) {
@@ -2023,10 +2051,12 @@ function dataUrl(b64) {
   return 'data:' + imgMime(b64) + ';base64,' + b64;
 }
 
-function readPatientDetails() {
-  function v(id) { const el = document.getElementById(id); return el ? (el.value || '').trim() : ''; }
-  const p = { name: v('pt-name'), pid: v('pt-id'), age: v('pt-age'),
-              sex: v('pt-sex'), eye: v('pt-eye'), ref: v('pt-ref') };
+// prefix picks the form: 'pt-' (DR), 'dme-pt-' (DME) or 'bm-pt-' (multi-disease).
+function readPatientDetails(prefix) {
+  const px = prefix || 'pt-';
+  function v(id) { const el = document.getElementById(px + id); return el ? (el.value || '').trim() : ''; }
+  const p = { name: v('name'), pid: v('id'), age: v('age'),
+              sex: v('sex'), eye: v('eye'), ref: v('ref') };
   return Object.keys(p).some(function (k) { return p[k]; }) ? p : null;
 }
 
@@ -2819,6 +2849,207 @@ async function checkPendingSave() {
   } catch {}
 }
 
+// ── Report pieces shared by the DR, DME and multi-disease reports ────────────
+const REPORT_CSS = `@page{size:A4;margin:14mm;}
+  :root{color-scheme:light;}
+  /* Browsers drop background colours when printing unless told otherwise, which
+     silently erased the lesion colour swatches and the result banner. */
+  *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{font-family:Inter,'Segoe UI',Arial,sans-serif;margin:0;background:#fff;color:#0C1024;font-size:13px;line-height:1.55;}
+  .wrap{max-width:780px;margin:0 auto;padding:26px 24px;}
+  .head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;border-bottom:2px solid #22B7A3;padding-bottom:13px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .mark{width:30px;height:30px;border-radius:8px;background:#22B7A3;color:#fff;font-weight:800;font-size:15px;line-height:30px;text-align:center;}
+  .bn{font-size:15px;font-weight:800;letter-spacing:-.2px;}
+  .bs{font-size:9.5px;color:#4A5070;letter-spacing:.6px;text-transform:uppercase;}
+  .hr-r{text-align:right;}
+  .dt{font-size:17px;font-weight:800;letter-spacing:-.3px;}
+  .dm{font-size:10.5px;color:#4A5070;}
+  .sec{font-size:10px;font-weight:700;color:#0C1024;text-transform:uppercase;letter-spacing:.7px;margin:22px 0 9px;padding-bottom:5px;border-bottom:1px solid #DDE0EA;}
+  .pt{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 18px;}
+  .pt span{display:block;font-size:9.5px;color:#4A5070;text-transform:uppercase;letter-spacing:.4px;}
+  .pt b{font-size:12.5px;font-weight:600;}
+  .hero{display:flex;align-items:center;gap:16px;background:var(--scbg);border:1px solid var(--scbd);border-left:4px solid var(--sc);border-radius:12px;padding:15px 18px;}
+  .hg{font-size:23px;font-weight:800;color:var(--sc);line-height:1.1;}
+  .hs{font-size:11.5px;color:#4A5070;}
+  .conf{margin-left:auto;min-width:145px;}
+  .cl{font-size:9.5px;color:#4A5070;text-transform:uppercase;letter-spacing:.4px;}
+  .cv{font-size:15px;font-weight:800;color:var(--sc);}
+  .bar{height:5px;background:#E7E9F0;border-radius:3px;overflow:hidden;margin-top:3px;}
+  .bar i{display:block;height:100%;background:var(--sc);}
+  .rec{background:#F0F1F5;border-radius:10px;padding:12px 16px;font-size:12.5px;margin-top:12px;}
+  table{width:100%;border-collapse:collapse;}
+  td,th{font-size:12px;padding:8px 12px 8px 0;border-bottom:1px solid #EDEFF4;}
+  th{text-align:left;font-size:9.5px;font-weight:700;color:#4A5070;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #DDE0EA;}
+  .kv td:first-child{color:#6B7090;font-weight:600;width:170px;}
+  .num{text-align:right;}
+  tr:last-child td{border-bottom:none;}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12px;color:#0C1024;font-weight:600;background:#F7F8FB;border:1px solid #E7E9F0;border-radius:8px;padding:9px 12px;margin-bottom:12px;}
+  /* A coloured glyph, not a background-filled box: text colour always survives
+     printing, background colour does not. */
+  .dot{font-style:normal;font-size:13px;line-height:0;margin-right:6px;vertical-align:middle;}
+  .imgs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px;}
+  .imgs figure{margin:0;}
+  .imgs img{width:100%;display:block;border-radius:8px;border:1px solid #DDE0EA;background:#0C1024;}
+  .cap{font-size:9.5px;font-weight:700;color:#4A5070;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px;}
+  .foot{margin-top:24px;border-top:1px solid #DDE0EA;padding-top:10px;font-size:10.5px;color:#4A5070;line-height:1.55;}
+  /* Start lesion findings on their own page so the colour key stays with the
+     table and images it describes, instead of stranding at the foot of page 1. */
+  .lzsec{page-break-before:always;break-before:page;}
+  /* Each additional image opens a fresh page, so one eye never runs into the next. */
+  .rpt + .rpt{page-break-before:always;break-before:page;}
+  @media print{.wrap{padding:0;}.sec{page-break-after:avoid;}.legend{page-break-after:avoid;}.imgs,table,.hero{page-break-inside:avoid;}}
+  .rnote{font-size:11.5px;color:#4A5070;margin-top:8px;}`;
+
+function reportPatientHTML(pat) {
+  if (!pat) return '';
+  const cell = function (label, val) {
+    return val ? `<div><span>${label}</span><b>${escHtml(val)}</b></div>` : '';
+  };
+  const cells = cell('Patient name', pat.name) + cell('Patient ID', pat.pid)
+              + cell('Age', pat.age) + cell('Sex', pat.sex)
+              + cell('Eye', pat.eye) + cell('Referred by', pat.ref);
+  return cells ? `<div class="sec">Patient</div><div class="pt">${cells}</div>` : '';
+}
+
+// A one-page report with the same header, styles and footer as the DR report.
+function reportPageHTML(docTitle, brandSub, heading, inner) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${docTitle} – ChakshurakhsakAI</title>
+  <style>${REPORT_CSS}</style></head><body><div class="wrap">
+  <div class="head">
+    <div class="brand">
+      <div class="mark">C</div>
+      <div><div class="bn">ChakshuRakshak AI</div><div class="bs">${brandSub}</div></div>
+    </div>
+    <div class="hr-r">
+      <div class="dt">${heading}</div>
+      <div class="dm">${new Date().toLocaleString()}</div>
+    </div>
+  </div>
+  ${inner}
+  <div class="foot">This report is generated by an AI screening tool and is not a medical diagnosis. Please consult a qualified ophthalmologist for clinical evaluation.<br>www.chakshurakshakai.com</div>
+  </div></body></html>`;
+}
+
+function openReportWindow(html) {
+  const w = window.open('', '_blank');
+  if (!w) { showToast('Allow pop-ups for this site to open the report.', '#F35858'); return; }
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(() => w.print(), 400);
+}
+
+function fileToDataUrl(file) {
+  return new Promise(function (resolve, reject) {
+    const r = new FileReader();
+    r.onload = function () { resolve(r.result); };
+    r.onerror = function () { reject(r.error); };
+    r.readAsDataURL(file);
+  });
+}
+
+function reportBarsHTML(labels, vals) {
+  return (labels || []).map(function (n, i) {
+    const v = Math.max(0, Math.min(1, Number((vals || [])[i]) || 0));
+    return `<tr><td>${escHtml(n)}</td><td class="num">${v.toFixed(3)}</td>`
+         + `<td style="width:45%"><div class="bar"><i style="width:${(v * 100).toFixed(1)}%"></i></div></td></tr>`;
+  }).join('');
+}
+
+// ── DME report (GRACE-Net) ───────────────────────────────────────────────────
+async function exportDmeReport() {
+  const dme = _dmeResult;
+  if (!dme || !_dmeFile) { showToast('No DME result to export yet.', '#F35858'); return; }
+  const original = await fileToDataUrl(_dmeFile);
+  const grade = Number(dme.grade) || 0;
+  const sc = ['#38CC87', '#FABD31', '#F35858'][grade] || '#F35858';
+  const recs = [
+    'The model found no signs of diabetic macular edema. Continue routine eye screening.',
+    'The model found hard exudates away from the fovea. Review by an ophthalmologist is recommended.',
+    'The model found hard exudates near the fovea. Prompt review by an ophthalmologist is recommended.'
+  ];
+  const lp = dme.lesion_presence || {};
+  const lpKeys = ['MA', 'HE', 'EX', 'SE'].filter(function (k) { return k in lp; });
+  const lpNames = { MA: 'Microaneurysms (MA)', HE: 'Haemorrhages (HE)', EX: 'Hard exudates (EX)', SE: 'Soft exudates (SE)' };
+  const st = dme.steps || {};
+  const p1 = function (v) { return Array.isArray(v) && v.length > 1 ? Number(v[1]).toFixed(3) : '—'; };
+  const inner = `${reportPatientHTML(readPatientDetails('dme-pt-'))}
+  <section class="rpt" style="--sc:${sc};--scbg:${sc}0D;--scbd:${sc}40">
+    <div class="sec">Result</div>
+    <div class="hero">
+      <div>
+        <div class="hg">${escHtml(dme.grade_name || '')}</div>
+        <div class="hs">DME grade ${grade} of 2 · ${escHtml(dme.model || 'GRACE-Net')}</div>
+      </div>
+      <div class="conf">
+        <div class="cl">DME probability</div>
+        <div class="cv">${(Number(dme.dme_prob || 0) * 100).toFixed(1)}%</div>
+        <div class="bar"><i style="width:${(Number(dme.dme_prob || 0) * 100).toFixed(1)}%"></i></div>
+      </div>
+    </div>
+    <div class="rec"><strong>Recommendation:</strong> ${recs[grade] || recs[2]}</div>
+    <div class="sec">Grade probabilities</div>
+    <table>${reportBarsHTML(dme.prob_labels, dme.dme_probs)}</table>
+    ${lpKeys.length ? `<div class="sec">Lesions (presence)</div>
+    <table>${reportBarsHTML(lpKeys.map(function (k) { return lpNames[k]; }), lpKeys.map(function (k) { return lp[k]; }))}</table>` : ''}
+    <div class="sec">Detail</div>
+    <table class="kv">
+      <tr><td>Image</td><td>${escHtml(_dmeFile.name)}</td></tr>
+      <tr><td>Hard exudates present</td><td>${Number(dme.ex_presence || 0).toFixed(3)}</td></tr>
+      <tr><td>Hard-exudate area</td><td>${(Number(dme.ex_area || 0) * 100).toFixed(2)}% of the image</td></tr>
+      ${dme.steps ? `<tr><td>Direct P(DME)</td><td>${p1(st.direct)}</td></tr>
+      <tr><td>Grading-rule P(DME)</td><td>${p1(st.rule)}</td></tr>
+      <tr><td>Fused P(DME)</td><td>${p1(st.final)} (α ${Number(st.alpha || 0).toFixed(2)})</td></tr>
+      <tr><td>Fusion check</td><td>${dme.consistent ? 'The two predictions agree' : 'The two predictions disagree — review carefully'}</td></tr>` : ''}
+    </table>
+    <div class="sec">Imaging</div>
+    <div class="imgs">
+      <figure><div class="cap">Original</div><img src="${original}"></figure>
+      ${dme.overlay ? `<figure><div class="cap">Hard exudates</div><img src="${dme.overlay}"></figure>` : ''}
+    </div>
+  </section>`;
+  openReportWindow(reportPageHTML('DME Report', 'Diabetic Macular Edema Grading', 'DME Analysis Report', inner));
+}
+
+// ── Multi-disease report (ConfECBL, beta) ────────────────────────────────────
+async function exportBetaReport() {
+  const scr = _betaScreening;
+  if (!scr || !_betaFile) { showToast('No screening result to export yet.', '#F35858'); return; }
+  const original = await fileToDataUrl(_betaFile);
+  const sc = { dr: '#F35858', other: '#FABD31', clear: '#38CC87' }[scr.verdict_level] || '#6B5BD2';
+  const ov = scr.overlays || {};
+  const inner = `${reportPatientHTML(readPatientDetails('bm-pt-'))}
+  <section class="rpt" style="--sc:${sc};--scbg:${sc}0D;--scbd:${sc}40">
+    <div class="sec">Result · Beta</div>
+    <div class="hero">
+      <div>
+        <div class="hg" style="font-size:19px">${escHtml(scr.verdict || '')}</div>
+        <div class="hs">${escHtml(scr.model || 'ConfECBL')} · research preview</div>
+      </div>
+    </div>
+    <div class="sec">Other conditions</div>
+    <table>${reportBarsHTML(scr.conf_labels, scr.Q)}</table>
+    <div class="sec">DR lesions (presence)</div>
+    <table>${reportBarsHTML(scr.lesion_labels, scr.P_dr)}</table>
+    <div class="sec">Detail</div>
+    <table class="kv">
+      <tr><td>Image</td><td>${escHtml(_betaFile.name)}</td></tr>
+      <tr><td>Referable DR probability</td><td>${Number(scr.referable || 0).toFixed(3)}</td></tr>
+      <tr><td>DME probability</td><td>${Number(scr.dme_prob || 0).toFixed(3)}</td></tr>
+      <tr><td>This model's DR grade</td><td>${escHtml(scr.grade_name || '')} (ICDR ${Number(scr.grade)})</td></tr>
+    </table>
+    <div class="rnote">This module grades DR on its own. A DR grade for clinical use comes from the DR analysis and its report, not from this beta screen.</div>
+    <div class="sec">Imaging</div>
+    <div class="imgs">
+      <figure><div class="cap">Original</div><img src="${original}"></figure>
+      ${ov.lesion ? `<figure><div class="cap">DR lesions</div><img src="${dataUrl(ov.lesion)}"></figure>` : ''}
+      ${ov.conf ? `<figure><div class="cap">Other-disease signs</div><img src="${dataUrl(ov.conf)}"></figure>` : ''}
+    </div>
+  </section>`;
+  openReportWindow(reportPageHTML('Multi-Disease Report', 'Multi-Disease Screening · Beta', 'Multi-Disease Screening Report', inner));
+}
+
 function exportPDF(savedResults, savedTotalTime) {
   // Saved reports pass their own results; otherwise export the live analysis.
   const fromSaved = Array.isArray(savedResults) && savedResults.length > 0;
@@ -2853,17 +3084,7 @@ function exportPDF(savedResults, savedTotalTime) {
   // Patient details belong to the analysis, not to an individual image, so they
   // are rendered once above the per-image sections. Omitted entirely when none
   // were entered, and absent on saved reports, which carry no patient data.
-  const pat = results[0] && results[0].patient;
-  let patientSection = '';
-  if (pat) {
-    const cell = function (label, val) {
-      return val ? `<div><span>${label}</span><b>${escHtml(val)}</b></div>` : '';
-    };
-    const cells = cell('Patient name', pat.name) + cell('Patient ID', pat.pid)
-                + cell('Age', pat.age) + cell('Sex', pat.sex)
-                + cell('Eye', pat.eye) + cell('Referred by', pat.ref);
-    if (cells) patientSection = `<div class="sec">Patient</div><div class="pt">${cells}</div>`;
-  }
+  const patientSection = reportPatientHTML(results[0] && results[0].patient);
 
   // With more than one image, lead with a table of every result so the worse eye
   // is visible without paging through the report.
@@ -2970,55 +3191,7 @@ function exportPDF(savedResults, savedTotalTime) {
   const body = results.map(buildSection).join('');
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>DR Report – ChakshurakhsakAI</title>
-  <style>@page{size:A4;margin:14mm;}
-  :root{color-scheme:light;}
-  /* Browsers drop background colours when printing unless told otherwise, which
-     silently erased the lesion colour swatches and the result banner. */
-  *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  body{font-family:Inter,'Segoe UI',Arial,sans-serif;margin:0;background:#fff;color:#0C1024;font-size:13px;line-height:1.55;}
-  .wrap{max-width:780px;margin:0 auto;padding:26px 24px;}
-  .head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;border-bottom:2px solid #22B7A3;padding-bottom:13px;}
-  .brand{display:flex;align-items:center;gap:10px;}
-  .mark{width:30px;height:30px;border-radius:8px;background:#22B7A3;color:#fff;font-weight:800;font-size:15px;line-height:30px;text-align:center;}
-  .bn{font-size:15px;font-weight:800;letter-spacing:-.2px;}
-  .bs{font-size:9.5px;color:#4A5070;letter-spacing:.6px;text-transform:uppercase;}
-  .hr-r{text-align:right;}
-  .dt{font-size:17px;font-weight:800;letter-spacing:-.3px;}
-  .dm{font-size:10.5px;color:#4A5070;}
-  .sec{font-size:10px;font-weight:700;color:#0C1024;text-transform:uppercase;letter-spacing:.7px;margin:22px 0 9px;padding-bottom:5px;border-bottom:1px solid #DDE0EA;}
-  .pt{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 18px;}
-  .pt span{display:block;font-size:9.5px;color:#4A5070;text-transform:uppercase;letter-spacing:.4px;}
-  .pt b{font-size:12.5px;font-weight:600;}
-  .hero{display:flex;align-items:center;gap:16px;background:var(--scbg);border:1px solid var(--scbd);border-left:4px solid var(--sc);border-radius:12px;padding:15px 18px;}
-  .hg{font-size:23px;font-weight:800;color:var(--sc);line-height:1.1;}
-  .hs{font-size:11.5px;color:#4A5070;}
-  .conf{margin-left:auto;min-width:145px;}
-  .cl{font-size:9.5px;color:#4A5070;text-transform:uppercase;letter-spacing:.4px;}
-  .cv{font-size:15px;font-weight:800;color:var(--sc);}
-  .bar{height:5px;background:#E7E9F0;border-radius:3px;overflow:hidden;margin-top:3px;}
-  .bar i{display:block;height:100%;background:var(--sc);}
-  .rec{background:#F0F1F5;border-radius:10px;padding:12px 16px;font-size:12.5px;margin-top:12px;}
-  table{width:100%;border-collapse:collapse;}
-  td,th{font-size:12px;padding:8px 12px 8px 0;border-bottom:1px solid #EDEFF4;}
-  th{text-align:left;font-size:9.5px;font-weight:700;color:#4A5070;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #DDE0EA;}
-  .kv td:first-child{color:#6B7090;font-weight:600;width:170px;}
-  .num{text-align:right;}
-  tr:last-child td{border-bottom:none;}
-  .legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12px;color:#0C1024;font-weight:600;background:#F7F8FB;border:1px solid #E7E9F0;border-radius:8px;padding:9px 12px;margin-bottom:12px;}
-  /* A coloured glyph, not a background-filled box: text colour always survives
-     printing, background colour does not. */
-  .dot{font-style:normal;font-size:13px;line-height:0;margin-right:6px;vertical-align:middle;}
-  .imgs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px;}
-  .imgs figure{margin:0;}
-  .imgs img{width:100%;display:block;border-radius:8px;border:1px solid #DDE0EA;background:#0C1024;}
-  .cap{font-size:9.5px;font-weight:700;color:#4A5070;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px;}
-  .foot{margin-top:24px;border-top:1px solid #DDE0EA;padding-top:10px;font-size:10.5px;color:#4A5070;line-height:1.55;}
-  /* Start lesion findings on their own page so the colour key stays with the
-     table and images it describes, instead of stranding at the foot of page 1. */
-  .lzsec{page-break-before:always;break-before:page;}
-  /* Each additional image opens a fresh page, so one eye never runs into the next. */
-  .rpt + .rpt{page-break-before:always;break-before:page;}
-  @media print{.wrap{padding:0;}.sec{page-break-after:avoid;}.legend{page-break-after:avoid;}.imgs,table,.hero{page-break-inside:avoid;}}</style></head><body><div class="wrap">
+  <style>${REPORT_CSS}</style></head><body><div class="wrap">
   <div class="head">
     <div class="brand">
       <div class="mark">C</div>
@@ -3034,11 +3207,7 @@ function exportPDF(savedResults, savedTotalTime) {
   ${body}
   <div class="foot">This report is generated by an AI screening tool and is not a medical diagnosis. Please consult a qualified ophthalmologist for clinical evaluation.<br>www.chakshurakshakai.com</div>
   </div></body></html>`;
-  const w = window.open('', '_blank');
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  setTimeout(() => w.print(), 400);
+  openReportWindow(html);
 }
 
 function shareResult() {
