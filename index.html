@@ -645,6 +645,28 @@ footer{padding:52px 60px 28px;}
 .cs-title{font-size:13px;font-weight:700;color:var(--g600);line-height:1.35;}
 .cs-soon{font-size:11px;font-weight:600;color:var(--g400);}
 @media(max-width:900px){.cs-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+/* HOME: three analyses */
+.hm-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;}
+.hm-card{padding:28px;border-radius:16px;}
+.hm-card .ch-title{font-size:19px;}
+.hm-card .ch-desc{font-size:13.5px;line-height:1.7;}
+.hm-perks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:40px;padding-top:32px;border-top:1px solid var(--g200);}
+.hm-perk b{display:block;font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.hm-perk span{font-size:13px;line-height:1.65;color:var(--g500);}
+.hm-soon{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:36px;}
+.hm-soon-label{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-right:6px;}
+.hm-soon .cs-tag{font-size:11px;font-weight:600;letter-spacing:0;padding:5px 12px;border:1px dashed var(--g300);background:var(--white);}
+@media(max-width:900px){.hm-grid,.hm-perks{grid-template-columns:1fr;}.hm-perks{gap:18px;}}
+@media(max-width:640px){
+  .hm-card{padding:22px 20px;}
+  .hero-bg-overlay{background:rgba(226,240,234,.82) !important;}
+  .nav-right .nav-btn-ghost{display:none;}
+  .nav-right .nav-btn{white-space:nowrap;}
+  .footer-top{grid-template-columns:1fr 1fr;gap:28px;}
+  .footer-top > div:first-child{grid-column:1 / -1;}
+  .cta-banner h2{font-size:28px;}
+  .cta-row .btn-primary,.cta-row .btn-ghost{white-space:nowrap;}
+}
 
 .feat-card,.ar-clinic-card,.ar-stage-card,.ar-meta-card{transition:box-shadow .2s,transform .2s,border-color .2s;}
 .feat-card:hover{border-color:var(--g300);}
@@ -951,127 +973,52 @@ footer{padding:52px 60px 28px;}
       <p class="hero-sub">Upload a fundus photograph and get diabetic retinopathy grading, vessel and lesion segmentation maps, diabetic macular edema grading and a beta multi-disease screen &mdash; in seconds.</p>
       <div class="hero-ctas">
         <button class="btn-primary" onclick="showAuthGate()">Analyze Retina →</button>
-        <button class="btn-ghost" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">See How It Works</button>
-      </div>
-      <div class="hero-stats">
-        <div><span class="stat-val">6</span><div class="stat-label">Public Datasets</div></div>
-        <div class="stat-divider"></div>
-        <div><span class="stat-val">3</span><div class="stat-label">Research Papers</div></div>
+        <button class="btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">See What It Does</button>
       </div>
     </div>
   </section>
 
-  <!-- TRUST STRIP -->
-  <div class="trust-strip">
-    <span class="trust-label">Validated on datasets from</span>
-    <div class="trust-logos">
-      <a class="logo-pill" href="https://www.kaggle.com/datasets/mariaherrerot/idrid-dataset" target="_blank" rel="noopener noreferrer">IDRiD</a>
-      <a class="logo-pill" href="https://www.kaggle.com/datasets/mariaherrerot/idrid-dataset" target="_blank" rel="noopener noreferrer">Messidor-2</a>
-      <a class="logo-pill" href="https://www.kaggle.com/c/aptos2019-blindness-detection" target="_blank" rel="noopener noreferrer">APTOS 2019</a>
-      <a class="logo-pill" href="https://www.kaggle.com/datasets/mariaherrerot/the-sustechsysu-dataset" target="_blank" rel="noopener noreferrer">SUSTech-SYSU</a>
-      <a class="logo-pill" href="https://www.kaggle.com/datasets/yoctoman/deepdrid" target="_blank" rel="noopener noreferrer">DeepDRiD</a>
-      <a class="logo-pill" href="https://www.kaggle.com/datasets/andrewmvd/drive-digital-retinal-images-for-vessel-extraction" target="_blank" rel="noopener noreferrer">DRIVE</a>
-      <a class="logo-pill" href="https://www.kaggle.com/datasets/andrewmvd/drive-digital-retinal-images-for-vessel-extraction" target="_blank" rel="noopener noreferrer">STARE</a>
-      <a class="logo-pill" href="https://www.kaggle.com/datasets/khoongweihao/chasedb1" target="_blank" rel="noopener noreferrer">CHASE_DB1</a>
-    </div>
-  </div>
-
-  <!-- FEATURES -->
+  <!-- FEATURES: the three analyses, each its own page and model -->
   <div id="features" class="section" style="background:var(--offwhite);">
-    <div class="section-title">What one photograph can show.</div>
-    <div class="section-sub">Research-grade retinal analysis, with every reading traceable to the image it came from.</div>
-    <div class="features-grid">
-      <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(34,183,163,.12);">⬡</div>
-        <div class="feat-title">5-Stage DR Classification</div>
-        <div class="feat-desc">Cascade architecture with confidence-based escape hatch. No DR → Mild → Moderate → Severe → PDR with 87% overall accuracy.</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(246,129,94,.12);">◎</div>
-        <div class="feat-title">Vessel Segmentation Map</div>
-        <div class="feat-desc">Multi-scale Attention U-Net achieves Dice 0.891, trained on DRIVE, STARE, CHASE_DB1, HRF, and FIVES — surpassing prior SOTA by 3.7–7.7%.</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(250,189,49,.12);">◈</div>
-        <div class="feat-title">Lesion Segmentation</div>
-        <div class="feat-desc">FLA-Net maps microaneurysms, haemorrhages and hard &amp; soft exudates onto the image, so a grade can be traced to what it rests on.</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(56,204,135,.12);">✦</div>
-        <div class="feat-title">A Report You Can Keep</div>
-        <div class="feat-desc">Every analysis exports to a PDF carrying the images, the grade, the segmentation maps and the findings behind them.</div>
-      </div>
+    <div class="section-title">Three analyses. One photograph.</div>
+    <div class="section-sub">Pick the analysis you need &mdash; each one runs its own model on the fundus image you give it.</div>
+    <div class="hm-grid">
+      <button type="button" class="ch-card ch-dr hm-card" onclick="showPage('upload')">
+        <span class="ch-badge">DR</span>
+        <span class="ch-title">Diabetic Retinopathy</span>
+        <span class="ch-desc">Five-stage grade from No DR to PDR with a confidence score, a vessel segmentation map, and lesion maps for microaneurysms, haemorrhages and hard &amp; soft exudates. Several images at once.</span>
+        <span class="ch-go">Start DR analysis &rarr;</span>
+      </button>
+      <button type="button" class="ch-card ch-dme hm-card" onclick="showPage('dme')">
+        <span class="ch-badge">DME</span>
+        <span class="ch-title">Diabetic Macular Edema</span>
+        <span class="ch-desc">Grades the image as no DME, or hard exudates away from or near the fovea, with the probability of each grade, per-lesion scores and an overlay of the exudates it marked.</span>
+        <span class="ch-go">Start DME analysis &rarr;</span>
+      </button>
+      <button type="button" class="ch-card ch-beta hm-card" onclick="showPage('beta')">
+        <span class="ch-badge">BETA</span>
+        <span class="ch-title">Multi-Disease Screening</span>
+        <span class="ch-desc">A research preview that looks past diabetic retinopathy &mdash; AMD, myopic changes, retinal vein occlusion and chorioretinal scarring &mdash; with referable-DR and DME probabilities.</span>
+        <span class="ch-go">Try the beta &rarr;</span>
+      </button>
     </div>
-
-    <!-- Multi-Disease Detection (beta): entry point only. The module, with its own
-         image picker, lives on the upload page; nothing runs from here. -->
-    <div class="beta-strip">
-      <div class="beta-strip-icon" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-          <circle cx="11" cy="11" r="8.2" stroke="#6B5BD2" stroke-width="1.6"/>
-          <circle cx="11" cy="11" r="3.4" stroke="#6B5BD2" stroke-width="1.6"/>
-          <path d="M11 1.2v3M11 17.8v3M1.2 11h3M17.8 11h3" stroke="#6B5BD2" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="beta-strip-body">
-        <div class="beta-strip-head">
-          <span class="beta-strip-title">Multi-Disease Detection</span>
-          <span class="bm-beta">BETA</span>
-        </div>
-        <div class="beta-strip-desc">A research preview that looks past diabetic retinopathy &mdash; AMD, myopic changes, retinal vein occlusion and chorioretinal scarring &mdash; on a single fundus photograph. It runs on its own image, separately from the DR analysis, and changes nothing in your DR grade or report.</div>
-      </div>
-      <button class="beta-strip-btn" type="button" onclick="openBetaModule()">Try the beta demo &rarr;</button>
+    <div class="hm-perks">
+      <div class="hm-perk"><b>Maps you can check</b><span>Every result comes with the overlay it rests on &mdash; vessels, lesions or exudates &mdash; on your own image.</span></div>
+      <div class="hm-perk"><b>A report for each analysis</b><span>Add patient details and download a printable PDF report for DR, DME or the multi-disease screen.</span></div>
+      <div class="hm-perk"><b>No account needed</b><span>Run any analysis as a guest. Sign in only if you want your DR reports saved.</span></div>
+    </div>
+    <div class="hm-soon">
+      <span class="hm-soon-label">Coming soon</span>
+      <span class="cs-tag">Glaucoma</span><span class="cs-tag">Cataract</span><span class="cs-tag">OCT Analysis</span><span class="cs-tag">FFA Analysis</span><span class="cs-tag">Hypertensive Retinopathy</span><span class="cs-tag">ROP</span><span class="cs-tag">Retinal Detachment</span><span class="cs-tag">Keratoconus</span>
     </div>
   </div>
-
-  <!-- HOW IT WORKS -->
-  <div class="how-section" id="how-it-works">
-    <div class="section-title">How ChakshurakhsakAI works.</div>
-    <div class="section-sub" style="margin-bottom:44px;">Three steps from image to insight.</div>
-    <div class="steps-row">
-      <div class="step">
-        <div class="step-num">01</div>
-        <div class="step-title">Upload Fundus Image</div>
-        <div class="step-desc">Drag and drop or browse. One eye or both, JPG or PNG, several images at a time.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">02</div>
-        <div class="step-title">AI Analysis Pipeline</div>
-        <div class="step-desc">ConvNeXt Large backbone processes RGB + FADHE-enhanced green channel through a 4-stage cascade classifier with confidence routing.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">03</div>
-        <div class="step-title">Explainable Results</div>
-        <div class="step-desc">The grade with its confidence, the vessel map, and a lesion overlay showing what the reading rests on.</div>
-      </div>
-    </div>
-    <div class="outcomes-row">
-      <div class="outcome" style="background:rgba(56,204,135,.07);border-color:rgba(56,204,135,.3);">
-        <div class="outcome-label" style="color:#1a7a4a;"><span class="outcome-dot" style="background:#38CC87;"></span>No DR Found</div>
-        <div class="outcome-sub" style="color:#2a8a5a;">Recommend annual screening.</div>
-      </div>
-      <div class="outcome" style="background:rgba(250,189,49,.07);border-color:rgba(250,189,49,.3);">
-        <div class="outcome-label" style="color:#7a5000;"><span class="outcome-dot" style="background:#FABD31;"></span>DR Detected</div>
-        <div class="outcome-sub" style="color:#8a6010;">Refer for ophthalmology review. Severity graded.</div>
-      </div>
-      <div class="outcome" style="background:rgba(243,88,88,.07);border-color:rgba(243,88,88,.3);">
-        <div class="outcome-label" style="color:#8a1a1a;"><span class="outcome-dot" style="background:#F35858;"></span>Severe / PDR</div>
-        <div class="outcome-sub" style="color:#9a2a2a;">Urgent ophthalmologist referral required.</div>
-      </div>
-      <div class="outcome" style="background:rgba(144,150,176,.07);border-color:rgba(144,150,176,.3);">
-        <div class="outcome-label" style="color:#4a5070;"><span class="outcome-dot" style="background:#9096B0;"></span>Signs Beyond DR</div>
-        <div class="outcome-sub" style="color:#5a6080;">Flagged by the beta module for specialist review.</div>
-      </div>
-    </div>
-  </div>
-
   <!-- CTA BANNER -->
   <div class="cta-banner">
     <h2>Ready to analyze your<br><span>retinal images?</span></h2>
     <p>Upload a fundus photograph and get a full retinal analysis in seconds. Free research access, no account required.</p>
     <div class="cta-row">
       <button class="btn-primary" onclick="showAuthGate()">Analyze Retina →</button>
-      <button class="btn-ghost" onclick="showAuthGate()">Learn More</button>
+      <button class="btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Learn More</button>
     </div>
   </div>
 
@@ -3359,6 +3306,17 @@ function findNearbyClinics() {
 })();
 
 // ── Mobile menu ───────────────────────────────────────────────────────────────
+// Put the menu button into every page's nav (CSS shows it only on narrow screens).
+document.querySelectorAll('nav .nav-right').forEach(function (r) {
+  const b = document.createElement('button');
+  b.className = 'nav-hamburger';
+  b.type = 'button';
+  b.setAttribute('aria-label', 'Menu');
+  b.innerHTML = '<span></span><span></span><span></span>';
+  b.onclick = toggleMobileMenu;
+  r.appendChild(b);
+});
+
 function toggleMobileMenu() {
   let menu = document.getElementById('mobile-nav-menu');
   if (!menu) {
