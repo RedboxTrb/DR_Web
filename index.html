@@ -663,6 +663,8 @@ footer{padding:52px 60px 28px;}
 .mm-div{display:flex;align-items:center;gap:12px;margin:26px 0 0;font-size:12px;font-weight:700;color:var(--navy);}
 .mm-div::after{content:'';flex:1;height:1px;background:var(--g200);}
 .kd-flat{background:none;border:none;padding:0;margin:0 0 20px;}
+.mm-input{display:none;}
+#dme-result:not(:empty),#bm-result:not(:empty){margin:-6px 0 18px;}
 .bm-done{font-size:13px;font-weight:600;color:#1a7a4a;background:rgba(56,204,135,.1);border-radius:10px;padding:14px 16px;margin-top:16px;}
 .bm-done a{color:var(--teal-d);cursor:pointer;margin-left:6px;}
 .ar-title .bm-beta{vertical-align:middle;margin-left:6px;font-size:10px;}
@@ -735,7 +737,6 @@ footer{padding:52px 60px 28px;}
 @media(max-width:900px){.val-grid{grid-template-columns:1fr;gap:32px;}.val-section .section-title{font-size:26px;}}
 
 /* MULTI-DISEASE RESULT */
-#page-beta .upload-container{max-width:1120px;}
 .mdx{margin-top:18px;}
 .mdx-meta{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
 .mdx-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start;}
@@ -1522,36 +1523,53 @@ footer{padding:52px 60px 28px;}
   </div>
   <div class="upload-body">
     <div class="upload-container">
-      <div class="bm-box dm-box" id="dme-module">
-        <div class="bm-head">
-          <span class="bm-title">DME Grading</span>
-          <span class="bm-sub">GRACE-Net</span>
+      <div class="preview-area" id="dme-preview-area">
+        <div class="preview-grid" id="dme-thumbs"></div>
+      </div>
+      <div class="dropzone" id="dme-dropzone" onclick="document.getElementById('dme-input').click()">
+        <div class="dz-icon">📁</div>
+        <div class="dz-title">Drop fundus images here</div>
+        <div class="dz-sub">Drag & drop JPG or PNG fundus photographs, or browse to upload</div>
+        <button class="dz-btn" onclick="event.stopPropagation();document.getElementById('dme-input').click()">Browse Files</button>
+        <div class="dz-formats">Supported: JPG, PNG, TIFF · Max 20MB per image · Multiple images supported</div>
+      </div>
+      <input type="file" id="dme-input" class="mm-input" accept="image/*" multiple onchange="dmePickFile(this.files)">
+      <div class="patient-box">
+        <div class="pb-title">Report Details <span>optional — printed on the report, never uploaded</span></div>
+        <div class="pb-grid">
+          <label>Patient name<input type="text" id="dme-pt-name" placeholder="e.g. A. Sharma" autocomplete="off"></label>
+          <label>Patient ID<input type="text" id="dme-pt-id" placeholder="e.g. MRN-10482" autocomplete="off"></label>
+          <label>Age<input type="text" id="dme-pt-age" placeholder="e.g. 58" autocomplete="off"></label>
+          <label>Sex<select id="dme-pt-sex"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select></label>
+          <label>Eye<select id="dme-pt-eye"><option value="">—</option><option>OD (right)</option><option>OS (left)</option><option>Both</option></select></label>
+          <label>Referred by<input type="text" id="dme-pt-ref" placeholder="e.g. Dr. R. Verma" autocomplete="off"></label>
         </div>
-        <p class="bm-text">For each image, reports one of three grades &mdash; no DME, exudates away from the fovea, or exudates near the fovea &mdash; with the probability of each, presence scores for MA, HE, EX and SE, and an overlay of the hard exudates it marked.</p>
-        <div class="bm-dz" onclick="document.getElementById('dme-input').click()">
-          <div class="bm-dz-title">Pick fundus images</div>
-          <div class="bm-dz-sub">One or more fundus photographs &middot; JPG or PNG</div>
-          <button class="bm-browse" type="button" onclick="event.stopPropagation();document.getElementById('dme-input').click()">Browse Files</button>
+      </div>
+      <div id="dme-result"></div>
+      <button class="analyze-btn" id="dme-run" disabled onclick="runDmeModel()">
+        <span>Select images to analyze</span>
+      </button>
+      <div class="upload-features">
+        <div class="uf-card">
+          <span class="uf-badge" style="background:rgba(246,129,94,.14);color:#B9502F;">GRACE-Net</span>
+          <div class="uf-title">3-Grade DME Grading</div>
+          <div class="uf-desc">No DME, or hard exudates away from or near the fovea, with the probability of each grade.</div>
         </div>
-        <input type="file" id="dme-input" accept="image/*" multiple onchange="dmePickFile(this.files)">
-        <div class="mm-thumbs" id="dme-thumbs"></div>
-        <div class="patient-box">
-          <div class="pb-title">Report Details <span>optional — printed on the report, never uploaded</span></div>
-          <div class="pb-grid">
-            <label>Patient name<input type="text" id="dme-pt-name" placeholder="e.g. A. Sharma" autocomplete="off"></label>
-            <label>Patient ID<input type="text" id="dme-pt-id" placeholder="e.g. MRN-10482" autocomplete="off"></label>
-            <label>Age<input type="text" id="dme-pt-age" placeholder="e.g. 58" autocomplete="off"></label>
-            <label>Sex<select id="dme-pt-sex"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select></label>
-            <label>Eye<select id="dme-pt-eye"><option value="">—</option><option>OD (right)</option><option>OS (left)</option><option>Both</option></select></label>
-            <label>Referred by<input type="text" id="dme-pt-ref" placeholder="e.g. Dr. R. Verma" autocomplete="off"></label>
-          </div>
+        <div class="uf-card">
+          <span class="uf-badge" style="background:rgba(250,189,49,.12);color:#7a5500;">EXPLAINABLE</span>
+          <div class="uf-title">Hard-Exudate Map</div>
+          <div class="uf-desc">See the hard exudates the model marked, overlaid on your fundus image.</div>
         </div>
-        <div class="bm-foot">
-          <span class="bm-file" id="dme-file">No image chosen yet</span>
-          <button class="bm-run" id="dme-run" type="button" disabled onclick="runDmeModel()">Grade DME &rarr;</button>
+        <div class="uf-card">
+          <span class="uf-badge" style="background:rgba(243,88,88,.12);color:#a12f2f;">LESIONS</span>
+          <div class="uf-title">Lesion Presence Scores</div>
+          <div class="uf-desc">Presence scores for microaneurysms, haemorrhages and hard &amp; soft exudates.</div>
         </div>
-        <div id="dme-result"></div>
-        <div class="bm-note">This analysis runs on its own, with its own image and its own report. It is separate from the DR grade and the DR report.</div>
+        <div class="uf-card">
+          <span class="uf-badge" style="background:rgba(56,204,135,.12);color:#0a6a3a;">BATCH MODE</span>
+          <div class="uf-title">Multiple Images</div>
+          <div class="uf-desc">Grade several fundus photographs in one go, with one combined report.</div>
+        </div>
       </div>
       <div class="upload-disclaimer">
         <div class="disclaimer-title">⚠ Research Tool — Not a Medical Device</div>
@@ -1605,41 +1623,55 @@ footer{padding:52px 60px 28px;}
   </div>
   <div class="upload-body">
     <div class="upload-container">
-      <!-- Multi-Disease Detection (ConfECBL), beta. Its own image picker and its own
-           request to /api/screen: the DR analysis never sees this image, and this
-           result is never saved or exported. -->
-      <div class="bm-box" id="beta-module">
-        <div class="bm-head">
-          <span class="bm-title">Multi-Disease Detection</span>
-          <span class="bm-beta">BETA</span>
-          <span class="bm-sub">research preview &middot; ConfECBL</span>
-        </div>
-        <p class="bm-text">Screens each fundus image chosen here for conditions outside diabetic retinopathy &mdash; AMD, myopic changes, retinal vein occlusion and chorioretinal scarring &mdash; and reports referable-DR and macular-edema probability with per-lesion scores for MA, HE, EX and SE.</p>
-        <div class="bm-dz" onclick="document.getElementById('bm-input').click()">
-          <div class="bm-dz-title">Pick images for the beta model</div>
-          <div class="bm-dz-sub">One or more fundus photographs &middot; JPG or PNG<br>Runs separately from the DR analysis &mdash; no other image is sent.</div>
-          <button class="bm-browse" type="button" onclick="event.stopPropagation();document.getElementById('bm-input').click()">Browse Files</button>
-        </div>
-        <input type="file" id="bm-input" accept="image/*" multiple onchange="betaPickFile(this.files)">
-        <div class="mm-thumbs" id="bm-thumbs"></div>
-        <div class="patient-box">
-          <div class="pb-title">Report Details <span>optional — printed on the report, never uploaded</span></div>
-          <div class="pb-grid">
-            <label>Patient name<input type="text" id="bm-pt-name" placeholder="e.g. A. Sharma" autocomplete="off"></label>
-            <label>Patient ID<input type="text" id="bm-pt-id" placeholder="e.g. MRN-10482" autocomplete="off"></label>
-            <label>Age<input type="text" id="bm-pt-age" placeholder="e.g. 58" autocomplete="off"></label>
-            <label>Sex<select id="bm-pt-sex"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select></label>
-            <label>Eye<select id="bm-pt-eye"><option value="">—</option><option>OD (right)</option><option>OS (left)</option><option>Both</option></select></label>
-            <label>Referred by<input type="text" id="bm-pt-ref" placeholder="e.g. Dr. R. Verma" autocomplete="off"></label>
-          </div>
-        </div>
-        <div class="bm-foot">
-          <span class="bm-file" id="bm-file">No image chosen yet</span>
-          <button class="bm-run" id="bm-run" type="button" disabled onclick="runBetaModel()">Run beta model &rarr;</button>
-        </div>
-        <div id="bm-result"></div>
-        <div class="bm-note"><b>Beta.</b> This module runs on its own, with its own image and its own report. It does not touch the DR analysis, its grade or the DR report.</div>
+      <div class="preview-area" id="bm-preview-area">
+        <div class="preview-grid" id="bm-thumbs"></div>
       </div>
+      <div class="dropzone" id="bm-dropzone" onclick="document.getElementById('bm-input').click()">
+        <div class="dz-icon">📁</div>
+        <div class="dz-title">Drop fundus images here</div>
+        <div class="dz-sub">Drag & drop JPG or PNG fundus photographs, or browse to upload</div>
+        <button class="dz-btn" onclick="event.stopPropagation();document.getElementById('bm-input').click()">Browse Files</button>
+        <div class="dz-formats">Supported: JPG, PNG, TIFF · Max 20MB per image · Multiple images supported</div>
+      </div>
+      <input type="file" id="bm-input" class="mm-input" accept="image/*" multiple onchange="betaPickFile(this.files)">
+      <div class="patient-box">
+        <div class="pb-title">Report Details <span>optional — printed on the report, never uploaded</span></div>
+        <div class="pb-grid">
+          <label>Patient name<input type="text" id="bm-pt-name" placeholder="e.g. A. Sharma" autocomplete="off"></label>
+          <label>Patient ID<input type="text" id="bm-pt-id" placeholder="e.g. MRN-10482" autocomplete="off"></label>
+          <label>Age<input type="text" id="bm-pt-age" placeholder="e.g. 58" autocomplete="off"></label>
+          <label>Sex<select id="bm-pt-sex"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select></label>
+          <label>Eye<select id="bm-pt-eye"><option value="">—</option><option>OD (right)</option><option>OS (left)</option><option>Both</option></select></label>
+          <label>Referred by<input type="text" id="bm-pt-ref" placeholder="e.g. Dr. R. Verma" autocomplete="off"></label>
+        </div>
+      </div>
+      <div id="bm-result"></div>
+      <button class="analyze-btn" id="bm-run" disabled onclick="runBetaModel()">
+        <span>Select images to analyze</span>
+      </button>
+      <div class="upload-features">
+        <div class="uf-card">
+          <span class="uf-badge" style="background:rgba(107,91,210,.12);color:#52429F;">ConfECBL · BETA</span>
+          <div class="uf-title">Look-alike Diseases</div>
+          <div class="uf-desc">AMD, myopic changes, retinal vein occlusion and chorioretinal scarring, each with a probability.</div>
+        </div>
+        <div class="uf-card">
+          <span class="uf-badge" style="background:rgba(34,183,163,.12);color:#107a6e;">DR &amp; DME</span>
+          <div class="uf-title">Referable DR and DME</div>
+          <div class="uf-desc">Referable-DR and macular-edema probabilities, and the model&rsquo;s own ICDR grade.</div>
+        </div>
+        <div class="uf-card">
+          <span class="uf-badge" style="background:rgba(250,189,49,.12);color:#7a5500;">EXPLAINABLE</span>
+          <div class="uf-title">Lesion and Disease Maps</div>
+          <div class="uf-desc">Overlays of the DR lesions and other-disease signs the model marked.</div>
+        </div>
+        <div class="uf-card">
+          <span class="uf-badge" style="background:rgba(56,204,135,.12);color:#0a6a3a;">BATCH MODE</span>
+          <div class="uf-title">Multiple Images</div>
+          <div class="uf-desc">Screen several fundus photographs in one go, with one combined report.</div>
+        </div>
+      </div>
+      <div class="bm-note" style="margin:0 0 20px;"><b>Beta.</b> This module runs on its own, with its own images and its own report. It does not touch the DR analysis, its grade or the DR report.</div>
       <div class="upload-disclaimer">
         <div class="disclaimer-title">⚠ Research Tool — Not a Medical Device</div>
         This tool is intended for research and educational purposes only. Results should not substitute professional clinical examination by a qualified ophthalmologist.
@@ -2153,40 +2185,64 @@ function betaNonDr(scr) {
 // Each item is { file, url (blob URL for display), res, time, err }.
 var MODS = {
   dme: {
-    items: [], input: 'dme-input', chip: 'dme-file', run: 'dme-run', out: 'dme-result', thumbs: 'dme-thumbs',
+    items: [], input: 'dme-input', area: 'dme-preview-area', run: 'dme-run', out: 'dme-result', thumbs: 'dme-thumbs', drop: 'dme-dropzone',
     api: '/api/dme', key: 'dme', page: 'dmeres', btn1: 'Grade DME', btnN: 'Grade {n} images', again: 'Grade again',
     wait: 'Grading', fail: 'DME grading failed'
   },
   screen: {
-    items: [], input: 'bm-input', chip: 'bm-file', run: 'bm-run', out: 'bm-result', thumbs: 'bm-thumbs',
+    items: [], input: 'bm-input', area: 'bm-preview-area', run: 'bm-run', out: 'bm-result', thumbs: 'bm-thumbs', drop: 'bm-dropzone',
     api: '/api/screen', key: 'screening', page: 'betares', btn1: 'Run beta model', btnN: 'Run on {n} images', again: 'Run again',
     wait: 'Screening', fail: 'Screening failed'
   }
 };
 
-function modRunLabel(m, again) {
+// Same wording as the DR upload button.
+function modRunLabel(m) {
   const n = m.items.length;
-  return (again ? m.again : (n > 1 ? m.btnN.replace('{n}', n) : m.btn1)) + ' &rarr;';
+  return n ? 'Analyze ' + n + ' image' + (n > 1 ? 's' : '') + ' &rarr;' : 'Select images to analyze';
+}
+
+function modRender(kind) {
+  const m = MODS[kind];
+  document.getElementById(m.thumbs).innerHTML = m.items.map(function (it, i) {
+    return '<div class="preview-item"><img src="' + it.url + '" alt="' + escHtml(it.file.name) + '" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#0C1024;">' +
+      '<div class="preview-label">' + escHtml(it.file.name) + '</div>' +
+      '<button class="preview-remove" type="button" onclick="modRemove(\'' + kind + '\',' + i + ')">×</button></div>';
+  }).join('');
+  document.getElementById(m.area).classList.toggle('show', m.items.length > 0);
+  const btn = document.getElementById(m.run);
+  btn.disabled = !m.items.length;
+  btn.innerHTML = '<span>' + modRunLabel(m) + '</span>';
 }
 
 function modPick(kind, files) {
   const m = MODS[kind];
-  const list = Array.from(files || []);
+  const list = Array.from(files || []).filter(function (f) { return /^image\//.test(f.type) || /\.(jpe?g|png|tiff?)$/i.test(f.name); });
   if (!list.length) return;
   m.items.forEach(function (it) { URL.revokeObjectURL(it.url); });
   m.items = list.map(function (f) { return { file: f, url: URL.createObjectURL(f), res: null, time: 0, err: null }; });
-  const mb = (list.reduce(function (a, f) { return a + f.size; }, 0) / 1048576).toFixed(1);
-  document.getElementById(m.chip).innerHTML = list.length > 1
-    ? 'Chosen: <b>' + list.length + ' images</b> &middot; ' + mb + ' MB'
-    : 'Chosen: <b>' + escHtml(list[0].name) + '</b> &middot; ' + mb + ' MB';
-  document.getElementById(m.thumbs).innerHTML = list.length > 1 ? m.items.map(function (it) {
-    return '<figure><img src="' + it.url + '" alt=""><span>' + escHtml(it.file.name) + '</span></figure>';
-  }).join('') : '';
-  const btn = document.getElementById(m.run);
-  btn.disabled = false;
-  btn.innerHTML = modRunLabel(m, false);
   document.getElementById(m.out).innerHTML = '';
+  document.getElementById(m.input).value = '';
+  modRender(kind);
 }
+
+function modRemove(kind, i) {
+  const m = MODS[kind];
+  const it = m.items.splice(i, 1)[0];
+  if (it) URL.revokeObjectURL(it.url);
+  modRender(kind);
+}
+
+// Drag and drop onto the DME and multi-disease drop zones, as on the DR page.
+window.addEventListener('load', function () {
+  Object.keys(MODS).forEach(function (kind) {
+    const z = document.getElementById(MODS[kind].drop);
+    if (!z) return;
+    z.addEventListener('dragover', function (e) { e.preventDefault(); z.classList.add('dragging'); });
+    z.addEventListener('dragleave', function () { z.classList.remove('dragging'); });
+    z.addEventListener('drop', function (e) { e.preventDefault(); z.classList.remove('dragging'); modPick(kind, e.dataTransfer.files); });
+  });
+});
 
 async function modRun(kind) {
   const m = MODS[kind];
@@ -2195,7 +2251,7 @@ async function modRun(kind) {
   const out = document.getElementById(m.out);
   const n = m.items.length;
   btn.disabled = true;
-  btn.textContent = m.wait + '...';
+  btn.innerHTML = '<span>Analyzing…</span>';
   for (let i = 0; i < n; i++) {
     const it = m.items[i];
     it.res = null; it.err = null;
@@ -2224,7 +2280,7 @@ async function modRun(kind) {
     }).join('');
   }
   btn.disabled = false;
-  btn.innerHTML = modRunLabel(m, true);
+  btn.innerHTML = '<span>' + modRunLabel(m) + '</span>';
 }
 
 // With several images, a table of every result first, each row jumping to its panel.
@@ -2686,7 +2742,7 @@ function removePreview(btn) {
 }
 
 function updateAnalyzeBtn() {
-  const count = document.querySelectorAll('.preview-item').length;
+  const count = document.querySelectorAll('#preview-grid .preview-item').length;
   const btn = document.getElementById('analyze-btn');
   const txt = document.getElementById('analyze-btn-text');
   if (count === 0) { btn.disabled = true; txt.textContent = 'Select images to analyze'; document.getElementById('preview-area').classList.remove('show'); }
