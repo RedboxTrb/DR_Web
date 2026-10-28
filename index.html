@@ -2121,16 +2121,22 @@ async function loadReports() {
       const pct  = (head.confidence * 100).toFixed(1);
       const n    = group.length;
       const openId = Math.min.apply(null, group.map(r => r.id));
+      // No DR per the ConfECBL screening: the row shows ConfECBL's verdict only, not the
+      // placeholder grade/confidence that exist for compatibility.
+      const noDr = !!(head.screening && head.screening.cascade_skipped);
+      const noDrOther = noDr && head.screening.verdict_level === 'other';
+      const badgeBg = noDr ? (noDrOther ? 'rgba(250,189,49,.12)' : gradeBg[0]) : gradeBg[head.grade];
+      const badgeFg = noDr ? (noDrOther ? '#FABD31' : gradeColors[0]) : gradeColors[head.grade];
       return `<div class="report-row" onclick="loadReportDetail(${openId})">
         <div class="report-row-left">
-          <div class="report-grade-badge" style="background:${gradeBg[head.grade]};color:${gradeColors[head.grade]};">G${head.grade}</div>
+          <div class="report-grade-badge" style="background:${badgeBg};color:${badgeFg};${noDr ? 'font-size:10px;' : ''}">${noDr ? 'No DR' : 'G' + head.grade}</div>
           <div>
-            <div class="report-severity">${escHtml(head.severity)}${n > 1 ? ` <span style="font-weight:600;color:var(--g400);font-size:12px;">· ${n} images${n > 1 ? ', most severe shown' : ''}</span>` : ''}</div>
+            <div class="report-severity">${escHtml(noDr ? head.screening.verdict : head.severity)}${n > 1 ? ` <span style="font-weight:600;color:var(--g400);font-size:12px;">· ${n} images${n > 1 ? ', most severe shown' : ''}</span>` : ''}</div>
             <div class="report-date">${date}</div>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:20px;">
-          <div class="report-conf">${pct}% confidence</div>
+          <div class="report-conf">${noDr ? 'ConfECBL screening' : pct + '% confidence'}</div>
           <div class="report-arrow">›</div>
         </div>
       </div>`;
