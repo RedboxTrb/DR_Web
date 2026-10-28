@@ -8,9 +8,10 @@ Configuration (environment variables):
   GEMINI_API_KEY      Gemini API key (Google AI Studio). Alternatively run on Vertex AI
                       with GOOGLE_GENAI_USE_VERTEXAI=true, GOOGLE_CLOUD_PROJECT and
                       GOOGLE_CLOUD_LOCATION; the SDK reads these itself.
-  GEMINI_MODEL        Model id. Default "gemini-3.8-flash" (older models are closed to
-                      new API keys).
-  GEMINI_FALLBACK_MODEL  Optional second model, tried when the first stays busy.
+  GEMINI_MODEL        Model id. Default "gemini-3.6-flash" (older models are closed to
+                      new API keys; the newest flash models are often overloaded).
+  GEMINI_FALLBACK_MODEL  Second model, tried when the first stays busy.
+                      Default "gemini-3.5-flash"; set to "" to turn off.
   ALLOWED_ORIGINS     Comma-separated CORS origins. Default "*" (any origin).
   RATE_LIMIT_PER_MIN  Requests per minute per client IP. Default 20.
 """
@@ -36,8 +37,8 @@ from pydantic import BaseModel, Field
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("eye-chatbot")
 
-MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
-FALLBACK_MODEL = os.getenv("GEMINI_FALLBACK_MODEL", "").strip()
+MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
+FALLBACK_MODEL = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-3.5-flash").strip()
 ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o.strip()]
 RATE_LIMIT_PER_MIN = int(os.getenv("RATE_LIMIT_PER_MIN", "20"))
 

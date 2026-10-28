@@ -25,7 +25,7 @@ This folder is listed in the site's `.vercelignore`, so Vercel does not publish 
               {"role": "model", "text": "..."}] }
 ```
 
-Response: `{ "reply": "...", "model": "gemini-3.8-flash" }`. Errors return
+Response: `{ "reply": "...", "model": "gemini-3.6-flash" }`. Errors return
 `{ "detail": "..." }` with 400 / 413 / 415 / 422 / 429 (rate limit) / 502 (Gemini failed).
 
 ## Configuration
@@ -33,8 +33,8 @@ Response: `{ "reply": "...", "model": "gemini-3.8-flash" }`. Errors return
 | Variable | Default | Meaning |
 |---|---|---|
 | `GEMINI_API_KEY` | — | Gemini API key from Google AI Studio |
-| `GEMINI_MODEL` | `gemini-3.8-flash` | Any current Gemini model id. Older models (1.5, 2.5) are closed to new API keys. |
-| `GEMINI_FALLBACK_MODEL` | — | Optional second model, tried when the first stays busy (503) |
+| `GEMINI_MODEL` | `gemini-3.6-flash` | Any current Gemini model id. Older models (1.5, 2.5) are closed to new API keys; the newest flash models (3.7, 3.8) are often overloaded (503). |
+| `GEMINI_FALLBACK_MODEL` | `gemini-3.5-flash` | Second model, tried when the first stays busy; set empty to turn off |
 | `ALLOWED_ORIGINS` | `*` | Comma-separated CORS origins for direct API calls |
 | `RATE_LIMIT_PER_MIN` | `20` | Messages per minute per client IP (per instance) |
 
