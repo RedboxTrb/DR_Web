@@ -8,11 +8,14 @@ Configuration (environment variables):
   GEMINI_API_KEY      Gemini API key (Google AI Studio). Alternatively run on Vertex AI
                       with GOOGLE_GENAI_USE_VERTEXAI=true, GOOGLE_CLOUD_PROJECT and
                       GOOGLE_CLOUD_LOCATION; the SDK reads these itself.
-  GEMINI_MODEL        Model id. Default "gemini-2.5-flash" (Gemini 1.5 is retired).
+  GEMINI_MODEL        Model id. Default "gemini-3.8-flash" (older models are closed to
+                      new API keys).
+  GEMINI_FALLBACK_MODEL  Optional second model, tried when the first stays busy.
   ALLOWED_ORIGINS     Comma-separated CORS origins. Default "*" (any origin).
   RATE_LIMIT_PER_MIN  Requests per minute per client IP. Default 20.
 """
 
+import asyncio
 import base64
 import binascii
 import logging
@@ -27,19 +30,22 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from google import genai
-from google.genai import types
+from google.genai import errors, types
 from pydantic import BaseModel, Field
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("eye-chatbot")
 
-MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+FALLBACK_MODEL = os.getenv("GEMINI_FALLBACK_MODEL", "").strip()
 ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o.strip()]
 RATE_LIMIT_PER_MIN = int(os.getenv("RATE_LIMIT_PER_MIN", "20"))
 
 MAX_MESSAGE_CHARS = 4000
 MAX_IMAGE_BYTES = 8 * 1024 * 1024          # decoded size
 MAX_HISTORY_TURNS = 12                     # earlier messages sent back for context
+RETRY_DELAYS = (1.5, 4.0)                  # waits before retrying a busy model
+TRANSIENT_CODES = {429, 500, 503, 504}
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"}
 
 SYSTEM_INSTRUCTION = (
@@ -69,7 +75,7 @@ _client: Optional[genai.Client] = None
 def get_client() -> genai.Client:
     global _client
     if _client is None:
-        _client = genai.Client()
+        _client = genai.Client(http_options=types.HttpOptions(timeout=60_000))
     return _client
 
 
@@ -86,6 +92,30 @@ class ChatRequest(BaseModel):
     image: Optional[str] = None
     # Optional earlier turns, so follow-up questions keep their context.
     history: List[Turn] = Field(default_factory=list)
+
+
+async def generate(contents: List[types.Content]):
+    """Call Gemini, retrying briefly when the model is busy (429/5xx), then the fallback model."""
+    config = types.GenerateContentConfig(
+        system_instruction=SYSTEM_INSTRUCTION,
+        temperature=0.4,
+        max_output_tokens=2048,
+    )
+    models = [MODEL] + ([FALLBACK_MODEL] if FALLBACK_MODEL and FALLBACK_MODEL != MODEL else [])
+    last_error: Exception = RuntimeError("no model tried")
+    for model in models:
+        for attempt in range(len(RETRY_DELAYS) + 1):
+            try:
+                resp = await get_client().aio.models.generate_content(model=model, contents=contents, config=config)
+                return resp, model
+            except errors.APIError as e:
+                last_error = e
+                if getattr(e, "code", None) not in TRANSIENT_CODES:
+                    raise
+                if attempt < len(RETRY_DELAYS):
+                    log.warning("Gemini %s busy (%s), retrying", model, e.code)
+                    await asyncio.sleep(RETRY_DELAYS[attempt])
+    raise last_error
 
 
 class ChatResponse(BaseModel):
@@ -172,15 +202,7 @@ async def chat(req: ChatRequest, request: Request) -> ChatResponse:
     contents.append(types.Content(role="user", parts=parts))
 
     try:
-        resp = await get_client().aio.models.generate_content(
-            model=MODEL,
-            contents=contents,
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_INSTRUCTION,
-                temperature=0.4,
-                max_output_tokens=2048,
-            ),
-        )
+        resp, used_model = await generate(contents)
     except Exception:  # SDK / network / quota errors: log details, return a plain message
         log.exception("Gemini request failed")
         raise HTTPException(status_code=502, detail="The assistant is unavailable right now. Please try again shortly.")
@@ -190,4 +212,4 @@ async def chat(req: ChatRequest, request: Request) -> ChatResponse:
         # Empty text usually means the response was blocked by a safety filter.
         reply = ("I could not answer that. Please rephrase your question, or consult a certified "
                  "ophthalmologist for advice about your eyes.")
-    return ChatResponse(reply=reply, model=MODEL)
+    return ChatResponse(reply=reply, model=used_model)
