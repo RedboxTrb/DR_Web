@@ -663,6 +663,15 @@ footer{padding:52px 60px 28px;}
 .mm-div{display:flex;align-items:center;gap:12px;margin:26px 0 0;font-size:12px;font-weight:700;color:var(--navy);}
 .mm-div::after{content:'';flex:1;height:1px;background:var(--g200);}
 .kd-flat{background:none;border:none;padding:0;margin:0 0 20px;}
+.bm-done{font-size:13px;font-weight:600;color:#1a7a4a;background:rgba(56,204,135,.1);border-radius:10px;padding:14px 16px;margin-top:16px;}
+.bm-done a{color:var(--teal-d);cursor:pointer;margin-left:6px;}
+.ar-title .bm-beta{vertical-align:middle;margin-left:6px;font-size:10px;}
+.ar-diag-card .mdx-grades{margin-top:4px;}
+.ar-meta-col .ar-meta-label{line-height:1.35;}
+.ar-cascade-card .sc-row,.ar-cascade-card .mdx-row{font-size:12px;}
+.lz-card .mdx-row{max-width:620px;}
+/* Results row (DR, DME, multi-disease): stack below tablet width instead of overflowing */
+@media(max-width:900px){.ar-results-row{grid-template-columns:minmax(0,1fr);}.ar-meta-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));}}
 .kd-flat .sc-card{margin-top:0;}
 .bm-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;margin-top:14px;}
 .dm-steps{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px;}
@@ -1749,6 +1758,96 @@ footer{padding:52px 60px 28px;}
 </div>
 
 <!-- ═══════════════════════════════════
+     DME RESULTS — same layout as the DR analysis page
+══════════════════════════════════ -->
+<div class="page" id="page-dmeres">
+  <nav>
+    <a class="nav-logo" onclick="showPage('home')">
+      <svg width="28" height="28" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><path d="M27 9 A12 12 0 1 0 27 27" fill="none" stroke="#0C1024" stroke-width="3.5" stroke-linecap="round"/><circle cx="19" cy="18" r="4" fill="#22B7A3"/></svg>
+      <span class="nav-logo-text">ChakshuRakshakAI</span>
+    </a>
+    <div class="nav-links">
+      <a onclick="showPage('home')">Home</a>
+      <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Analysis</a>
+      <a onclick="showPage('dme')">New Analysis</a>
+    </div>
+    <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
+      <div id="nav-guest-dmeres" style="display:flex;gap:10px;align-items:center;">
+        <button class="nav-btn-ghost" onclick="showPage('auth')">Log in</button>
+      </div>
+      <div id="nav-user-dmeres" class="profile-chip" style="display:none;" onclick="this.classList.toggle('open')" tabindex="0">
+        <div class="profile-avatar" id="nav-avatar-dmeres">?</div>
+        <span id="nav-user-name-dmeres"></span>
+        <span class="profile-chevron">&#9660;</span>
+        <div class="profile-dropdown">
+          <a onclick="event.stopPropagation();document.getElementById('nav-user-dmeres').classList.remove('open');showPage('reports')">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M4 5h6M4 7.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            My Reports
+          </a>
+          <hr>
+          <a class="dd-logout" onclick="event.stopPropagation();document.getElementById('nav-user-dmeres').classList.remove('open');authLogout()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 4.5 11.5 7 9 9.5M5 7h6.5M5 2H2.5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1H5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Logout
+          </a>
+        </div>
+      </div>
+      <button class="nav-btn" onclick="exportDmeReport()">Export PDF</button>
+    </div>
+  </nav>
+  <div class="ar-page">
+    <div id="dmeres-container"></div>
+    <div class="ar-disclaimer">
+      <strong>Medical Disclaimer:</strong> This analysis is for screening purposes only and should not replace professional medical diagnosis. Please consult a qualified ophthalmologist for definitive diagnosis and treatment recommendations.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     MULTI-DISEASE RESULTS (beta) — same layout as the DR analysis page
+══════════════════════════════════ -->
+<div class="page" id="page-betares">
+  <nav>
+    <a class="nav-logo" onclick="showPage('home')">
+      <svg width="28" height="28" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><path d="M27 9 A12 12 0 1 0 27 27" fill="none" stroke="#0C1024" stroke-width="3.5" stroke-linecap="round"/><circle cx="19" cy="18" r="4" fill="#22B7A3"/></svg>
+      <span class="nav-logo-text">ChakshuRakshakAI</span>
+    </a>
+    <div class="nav-links">
+      <a onclick="showPage('home')">Home</a>
+      <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Analysis</a>
+      <a onclick="showPage('beta')">New Analysis</a>
+    </div>
+    <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
+      <div id="nav-guest-betares" style="display:flex;gap:10px;align-items:center;">
+        <button class="nav-btn-ghost" onclick="showPage('auth')">Log in</button>
+      </div>
+      <div id="nav-user-betares" class="profile-chip" style="display:none;" onclick="this.classList.toggle('open')" tabindex="0">
+        <div class="profile-avatar" id="nav-avatar-betares">?</div>
+        <span id="nav-user-name-betares"></span>
+        <span class="profile-chevron">&#9660;</span>
+        <div class="profile-dropdown">
+          <a onclick="event.stopPropagation();document.getElementById('nav-user-betares').classList.remove('open');showPage('reports')">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M4 5h6M4 7.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            My Reports
+          </a>
+          <hr>
+          <a class="dd-logout" onclick="event.stopPropagation();document.getElementById('nav-user-betares').classList.remove('open');authLogout()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 4.5 11.5 7 9 9.5M5 7h6.5M5 2H2.5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1H5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Logout
+          </a>
+        </div>
+      </div>
+      <button class="nav-btn" onclick="exportBetaReport()">Export PDF</button>
+    </div>
+  </nav>
+  <div class="ar-page">
+    <div id="betares-container"></div>
+    <div class="ar-disclaimer">
+      <strong>Medical Disclaimer:</strong> This analysis is for screening purposes only and should not replace professional medical diagnosis. Please consult a qualified ophthalmologist for definitive diagnosis and treatment recommendations.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
      PAGE 4: AUTH (Login / Sign Up)
 ══════════════════════════════════ -->
 <div class="page" id="page-auth">
@@ -2016,8 +2115,6 @@ function betaBarsHTML(labels, vals) {
   }).join('');
 }
 
-// opts.saved renders a report from My Reports: its own image, no overlays (they are
-// not stored) and no action buttons (the detail page has its own Export).
 var MDX_LESION_COL = { MA: '#E5484D', HE: '#F08A24', EX: '#D9B200', SE: '#3E9BE0' };
 var MDX_COND_COL = { AMD: '#9B5DE5', Myopia: '#22B573', RVO: '#E5489A', Scar: '#8A8F98', Other: '#5B6068' };
 var MDX_LEVEL = {
@@ -2038,13 +2135,6 @@ function mdxRows(labels, vals, colors) {
   }).join('');
 }
 
-function mdxStat(label, v, color) {
-  v = Math.max(0, Math.min(1, Number(v) || 0));
-  return '<div class="mdx-stat"><div class="mdx-stat-l">' + label + '</div>' +
-    '<div class="mdx-stat-v">' + (v * 100).toFixed(1) + '<small>%</small></div>' +
-    '<div class="mdx-bar"><i style="width:' + (v * 100).toFixed(1) + '%;background:' + color + '"></i></div></div>';
-}
-
 // Probability that at least one non-DR condition is present. Use the model's own
 // figure when it sends one; otherwise combine the per-condition probabilities.
 function betaNonDr(scr) {
@@ -2055,138 +2145,21 @@ function betaNonDr(scr) {
   return 1 - keep;
 }
 
-function betaPanelHTML(scr, filename, procTime, opts) {
-  opts = opts || {};
-  var idx = opts.idx;
-  var ov = opts.saved ? {} : (scr.overlays || {});
-  var lv = MDX_LEVEL[scr.verdict_level] || MDX_LEVEL.other;
-  var sub = scr.verdict_sub || scr.advice || scr.recommendation || lv.sub;
-  var grade = Number(scr.grade);
-  var tabs = [['orig', 'Original'], ['lesion', 'DR lesions'], ['conf', 'Other diseases']].map(function (t) {
-    var ok = t[0] === 'orig' || !!ov[t[0]];
-    return '<button type="button" class="mdx-tab' + (t[0] === 'orig' ? ' on' : '') + '" data-v="' + t[0] + '"' +
-      (ok ? ' onclick="setBetaView(' + idx + ', \'' + t[0] + '\')"' : ' disabled title="' +
-        (opts.saved ? 'Overlays are not kept with saved reports' : 'Nothing marked by the model') + '"') +
-      '>' + t[1] + '</button>';
-  }).join('');
-  var grades = ICDR_NAMES.map(function (n, i) {
-    return '<div class="mdx-g' + (i === grade ? ' on' : '') + '"' + (i === grade ? ' style="--ac:' + lv.c + '"' : '') +
-      '><b>' + i + '</b><span>' + n + '</span></div>';
-  }).join('');
-  return '<div class="mdx" id="screen-panel-' + idx + '">' +
-    '<div class="mdx-meta"><span class="sc-tag">' + escHtml(scr.model || 'ConfECBL') + '</span>' +
-      '<span class="bm-time">' + escHtml(filename) + ' &middot; ' + Number(procTime || 0).toFixed(2) + ' s</span></div>' +
-    '<div class="mdx-grid">' +
-      '<div class="mdx-card mdx-imgcard">' +
-        '<div class="mdx-h">Fundus image</div>' +
-        '<div class="mdx-imgbox"><img id="bm-img-' + idx + '" src="' + opts.img + '" alt="The image screened by the beta model"></div>' +
-        '<div class="mdx-tabs">' + tabs + '</div>' +
-        '<div class="sc-leg" id="bm-leg-' + idx + '"></div>' +
-      '</div>' +
-      '<div class="mdx-right">' +
-        '<div class="mdx-verdict" style="--ac:' + lv.c + '"><span class="mdx-vdot"></span><div>' +
-          '<div class="mdx-vt">' + escHtml(scr.verdict) + '</div>' +
-          '<div class="mdx-vs">' + escHtml(sub) + '</div></div></div>' +
-        '<div class="mdx-card"><div class="mdx-h">DR grade &middot; ICDR scale</div><div class="mdx-grades">' + grades + '</div>' +
-          '<div class="mdx-fine">This model&rsquo;s own DR grade. A DR grade in your report always comes from the DR analysis.</div></div>' +
-        '<div class="mdx-stats">' +
-          mdxStat('Referable DR', scr.referable, '#E07A2E') +
-          mdxStat('Diabetic macular edema', scr.dme_prob, '#3E9BE0') +
-          mdxStat('Non-DR abnormality', betaNonDr(scr), '#9B5DE5') +
-        '</div>' +
-        '<div class="mdx-two">' +
-          '<div class="mdx-card"><div class="mdx-h">DR lesions</div>' + mdxRows(scr.lesion_labels, scr.P_dr, MDX_LESION_COL) + '</div>' +
-          '<div class="mdx-card"><div class="mdx-h">Look-alike diseases</div>' + mdxRows(scr.conf_labels, scr.Q, MDX_COND_COL) + '</div>' +
-        '</div>' +
-      '</div>' +
-    '</div>' +
-    '<div class="sc-note">' + BETA_NOTE + '</div>' +
-    '</div>';
-}
-
-function setBetaView(idx, view) {
-  var it = MODS.screen.items[idx];
-  var img = document.getElementById('bm-img-' + idx);
-  var leg = document.getElementById('bm-leg-' + idx);
-  if (!img || !it || !it.res) return;
-  var b64 = (it.res.overlays || {})[view];
-  img.src = (view === 'orig' || !b64) ? it.url : dataUrl(b64);
-  if (leg) leg.innerHTML = BETA_LEGENDS[view] || '';
-  var box = img.closest('.mdx');
-  if (box) box.querySelectorAll('.mdx-tab').forEach(function (t) { t.classList.toggle('on', t.getAttribute('data-v') === view); });
-}
-
 // ── Diabetic Macular Edema (GRACE-Net) — standalone page ────────────────────
 // Same shape as the beta module: its own image, its own request to /api/dme, its own
 // panel. Nothing here touches the DR analysis state, saved reports or the PDF.
-
-function dmePanelHTML(dme, filename, procTime, opts) {
-  opts = opts || {};
-  var idx = opts.idx;
-  var grade = Number(dme.grade) || 0;
-  var level = grade === 0 ? 'clear' : (grade === 1 ? 'other' : 'dr');
-  var toggle = dme.overlay
-    ? '<div class="sc-views">' +
-        '<label><input type="radio" name="dme-view-' + idx + '" value="orig" checked onchange="setDmeView(' + idx + ', \'orig\')"> Original</label>' +
-        '<label><input type="radio" name="dme-view-' + idx + '" value="ex" onchange="setDmeView(' + idx + ', \'ex\')"> Hard exudates</label>' +
-      '</div>'
-    : '';
-  var lp = dme.lesion_presence || {};
-  var lpKeys = ['MA', 'HE', 'EX', 'SE'].filter(function (k) { return k in lp; });
-  // The fusion steps are two-class (no DME / DME); show P(DME) from each.
-  var st = dme.steps || {};
-  function p1(v) { return Array.isArray(v) && v.length > 1 ? Number(v[1]).toFixed(3) : '&mdash;'; }
-  var steps = dme.steps
-    ? '<div class="sc-sub">Protocol-aware fusion &middot; P(DME)</div>' +
-      '<table class="dm-steps">' +
-        '<tr><td>Direct prediction</td><td>' + p1(st.direct) + '</td></tr>' +
-        '<tr><td>Grading-rule prediction</td><td>' + p1(st.rule) + '</td></tr>' +
-        '<tr><td>Disagreement (total variation)</td><td>' + Number(st.tv || 0).toFixed(3) + '</td></tr>' +
-        '<tr><td>Fusion weight &alpha;</td><td>' + Number(st.alpha || 0).toFixed(2) + '</td></tr>' +
-        '<tr><td>Fused</td><td>' + p1(st.final) + '</td></tr>' +
-      '</table>' +
-      '<div class="sc-detail" style="margin-top:6px;">The two predictions ' +
-        (dme.consistent ? 'agree.' : '<b>disagree</b> &mdash; review this image carefully.') + '</div>'
-    : '';
-  return '<div class="sc-card" id="dme-panel-' + idx + '">' +
-    '<div class="sc-head"><span class="sc-title">Macular Edema Grading</span>' +
-      '<span class="sc-tag">' + escHtml(dme.model || 'GRACE-Net') + '</span>' +
-      '<span class="bm-time">' + escHtml(filename) + ' &middot; ' + Number(procTime || 0).toFixed(2) + ' s</span></div>' +
-    '<div class="sc-grid">' +
-      '<div><img class="sc-img" id="dme-img-' + idx + '" src="' + opts.img + '" alt="The image graded for macular edema">' + toggle +
-        '<div class="sc-leg">' + (dme.overlay ? 'Hard-exudate area: ' + (Number(dme.ex_area || 0) * 100).toFixed(2) + '% of the image' : '') + '</div></div>' +
-      '<div>' +
-        '<div class="sc-verdict ' + level + '">' + escHtml(dme.grade_name) + ' &middot; grade ' + grade + '</div>' +
-        '<div class="sc-detail">DME prob ' + Number(dme.dme_prob || 0).toFixed(3) +
-          ' &middot; hard exudates present ' + Number(dme.ex_presence || 0).toFixed(3) + '</div>' +
-        '<div class="sc-sub">Grade probabilities</div>' + betaBarsHTML(dme.prob_labels, dme.dme_probs) +
-        (lpKeys.length ? '<div class="sc-sub">Lesions (presence)</div>' +
-          betaBarsHTML(lpKeys, lpKeys.map(function (k) { return lp[k]; })) : '') +
-        steps +
-        '<div class="sc-note">Research use only, and not part of the DR report. Final diagnosis by an ophthalmologist.</div>' +
-      '</div>' +
-    '</div>' +
-    '</div>';
-}
-
-function setDmeView(idx, view) {
-  var it = MODS.dme.items[idx];
-  var img = document.getElementById('dme-img-' + idx);
-  if (!img || !it || !it.res) return;
-  img.src = (view === 'ex' && it.res.overlay) ? it.res.overlay : it.url;
-}
 
 // ── DME and multi-disease pages: one or more images, run one after another ───
 // Each item is { file, url (blob URL for display), res, time, err }.
 var MODS = {
   dme: {
     items: [], input: 'dme-input', chip: 'dme-file', run: 'dme-run', out: 'dme-result', thumbs: 'dme-thumbs',
-    api: '/api/dme', key: 'dme', btn1: 'Grade DME', btnN: 'Grade {n} images', again: 'Grade again',
+    api: '/api/dme', key: 'dme', page: 'dmeres', btn1: 'Grade DME', btnN: 'Grade {n} images', again: 'Grade again',
     wait: 'Grading', fail: 'DME grading failed'
   },
   screen: {
     items: [], input: 'bm-input', chip: 'bm-file', run: 'bm-run', out: 'bm-result', thumbs: 'bm-thumbs',
-    api: '/api/screen', key: 'screening', btn1: 'Run beta model', btnN: 'Run on {n} images', again: 'Run again',
+    api: '/api/screen', key: 'screening', page: 'betares', btn1: 'Run beta model', btnN: 'Run on {n} images', again: 'Run again',
     wait: 'Screening', fail: 'Screening failed'
   }
 };
@@ -2240,26 +2213,18 @@ async function modRun(kind) {
       it.err = e.message || String(e);
     }
   }
-  out.innerHTML = modResultsHTML(kind);
+  const ok = m.items.filter(function (it) { return it.res; }).length;
+  if (ok) {
+    document.getElementById(m.page + '-container').innerHTML = kindResultsHTML(kind);
+    out.innerHTML = '<div class="bm-done">Results are ready. <a onclick="showPage(\'' + m.page + '\')">View results &rarr;</a></div>';
+    showPage(m.page);
+  } else {
+    out.innerHTML = m.items.map(function (it) {
+      return '<div class="bm-err">' + escHtml(it.file.name) + ': ' + escHtml(it.err || 'No result') + '</div>';
+    }).join('');
+  }
   btn.disabled = false;
   btn.innerHTML = modRunLabel(m, true);
-}
-
-function modResultsHTML(kind) {
-  const m = MODS[kind];
-  const n = m.items.length;
-  const ok = m.items.filter(function (it) { return it.res; }).length;
-  const panels = m.items.map(function (it, i) {
-    const head = n > 1 ? '<div class="mm-div"><span>Image ' + (i + 1) + ' of ' + n + ' &middot; ' + escHtml(it.file.name) + '</span></div>' : '';
-    if (!it.res) return head + '<div class="bm-err">' + escHtml(it.file.name) + ': ' + escHtml(it.err || 'No result') + '</div>';
-    const opts = { idx: i, img: it.url };
-    return head + (kind === 'dme' ? dmePanelHTML(it.res, it.file.name, it.time, opts)
-                                  : betaPanelHTML(it.res, it.file.name, it.time, opts));
-  }).join('');
-  const actions = ok ? '<div class="bm-actions">' + saveBtnHTML(kind) +
-    '<button class="bm-run" type="button" onclick="' + (kind === 'dme' ? 'exportDmeReport()' : 'exportBetaReport()') + '">' +
-    (ok > 1 ? 'Download report (' + ok + ' images)' : 'Download report') + ' &rarr;</button></div>' : '';
-  return (n > 1 ? modSummaryHTML(kind) : '') + panels + actions;
 }
 
 // With several images, a table of every result first, each row jumping to its panel.
@@ -2279,6 +2244,147 @@ function modSummaryHTML(kind) {
                      : '<th>Image</th><th>Verdict</th><th class="num">Referable DR</th><th class="num">Non-DR</th>';
   return '<div class="mm-sum"><div class="mdx-h">Summary &middot; ' + m.items.length + ' images</div>' +
     '<table><tr>' + head + '</tr>' + rows + '</table></div>';
+}
+
+// ── DME and multi-disease results pages, laid out like the DR analysis page ──
+var AR_ICON = {
+  check: function (c) { return '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="' + c + '" stroke-width="1.5"/><path d="M6 10l3 3 5-5" stroke="' + c + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'; },
+  info: '<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1"/><line x1="6.5" y1="4.5" x2="6.5" y2="6.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><circle cx="6.5" cy="9" r=".6" fill="currentColor"/></svg>',
+  rec: '<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1"/><path d="M4.5 8.5a3 3 0 010-6" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>',
+  clock: '<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1"/><path d="M6.5 3.5v3l2 1.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>',
+  dl: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  save: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2.5A.5.5 0 0 1 2.5 2h7l2.5 2.5V11.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-9Z" stroke="currentColor" stroke-width="1.3"/><path d="M5 2v3h4V2" stroke="currentColor" stroke-width="1.3"/></svg>'
+};
+// Severity tones, the same three the DR page uses.
+var AR_TONE = {
+  ok:   { c: 'var(--green)', bg: 'rgba(56,204,135,.06)', bd: 'rgba(56,204,135,.25)' },
+  warn: { c: 'var(--amber)', bg: 'rgba(250,189,49,.06)', bd: 'rgba(250,189,49,.25)' },
+  bad:  { c: 'var(--red)',   bg: 'rgba(243,88,88,.06)',  bd: 'rgba(243,88,88,.25)' }
+};
+var DME_DESCS = [
+  'No signs of diabetic macular edema were found by the model.',
+  'Hard exudates were found away from the fovea.',
+  'Hard exudates were found near the fovea.'
+];
+var DME_RECS = [
+  'The model found no signs of diabetic macular edema. Continue routine eye screening.',
+  'The model found hard exudates away from the fovea. Review by an ophthalmologist is recommended.',
+  'The model found hard exudates near the fovea. Prompt review by an ophthalmologist is recommended.'
+];
+
+function arImagesHTML(panels) {
+  return '<div class="ar-images-card"><div class="ar-image-panels" style="grid-template-columns:repeat(' + panels.length + ',minmax(0,1fr));">' +
+    panels.map(function (p) {
+      return '<div class="ar-img-panel"><div class="ar-img-label-row"><span class="ar-img-label">' + p.label + '</span>' + p.tag + '</div>' +
+        '<div class="ar-img-box"><img src="' + p.src + '" alt="' + p.label + '" style="width:100%;height:100%;object-fit:contain;border-radius:14px;display:block;"></div>' +
+        (p.legend ? '<div class="sc-leg">' + p.legend + '</div>' : '') + '</div>';
+    }).join('') + '</div></div>';
+}
+
+function arDiagHTML(tone, title, sub, confLabel, conf, extra) {
+  var pct = (Math.max(0, Math.min(1, Number(conf) || 0)) * 100).toFixed(1);
+  return '<div class="ar-diag-card" style="background:' + tone.bg + ';border:1px solid ' + tone.bd + ';">' +
+    '<div class="ar-diag-header">' + AR_ICON.check(tone.c) + '<span class="ar-diag-title">' + escHtml(title) + '</span></div>' +
+    '<div class="ar-diag-sub">' + escHtml(sub) + '</div>' +
+    '<div class="ar-conf-row"><span class="ar-conf-label">' + confLabel + '</span><span class="ar-conf-val" style="color:' + tone.c + ';">' + pct + '%</span></div>' +
+    '<div class="ar-conf-track"><div class="ar-conf-fill" style="width:' + pct + '%;background:' + tone.c + ';"></div></div>' +
+    extra + '</div>';
+}
+
+function arMetaHTML(cards) {
+  return '<div class="ar-meta-col">' + cards.map(function (c) {
+    return '<div class="ar-meta-card"><div class="ar-meta-label">' + c[0] + '</div><div class="ar-meta-val"' + (c[2] ? ' style="color:' + c[2] + ';"' : '') + '>' + c[1] + '</div></div>';
+  }).join('') + '</div>';
+}
+
+function arRightHTML(cardTitle, cardBody, rec, time) {
+  return '<div class="ar-right-col">' +
+    '<div class="ar-cascade-card"><div class="ar-cascade-title">' + cardTitle + '</div>' + cardBody + '</div>' +
+    '<div class="ar-rec-card"><div class="ar-rec-title">' + AR_ICON.rec + 'Recommendation</div><div class="ar-rec-text">' + escHtml(rec) + '</div></div>' +
+    '<div class="ar-proc-card"><div class="ar-proc-label">' + AR_ICON.clock + 'Processing Time</div><div class="ar-proc-val">' + Number(time || 0).toFixed(2) + 's</div></div>' +
+  '</div>';
+}
+
+function pct1(v) { return (Math.max(0, Math.min(1, Number(v) || 0)) * 100).toFixed(1) + '%'; }
+
+// x = { res, name, time, img }. idx is the image number on the page, or 's' for a saved report.
+function dmeBlockHTML(x, idx) {
+  var d = x.res, g = Math.max(0, Math.min(2, Number(d.grade) || 0));
+  var tone = [AR_TONE.ok, AR_TONE.warn, AR_TONE.bad][g];
+  var panels = [{ label: 'Original Image', src: x.img, tag: '<span class="ar-img-badge">' + escHtml(x.name) + '</span>' }];
+  if (d.overlay) panels.push({ label: 'Hard Exudates', src: d.overlay, tag: '<span class="ar-img-tag coral">Overlay</span>' });
+  var st = d.steps || {};
+  function p1(v) { return Array.isArray(v) && v.length > 1 ? Number(v[1]).toFixed(3) : '&mdash;'; }
+  var fusion = d.steps ? '<div class="ar-decision-path"><div class="ar-dp-title">' + AR_ICON.info + 'Protocol-aware fusion &middot; P(DME)</div>' +
+      '<div class="ar-dp-stage"><span class="ar-stage-pill">Direct</span> ' + p1(st.direct) + '</div>' +
+      '<div class="ar-dp-stage"><span class="ar-stage-pill">Grading rule</span> ' + p1(st.rule) + '</div>' +
+      '<div class="ar-dp-stage"><span class="ar-stage-pill">Fused</span> ' + p1(st.final) + ' <span class="ar-stage-prob">&alpha;=' + Number(st.alpha || 0).toFixed(2) + ' &middot; TV=' + Number(st.tv || 0).toFixed(3) + '</span></div>' +
+      '<div class="ar-dp-stage" style="margin-top:6px;">' + (d.consistent ? 'The two predictions agree.' : '<b>The two predictions disagree</b> &mdash; review this image carefully.') + '</div>' +
+    '</div>' : '';
+  var lp = d.lesion_presence || {};
+  var lpKeys = ['MA', 'HE', 'EX', 'SE'].filter(function (k) { return k in lp; });
+  return '<div class="ar-result-block" id="dme-panel-' + idx + '">' +
+    arImagesHTML(panels) +
+    '<div class="ar-results-row">' +
+      arDiagHTML(tone, d.grade_name || '', DME_DESCS[g], 'DME probability', d.dme_prob, fusion) +
+      arMetaHTML([['Grade', 'Grade ' + g + ' of 2'], ['Referral', ['None', 'Review', 'Prompt review'][g], tone.c],
+                  ['Hard Exudates', pct1(d.ex_presence)]]) +
+      arRightHTML('Grade Probabilities', betaBarsHTML(d.prob_labels, d.dme_probs), DME_RECS[g], x.time) +
+    '</div>' +
+    (lpKeys.length ? '<div class="lz-card"><div class="lz-head"><span class="lz-title">Lesions (presence)</span><span class="lz-tag">' + escHtml(d.model || 'GRACE-Net') + '</span></div>' +
+      mdxRows(lpKeys, lpKeys.map(function (k) { return lp[k]; }), MDX_LESION_COL) +
+      (d.overlay ? '<div class="sc-leg">Hard-exudate area: ' + (Number(d.ex_area || 0) * 100).toFixed(2) + '% of the image</div>' : '') + '</div>' : '') +
+  '</div>';
+}
+
+function betaBlockHTML(x, idx) {
+  var r = x.res, ov = r.overlays || {};
+  var tone = { clear: AR_TONE.ok, other: AR_TONE.warn, dr: AR_TONE.bad }[r.verdict_level] || AR_TONE.warn;
+  var lv = MDX_LEVEL[r.verdict_level] || MDX_LEVEL.other;
+  var sub = r.verdict_sub || r.advice || r.recommendation || lv.sub;
+  var panels = [{ label: 'Original Image', src: x.img, tag: '<span class="ar-img-badge">' + escHtml(x.name) + '</span>' }];
+  if (ov.lesion) panels.push({ label: 'DR Lesions', src: dataUrl(ov.lesion), tag: '<span class="ar-img-tag teal">Overlay</span>', legend: BETA_LEGENDS.lesion });
+  if (ov.conf) panels.push({ label: 'Other-Disease Signs', src: dataUrl(ov.conf), tag: '<span class="ar-img-tag coral">Overlay</span>', legend: BETA_LEGENDS.conf });
+  var grade = Number(r.grade);
+  var scale = '<div class="ar-decision-path"><div class="ar-dp-title">' + AR_ICON.info + 'DR grade &middot; ICDR scale (this model)</div>' +
+    '<div class="mdx-grades">' + ICDR_NAMES.map(function (n, i) {
+      return '<div class="mdx-g' + (i === grade ? ' on' : '') + '"' + (i === grade ? ' style="--ac:' + lv.c + '"' : '') + '><b>' + i + '</b><span>' + n + '</span></div>';
+    }).join('') + '</div>' +
+    '<div class="mdx-fine">A DR grade in your report always comes from the DR analysis, not from this beta model.</div></div>';
+  return '<div class="ar-result-block" id="screen-panel-' + idx + '">' +
+    arImagesHTML(panels) +
+    '<div class="ar-results-row">' +
+      arDiagHTML(tone, r.verdict || '', sub, 'Non-DR abnormality', betaNonDr(r), scale) +
+      arMetaHTML([['Referable DR', pct1(r.referable)], ['Diabetic Macular Edema', pct1(r.dme_prob)]]) +
+      arRightHTML('Look-alike Diseases', mdxRows(r.conf_labels, r.Q, MDX_COND_COL), sub, x.time) +
+    '</div>' +
+    '<div class="lz-card"><div class="lz-head"><span class="lz-title">DR Lesions (presence)</span><span class="lz-tag">' + escHtml(r.model || 'ConfECBL') + ' &middot; beta</span></div>' +
+      mdxRows(r.lesion_labels, r.P_dr, MDX_LESION_COL) + '</div>' +
+  '</div>';
+}
+
+function kindResultsHTML(kind) {
+  var m = MODS[kind];
+  var isDme = kind === 'dme';
+  var n = m.items.length;
+  var ok = m.items.filter(function (it) { return it.res; }).length;
+  var sub = ok + ' image' + (ok === 1 ? '' : 's') + ' processed successfully' + (ok < n ? ' &middot; ' + (n - ok) + ' failed' : '');
+  var save = saveBtnHTML(kind);
+  var header = '<div class="ar-header-card"><div class="ar-header-left">' +
+      '<div class="ar-title">' + (isDme ? 'DME Analysis Results' : 'Multi-Disease Screening Results <span class="bm-beta">BETA</span>') + '</div>' +
+      '<div class="ar-subtitle success">' + sub + '</div></div>' +
+    '<div class="ar-header-actions">' +
+      '<button class="ar-btn-ghost" onclick="' + (isDme ? 'exportDmeReport()' : 'exportBetaReport()') + '">' + AR_ICON.dl + 'Export</button>' +
+      save +
+      '<button class="ar-btn-primary" onclick="showPage(\'' + (isDme ? 'dme' : 'beta') + '\')">&larr; New Analysis</button>' +
+    '</div></div>';
+  var blocks = m.items.map(function (it, i) {
+    var div = i > 0 ? '<div class="ar-result-divider"><span>Image ' + (i + 1) + ' &middot; ' + escHtml(it.file.name) + '</span></div>' : '';
+    if (!it.res) return div + '<div class="bm-err" id="' + kind + '-panel-' + i + '">' + escHtml(it.file.name) + ': ' + escHtml(it.err || 'No result') + '</div>';
+    var x = { res: it.res, name: it.file.name, time: it.time, img: it.url };
+    return div + (isDme ? dmeBlockHTML(x, i) : betaBlockHTML(x, i));
+  }).join('');
+  return header + (n > 1 ? modSummaryHTML(kind) : '') + blocks;
 }
 
 function dmePickFile(files) { modPick('dme', files); }
@@ -2386,7 +2492,7 @@ async function loadCurrentUser() {
 function updateNavForUser(user) {
   const name = user.name.split(' ')[0];
   const initial = name.charAt(0).toUpperCase();
-  ['home','upload','analysis','choose','dme','beta','validation'].forEach(p => {
+  ['home','upload','analysis','choose','dme','beta','validation','dmeres','betares'].forEach(p => {
     const g = document.getElementById('nav-guest-' + p);
     const u = document.getElementById('nav-user-' + p);
     const n = document.getElementById('nav-user-name-' + p);
@@ -2401,7 +2507,7 @@ function updateNavForUser(user) {
 }
 
 function updateNavForGuest() {
-  ['home','upload','analysis','choose','dme','beta','validation'].forEach(p => {
+  ['home','upload','analysis','choose','dme','beta','validation','dmeres','betares'].forEach(p => {
     const g = document.getElementById('nav-guest-' + p);
     const u = document.getElementById('nav-user-' + p);
     if (g) g.style.display = 'flex';
@@ -3136,8 +3242,8 @@ window.addEventListener('load', loadReportKinds);
 function saveBtnHTML(kind) {
   if (_reportKinds.indexOf(kind) < 0) return '';
   const n = MODS[kind].items.filter(function (it) { return it.res; }).length;
-  return '<button class="bm-browse" type="button" id="' + kind + '-save" onclick="saveKindReport(\'' + kind + '\')">' +
-    (n > 1 ? 'Save all to My Reports' : 'Save to My Reports') + '</button>';
+  return '<button class="ar-btn-ghost" type="button" id="' + kind + '-save" onclick="saveKindReport(\'' + kind + '\')">' +
+    AR_ICON.save + (n > 1 ? 'Save All Reports' : 'Save Report') + '</button>';
 }
 
 // The original, scaled down to at most `max` px on the long side, as base64 JPEG,
@@ -3250,8 +3356,8 @@ function renderKindDetail(rep, content) {
   const img = rep.original_image ? dataUrl(rep.original_image) : '';
   const fname = rep.original_filename || (rep.images && rep.images[0] && rep.images[0].image_label) || ('Report #' + rep.id);
   _savedReport = { kind: rep.kind, res: det, img: img, filename: fname };
-  const panel = isDme ? dmePanelHTML(det, fname, rep.processing_time, { idx: 's', img: img, saved: true })
-                      : betaPanelHTML(det, fname, rep.processing_time, { idx: 's', img: img, saved: true });
+  const x = { res: det, name: fname, time: rep.processing_time, img: img };
+  const panel = isDme ? dmeBlockHTML(x, 's') : betaBlockHTML(x, 's');
   content.innerHTML = `
       <div class="ar-header-card">
         <div><div class="ar-title">Report #${rep.id} · ${isDme ? 'Diabetic Macular Edema' : 'Multi-Disease Screening (beta)'}</div><div class="ar-subtitle success">${new Date(rep.created_at + 'Z').toLocaleString()}</div></div>
@@ -3260,7 +3366,7 @@ function renderKindDetail(rep, content) {
           <button class="ar-btn-primary" onclick="showPage('reports')">← Back to Reports</button>
         </div>
       </div>
-      <div class="bm-box kd-flat${isDme ? ' dm-box' : ''}">${panel}</div>
+      ${panel}
       <div class="ar-disclaimer"><strong>Medical Disclaimer:</strong> This analysis is for screening purposes only and should not replace professional medical diagnosis.</div>`;
 }
 
