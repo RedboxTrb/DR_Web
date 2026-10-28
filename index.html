@@ -1782,6 +1782,11 @@ function buildResultHTML(result, idx) {
   var recs  = ['Continue annual eye screenings to monitor eye health.','Schedule a follow-up with an ophthalmologist within 12 months.','Consult an ophthalmologist within 3–6 months. Optimise blood glucose control.','Urgent referral to a retina specialist recommended. Risk of vision loss without treatment.','Immediate referral to a retina specialist required. High risk of severe vision loss.'];
   var riskLabel = ['None','Low','Moderate','High','Very High'][grade];
   var riskColor = ['var(--green)','var(--amber)','var(--amber)','var(--red)','var(--red)'][grade];
+  if (cascadeConflict(result.screening, grade)) {
+    gradeColor = 'var(--amber)'; bgMap[0] = bgMap[1]; bdrMap[0] = bdrMap[1];
+    descs[0] = conflictDesc(result.screening); recs[0] = conflictRec(result.screening);
+    riskLabel = 'Review'; riskColor = 'var(--amber)';
+  }
   var imageName = result.image_id || ('Image ' + (idx + 1));
   var procTime  = (result.processing_time || 0).toFixed(2);
 
@@ -1863,6 +1868,17 @@ function screeningRecommendation(scr) {
   }
   return DR_RECS[0];
 }
+
+// ConfECBL decides DR vs no DR. If it found DR but the grading cascade graded the image 0,
+// ConfECBL's verdict takes precedence over the cascade's "no DR / healthy" wording.
+function cascadeConflict(scr, grade) {
+  return !!(scr && !scr.cascade_skipped && scr.dr_detected && grade === 0);
+}
+function conflictDesc(scr) {
+  return 'ConfECBL screening detected diabetic retinopathy (' + scr.grade_name + '); the grading cascade did not grade this image as DR. ' +
+         'The ConfECBL result takes precedence — please have this image reviewed by an ophthalmologist.';
+}
+function conflictRec(scr) { return DR_RECS[scr.grade] || DR_RECS[1]; }
 
 function screenBarsHTML(labels, vals) {
   return labels.map(function (n, i) {
@@ -2184,7 +2200,8 @@ async function loadReportDetail(reportId) {
 
     const block = function (im, idx) {
       const g = im.grade;
-      const gradeColor = g === 0 ? 'var(--green)' : g <= 2 ? 'var(--amber)' : 'var(--red)';
+      const cf = cascadeConflict(im.screening, g);
+      const gradeColor = cf ? 'var(--amber)' : g === 0 ? 'var(--green)' : g <= 2 ? 'var(--amber)' : 'var(--red)';
       const pct = (im.confidence * 100).toFixed(1);
       const label = im.image_label || ('Image ' + (idx + 1));
       const stagesHtml = [
@@ -2210,19 +2227,19 @@ async function loadReportDetail(reportId) {
         </div>
       </div>
       <div class="ar-results-row">
-        <div class="ar-diag-card" style="background:${bgMap[g]};border:1px solid ${bdrMap[g]};">
+        <div class="ar-diag-card" style="background:${bgMap[cf ? 1 : g]};border:1px solid ${bdrMap[cf ? 1 : g]};">
           <div class="ar-diag-header"><span class="ar-diag-title">${escHtml(im.severity)}</span></div>
-          <div class="ar-diag-sub">${descs[g] || ''}</div>
+          <div class="ar-diag-sub">${cf ? escHtml(conflictDesc(im.screening)) : (descs[g] || '')}</div>
           <div class="ar-conf-row"><span class="ar-conf-label">Confidence</span><span class="ar-conf-val" style="color:${gradeColor};">${pct}%</span></div>
           <div class="ar-conf-track"><div class="ar-conf-fill" style="width:${pct}%;background:${gradeColor};"></div></div>
         </div>
         <div class="ar-meta-col">
           <div class="ar-meta-card"><div class="ar-meta-label">Grade</div><div class="ar-meta-val">Grade ${g}</div></div>
-          <div class="ar-meta-card"><div class="ar-meta-label">Risk Level</div><div class="ar-meta-val" style="color:${riskColors[g]};">${riskLabels[g]}</div></div>
+          <div class="ar-meta-card"><div class="ar-meta-label">Risk Level</div><div class="ar-meta-val" style="color:${cf ? 'var(--amber)' : riskColors[g]};">${cf ? 'Review' : riskLabels[g]}</div></div>
         </div>
         <div class="ar-right-col">
           <div class="ar-cascade-card"><div class="ar-cascade-title">Cascade Stages</div>${stagesHtml}</div>
-          <div class="ar-rec-card"><div class="ar-rec-title">Recommendation</div><div class="ar-rec-text">${recs[g] || recs[0]}</div></div>
+          <div class="ar-rec-card"><div class="ar-rec-title">Recommendation</div><div class="ar-rec-text">${cf ? escHtml(conflictRec(im.screening)) : (recs[g] || recs[0])}</div></div>
           <div class="ar-proc-card"><div class="ar-proc-label">Processing Time</div><div class="ar-proc-val">${(im.processing_time || 0).toFixed(2)}s</div></div>
         </div>
       </div>
@@ -2470,7 +2487,8 @@ function exportPDF(savedResults, savedTotalTime) {
     // verdict is the headline and there are no stage rows or vessel maps to show.
     const scr = result.screening || null;
     const skipped = !!(scr && scr.cascade_skipped);
-    const sc = (skipped && scr.verdict_level === 'other') ? '#FABD31' : severityColors[grade];
+    const conflict = cascadeConflict(scr, grade);
+    const sc = ((skipped && scr.verdict_level === 'other') || conflict) ? '#FABD31' : severityColors[grade];
 
     let screeningSection = '';
     if (scr) {
@@ -2566,7 +2584,7 @@ function exportPDF(savedResults, savedTotalTime) {
     <div class="hero">
       <div>
         <div class="hg">Grade ${grade}</div>
-        <div class="hs">${skipped ? escHtml(scr.verdict) : escHtml(cls.severity || '') + ' · ' + riskLabels[grade] + ' risk'}</div>
+        <div class="hs">${skipped ? escHtml(scr.verdict) : conflict ? escHtml(cls.severity || '') + ' · ConfECBL detected DR (' + escHtml(scr.grade_name) + ')' : escHtml(cls.severity || '') + ' · ' + riskLabels[grade] + ' risk'}</div>
       </div>
       <div class="conf">
         <div class="cl">Model confidence</div>
@@ -2574,7 +2592,7 @@ function exportPDF(savedResults, savedTotalTime) {
         <div class="bar"><i style="width:${pct}%"></i></div>
       </div>
     </div>
-    <div class="rec"><strong>Recommendation:</strong> ${skipped ? escHtml(screeningRecommendation(scr)) : recs[grade]}</div>
+    <div class="rec"><strong>Recommendation:</strong> ${skipped ? escHtml(screeningRecommendation(scr)) : conflict ? escHtml(conflictRec(scr)) + '<br><span style="color:#4A5070">' + escHtml(conflictDesc(scr)) + '</span>' : recs[grade]}</div>
     <div class="sec">Classification Detail</div>
     <table class="kv">
       <tr><td>DR Grade</td><td>Grade ${grade} of 4</td></tr>
