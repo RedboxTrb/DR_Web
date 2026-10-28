@@ -602,6 +602,40 @@ footer{padding:52px 60px 28px;}
 .sc-num{width:38px;flex:none;text-align:right;font-variant-numeric:tabular-nums;color:var(--g600);}
 .sc-note{font-size:11px;color:var(--g500);margin-top:14px;line-height:1.55;}
 @media(max-width:720px){.sc-grid{grid-template-columns:1fr;}.beta-strip{padding:18px;}.beta-strip-btn{width:100%;}}
+/* ANALYSIS CHOOSER + DME PAGE */
+:root{--dme:#F6815E;--dme-d:#B9502F;--dme-bg:rgba(246,129,94,.08);--dme-bd:rgba(246,129,94,.3);}
+.ch-back{display:inline-block;margin-top:16px;font-size:13px;font-weight:600;color:var(--teal-d);cursor:pointer;}
+.ch-back:hover{text-decoration:underline;}
+.ch-container{max-width:1000px;}
+.ch-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-bottom:24px;}
+.ch-card{--ac:var(--teal);--ac-d:var(--teal-d);--ac-bg:rgba(34,183,163,.1);display:flex;flex-direction:column;align-items:flex-start;text-align:left;font-family:inherit;background:var(--white);border:1px solid var(--g200);border-top:3px solid var(--ac);border-radius:14px;padding:22px 20px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s;}
+.ch-card:hover{border-color:var(--ac);box-shadow:0 6px 20px rgba(12,16,36,.07);transform:translateY(-2px);}
+.ch-card:focus-visible{outline:2px solid var(--ac-d);outline-offset:2px;}
+.ch-dme{--ac:var(--dme);--ac-d:var(--dme-d);--ac-bg:var(--dme-bg);}
+.ch-beta{--ac:var(--beta);--ac-d:var(--beta-d);--ac-bg:var(--beta-bg);}
+.ch-badge{font-size:10px;font-weight:800;letter-spacing:.5px;color:var(--ac-d);background:var(--ac-bg);border-radius:20px;padding:3px 10px;margin-bottom:14px;}
+.ch-title{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.ch-desc{font-size:13px;line-height:1.65;color:var(--g500);flex:1;margin-bottom:18px;}
+.ch-go{font-size:13px;font-weight:700;color:var(--ac-d);}
+.ch-hero-beta{vertical-align:middle;font-size:11px;position:relative;top:-4px;}
+.dm-box{border-left-color:var(--dme);}
+.dm-box .bm-dz{border-color:var(--dme-bd);background:var(--dme-bg);}
+.dm-box .bm-browse{color:var(--dme-d);border-color:var(--dme-bd);}
+.dm-box .bm-browse:hover{border-color:var(--dme);}
+.dm-box .bm-run{background:var(--dme-d);border-color:var(--dme-d);}
+.dm-box .bm-run:hover:enabled{background:#9C4026;}
+.dm-box .bm-run:disabled{background:var(--g200);border-color:var(--g200);color:var(--g400);}
+.dm-box .bm-wait{color:var(--dme-d);background:var(--dme-bg);}
+.dm-box .sc-card{border-left:3px solid var(--dme);margin-top:18px;}
+.dm-box .sc-title{color:var(--dme-d);}
+.dm-box .sc-tag{color:var(--dme-d);background:var(--dme-bg);border-color:var(--dme-bd);}
+.dm-box .sc-bar i{background:var(--dme);}
+.dm-steps{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px;}
+.dm-steps td{padding:5px 0;border-bottom:1px solid var(--g100);color:var(--g600);}
+.dm-steps td:last-child{text-align:right;font-variant-numeric:tabular-nums;color:var(--navy);font-weight:600;}
+@media(max-width:900px){.ch-grid{grid-template-columns:1fr;}}
+@media(max-width:640px){.ch-grid{margin-top:16px;}}
+
 .feat-card,.ar-clinic-card,.ar-stage-card,.ar-meta-card{transition:box-shadow .2s,transform .2s,border-color .2s;}
 .feat-card:hover{border-color:var(--g300);}
 
@@ -865,12 +899,12 @@ footer{padding:52px 60px 28px;}
     <div class="nav-links">
       <a href="#home" onclick="showPage('home')">Home</a>
       <a href="#features" onclick="if(document.getElementById('page-home').classList.contains('active')){event.preventDefault();document.getElementById('features').scrollIntoView({behavior:'smooth'});}">About</a>
-      <a onclick="showPage('upload')">Demo</a>
+      <a onclick="showPage('choose')">Demo</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-home" style="display:flex;gap:16px;align-items:center;">
         <button class="nav-btn-ghost" onclick="showPage('auth');const b=document.getElementById('auth-guest-banner');if(b)b.classList.remove('show');">Log in</button>
-        <button class="nav-btn" onclick="showPage('upload')">Try Demo →</button>
+        <button class="nav-btn" onclick="showPage('choose')">Try Demo →</button>
       </div>
       <div id="nav-user-home" class="profile-chip" style="display:none;" onclick="this.classList.toggle('open')" tabindex="0">
         <div class="profile-avatar" id="nav-avatar-home">?</div>
@@ -904,7 +938,7 @@ footer{padding:52px 60px 28px;}
     <div class="hero-content">
       <div class="hero-badge">AI-Powered Retinal Image Analysis</div>
       <h1 class="hero-h1">Retinal Analysis<br><span>From One</span><br>Fundus Photograph.</h1>
-      <p class="hero-sub">Upload a fundus photograph and get diabetic retinopathy grading, vessel and lesion segmentation maps, and a beta multi-disease screen &mdash; in seconds.</p>
+      <p class="hero-sub">Upload a fundus photograph and get diabetic retinopathy grading, vessel and lesion segmentation maps, diabetic macular oedema grading and a beta multi-disease screen &mdash; in seconds.</p>
       <div class="hero-ctas">
         <button class="btn-primary" onclick="showAuthGate()">Analyze Retina →</button>
         <button class="btn-ghost" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">See How It Works</button>
@@ -1039,7 +1073,7 @@ footer{padding:52px 60px 28px;}
           <svg width="28" height="28" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><path d="M27 9 A12 12 0 1 0 27 27" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/><circle cx="19" cy="18" r="4" fill="#22B7A3"/></svg>
           <span style="color:var(--white);font-size:17px;font-weight:700;">ChakshurakhsakAI</span>
         </div>
-        <p class="footer-brand-desc">A research platform for retinal image analysis &mdash; diabetic retinopathy grading, vessel and lesion segmentation, and a beta multi-disease screen &mdash; from a single fundus photograph.</p>
+        <p class="footer-brand-desc">A research platform for retinal image analysis &mdash; diabetic retinopathy grading, vessel and lesion segmentation, diabetic macular oedema grading and a beta multi-disease screen &mdash; from a single fundus photograph.</p>
         <a class="footer-maitri" href="https://maitri-lab.com" target="_blank" rel="noopener">
           <img src="data:image/png;base64,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" alt="" width="34" height="34">
           <span><small>Developed by</small>MAITRI Lab</span>
@@ -1052,7 +1086,7 @@ footer{padding:52px 60px 28px;}
       </div>
       <div class="footer-col">
         <div class="footer-col-title">Platform</div>
-        <a onclick="showPage('upload')">Try Demo</a>
+        <a onclick="showPage('choose')">Try Demo</a>
         <a onclick="copyEmail('info@chakshurakshakai.com', 'api')">API Access</a>
       </div>
       <div class="footer-col">
@@ -1087,7 +1121,7 @@ footer{padding:52px 60px 28px;}
     <div class="nav-right">
       <div id="nav-guest-upload" style="display:flex;gap:12px;align-items:center;">
         <button class="nav-btn-ghost" onclick="showPage('auth');const b=document.getElementById('auth-guest-banner');if(b)b.classList.remove('show');">Log in</button>
-        <button class="nav-btn" onclick="showPage('upload')">Try Demo →</button>
+        <button class="nav-btn" onclick="showPage('choose')">Try Demo →</button>
       </div>
       <div id="nav-user-upload" class="profile-chip" style="display:none;" onclick="this.classList.toggle('open')" tabindex="0">
         <div class="profile-avatar" id="nav-avatar-upload">?</div>
@@ -1110,6 +1144,7 @@ footer{padding:52px 60px 28px;}
   <div class="upload-hero">
     <h1>Analyze <span>Retinal Images</span></h1>
     <p>Upload one or more fundus photographs for DR grading, vessel and lesion segmentation maps, and an exportable report.</p>
+    <a class="ch-back" onclick="showPage('choose')">&larr; Choose a different analysis</a>
   </div>
   <div class="upload-body">
     <div class="upload-container">
@@ -1135,29 +1170,6 @@ footer{padding:52px 60px 28px;}
           <label>Referred by<input type="text" id="pt-ref" placeholder="e.g. Dr. R. Verma" autocomplete="off"></label>
         </div>
       </div>
-      <!-- Multi-Disease Detection (ConfECBL), beta. Its own image picker and its own
-           request to /api/screen: the DR analysis above never sees this image, and this
-           result is never saved or exported. -->
-      <div class="bm-box" id="beta-module">
-        <div class="bm-head">
-          <span class="bm-title">Multi-Disease Detection</span>
-          <span class="bm-beta">BETA</span>
-          <span class="bm-sub">research preview &middot; ConfECBL</span>
-        </div>
-        <p class="bm-text">Screens one fundus image, chosen here, for conditions outside diabetic retinopathy &mdash; AMD, myopic changes, retinal vein occlusion and chorioretinal scarring &mdash; and reports referable-DR and macular-oedema probability with per-lesion scores for MA, HE, EX and SE.</p>
-        <div class="bm-dz" onclick="document.getElementById('bm-input').click()">
-          <div class="bm-dz-title">Pick an image for the beta model</div>
-          <div class="bm-dz-sub">Its own upload &mdash; the images you dropped above for DR analysis are not sent here.<br>One fundus photograph &middot; JPG or PNG</div>
-          <button class="bm-browse" type="button" onclick="event.stopPropagation();document.getElementById('bm-input').click()">Browse Files</button>
-        </div>
-        <input type="file" id="bm-input" accept="image/*" onchange="betaPickFile(this.files)">
-        <div class="bm-foot">
-          <span class="bm-file" id="bm-file">No image chosen yet</span>
-          <button class="bm-run" id="bm-run" type="button" disabled onclick="runBetaModel()">Run beta model &rarr;</button>
-        </div>
-        <div id="bm-result"></div>
-        <div class="bm-note"><b>Beta.</b> This module runs on its own, with its own image. It does not touch the DR analysis or its grade, is not written into the exported report, and is not saved with your reports.</div>
-      </div>
       <button class="analyze-btn" id="analyze-btn" disabled onclick="analyzeImages()">
         <span id="analyze-btn-text">Select images to analyze</span>
       </button>
@@ -1182,6 +1194,224 @@ footer{padding:52px 60px 28px;}
           <div class="uf-title">Multiple Images</div>
           <div class="uf-desc">Upload both OD and OS images for a complete bilateral analysis.</div>
         </div>
+      </div>
+      <div class="upload-disclaimer">
+        <div class="disclaimer-title">⚠ Research Tool — Not a Medical Device</div>
+        This tool is intended for research and educational purposes only. Results should not substitute professional clinical examination by a qualified ophthalmologist.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     ANALYSIS CHOOSER: three independent flows, each with its own model
+══════════════════════════════════ -->
+<div class="page" id="page-choose">
+  <nav>
+    <a class="nav-logo" onclick="showPage('home')">
+      <svg width="28" height="28" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><path d="M27 9 A12 12 0 1 0 27 27" fill="none" stroke="#0C1024" stroke-width="3.5" stroke-linecap="round"/><circle cx="19" cy="18" r="4" fill="#22B7A3"/></svg>
+      <span class="nav-logo-text">ChakshurakhsakAI</span>
+    </a>
+    <div class="nav-links">
+      <a onclick="showPage('home')">Home</a>
+      <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
+      <a style="color:var(--teal);font-weight:600;" onclick="showPage('choose')">Demo</a>
+    </div>
+    <div class="nav-right">
+      <div id="nav-guest-choose" style="display:flex;gap:12px;align-items:center;">
+        <button class="nav-btn-ghost" onclick="showPage('auth');const b=document.getElementById('auth-guest-banner');if(b)b.classList.remove('show');">Log in</button>
+        <button class="nav-btn" onclick="showPage('upload')">Try Demo →</button>
+      </div>
+      <div id="nav-user-choose" class="profile-chip" style="display:none;" onclick="this.classList.toggle('open')" tabindex="0">
+        <div class="profile-avatar" id="nav-avatar-choose">?</div>
+        <span id="nav-user-name-choose"></span>
+        <span class="profile-chevron">&#9660;</span>
+        <div class="profile-dropdown">
+          <a onclick="event.stopPropagation();document.getElementById('nav-user-choose').classList.remove('open');showPage('reports')">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M4 5h6M4 7.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            My Reports
+          </a>
+          <hr>
+          <a class="dd-logout" onclick="event.stopPropagation();document.getElementById('nav-user-choose').classList.remove('open');authLogout()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 4.5 11.5 7 9 9.5M5 7h6.5M5 2H2.5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1H5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Logout
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="upload-hero">
+    <h1>Choose an <span>Analysis</span></h1>
+    <p>Each analysis runs its own model on the images you give it. Pick one to continue &mdash; you can come back and run another.</p>
+  </div>
+  <div class="upload-body">
+    <div class="upload-container ch-container">
+      <div class="ch-grid">
+        <button type="button" class="ch-card ch-dr" onclick="showPage('upload')">
+          <span class="ch-badge">DR</span>
+          <span class="ch-title">Diabetic Retinopathy</span>
+          <span class="ch-desc">Five-stage DR grade (No DR to PDR) with a confidence score, vessel segmentation map and lesion maps for MA, HE, EX and SE. Multiple images, exportable report.</span>
+          <span class="ch-go">Start DR analysis &rarr;</span>
+        </button>
+        <button type="button" class="ch-card ch-dme" onclick="showPage('dme')">
+          <span class="ch-badge">DME</span>
+          <span class="ch-title">Diabetic Macular Oedema</span>
+          <span class="ch-desc">Grades one fundus photograph as no DME, or hard exudates away from or near the fovea, with per-lesion scores and a hard-exudate overlay. GRACE-Net.</span>
+          <span class="ch-go">Start DME analysis &rarr;</span>
+        </button>
+        <button type="button" class="ch-card ch-beta" onclick="showPage('beta')">
+          <span class="ch-badge">BETA</span>
+          <span class="ch-title">Multi-Disease Screening</span>
+          <span class="ch-desc">A research preview that looks past DR &mdash; AMD, myopic changes, retinal vein occlusion and chorioretinal scarring &mdash; on one fundus photograph. ConfECBL.</span>
+          <span class="ch-go">Try the beta &rarr;</span>
+        </button>
+      </div>
+      <div class="upload-disclaimer">
+        <div class="disclaimer-title">⚠ Research Tool — Not a Medical Device</div>
+        This tool is intended for research and educational purposes only. Results should not substitute professional clinical examination by a qualified ophthalmologist.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     DIABETIC MACULAR OEDEMA (GRACE-Net): own picker, own request to /api/dme.
+     The result is shown here only; it is not saved or written into the DR report.
+══════════════════════════════════ -->
+<div class="page" id="page-dme">
+  <nav>
+    <a class="nav-logo" onclick="showPage('home')">
+      <svg width="28" height="28" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><path d="M27 9 A12 12 0 1 0 27 27" fill="none" stroke="#0C1024" stroke-width="3.5" stroke-linecap="round"/><circle cx="19" cy="18" r="4" fill="#22B7A3"/></svg>
+      <span class="nav-logo-text">ChakshurakhsakAI</span>
+    </a>
+    <div class="nav-links">
+      <a onclick="showPage('home')">Home</a>
+      <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
+      <a style="color:var(--teal);font-weight:600;" onclick="showPage('choose')">Demo</a>
+    </div>
+    <div class="nav-right">
+      <div id="nav-guest-dme" style="display:flex;gap:12px;align-items:center;">
+        <button class="nav-btn-ghost" onclick="showPage('auth');const b=document.getElementById('auth-guest-banner');if(b)b.classList.remove('show');">Log in</button>
+        <button class="nav-btn" onclick="showPage('upload')">Try Demo →</button>
+      </div>
+      <div id="nav-user-dme" class="profile-chip" style="display:none;" onclick="this.classList.toggle('open')" tabindex="0">
+        <div class="profile-avatar" id="nav-avatar-dme">?</div>
+        <span id="nav-user-name-dme"></span>
+        <span class="profile-chevron">&#9660;</span>
+        <div class="profile-dropdown">
+          <a onclick="event.stopPropagation();document.getElementById('nav-user-dme').classList.remove('open');showPage('reports')">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M4 5h6M4 7.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            My Reports
+          </a>
+          <hr>
+          <a class="dd-logout" onclick="event.stopPropagation();document.getElementById('nav-user-dme').classList.remove('open');authLogout()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 4.5 11.5 7 9 9.5M5 7h6.5M5 2H2.5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1H5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Logout
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="upload-hero">
+    <h1>Diabetic <span>Macular Oedema</span></h1>
+    <p>Upload one fundus photograph to grade diabetic macular oedema from the hard exudates the model finds and how close they lie to the fovea.</p>
+    <a class="ch-back" onclick="showPage('choose')">&larr; Choose a different analysis</a>
+  </div>
+  <div class="upload-body">
+    <div class="upload-container">
+      <div class="bm-box dm-box" id="dme-module">
+        <div class="bm-head">
+          <span class="bm-title">DME Grading</span>
+          <span class="bm-sub">GRACE-Net</span>
+        </div>
+        <p class="bm-text">Reports one of three grades &mdash; no DME, exudates away from the fovea, or exudates near the fovea &mdash; with the probability of each, presence scores for MA, HE, EX and SE, and an overlay of the hard exudates it marked.</p>
+        <div class="bm-dz" onclick="document.getElementById('dme-input').click()">
+          <div class="bm-dz-title">Pick a fundus image</div>
+          <div class="bm-dz-sub">One fundus photograph &middot; JPG or PNG</div>
+          <button class="bm-browse" type="button" onclick="event.stopPropagation();document.getElementById('dme-input').click()">Browse Files</button>
+        </div>
+        <input type="file" id="dme-input" accept="image/*" onchange="dmePickFile(this.files)">
+        <div class="bm-foot">
+          <span class="bm-file" id="dme-file">No image chosen yet</span>
+          <button class="bm-run" id="dme-run" type="button" disabled onclick="runDmeModel()">Grade DME &rarr;</button>
+        </div>
+        <div id="dme-result"></div>
+        <div class="bm-note">This analysis runs on its own, with its own image. It is not part of the DR grade, is not written into the exported DR report, and is not saved with your reports.</div>
+      </div>
+      <div class="upload-disclaimer">
+        <div class="disclaimer-title">⚠ Research Tool — Not a Medical Device</div>
+        This tool is intended for research and educational purposes only. Results should not substitute professional clinical examination by a qualified ophthalmologist.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     MULTI-DISEASE SCREENING (ConfECBL), beta
+══════════════════════════════════ -->
+<div class="page" id="page-beta">
+  <nav>
+    <a class="nav-logo" onclick="showPage('home')">
+      <svg width="28" height="28" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><path d="M27 9 A12 12 0 1 0 27 27" fill="none" stroke="#0C1024" stroke-width="3.5" stroke-linecap="round"/><circle cx="19" cy="18" r="4" fill="#22B7A3"/></svg>
+      <span class="nav-logo-text">ChakshurakhsakAI</span>
+    </a>
+    <div class="nav-links">
+      <a onclick="showPage('home')">Home</a>
+      <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
+      <a style="color:var(--teal);font-weight:600;" onclick="showPage('choose')">Demo</a>
+    </div>
+    <div class="nav-right">
+      <div id="nav-guest-beta" style="display:flex;gap:12px;align-items:center;">
+        <button class="nav-btn-ghost" onclick="showPage('auth');const b=document.getElementById('auth-guest-banner');if(b)b.classList.remove('show');">Log in</button>
+        <button class="nav-btn" onclick="showPage('upload')">Try Demo →</button>
+      </div>
+      <div id="nav-user-beta" class="profile-chip" style="display:none;" onclick="this.classList.toggle('open')" tabindex="0">
+        <div class="profile-avatar" id="nav-avatar-beta">?</div>
+        <span id="nav-user-name-beta"></span>
+        <span class="profile-chevron">&#9660;</span>
+        <div class="profile-dropdown">
+          <a onclick="event.stopPropagation();document.getElementById('nav-user-beta').classList.remove('open');showPage('reports')">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M4 5h6M4 7.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            My Reports
+          </a>
+          <hr>
+          <a class="dd-logout" onclick="event.stopPropagation();document.getElementById('nav-user-beta').classList.remove('open');authLogout()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 4.5 11.5 7 9 9.5M5 7h6.5M5 2H2.5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1H5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Logout
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="upload-hero">
+    <h1>Multi-Disease <span>Screening</span> <span class="bm-beta ch-hero-beta">BETA</span></h1>
+    <p>A research preview that screens one fundus photograph for conditions outside diabetic retinopathy.</p>
+    <a class="ch-back" onclick="showPage('choose')">&larr; Choose a different analysis</a>
+  </div>
+  <div class="upload-body">
+    <div class="upload-container">
+      <!-- Multi-Disease Detection (ConfECBL), beta. Its own image picker and its own
+           request to /api/screen: the DR analysis never sees this image, and this
+           result is never saved or exported. -->
+      <div class="bm-box" id="beta-module">
+        <div class="bm-head">
+          <span class="bm-title">Multi-Disease Detection</span>
+          <span class="bm-beta">BETA</span>
+          <span class="bm-sub">research preview &middot; ConfECBL</span>
+        </div>
+        <p class="bm-text">Screens one fundus image, chosen here, for conditions outside diabetic retinopathy &mdash; AMD, myopic changes, retinal vein occlusion and chorioretinal scarring &mdash; and reports referable-DR and macular-oedema probability with per-lesion scores for MA, HE, EX and SE.</p>
+        <div class="bm-dz" onclick="document.getElementById('bm-input').click()">
+          <div class="bm-dz-title">Pick an image for the beta model</div>
+          <div class="bm-dz-sub">One fundus photograph &middot; JPG or PNG<br>Runs separately from the DR analysis &mdash; no other image is sent.</div>
+          <button class="bm-browse" type="button" onclick="event.stopPropagation();document.getElementById('bm-input').click()">Browse Files</button>
+        </div>
+        <input type="file" id="bm-input" accept="image/*" onchange="betaPickFile(this.files)">
+        <div class="bm-foot">
+          <span class="bm-file" id="bm-file">No image chosen yet</span>
+          <button class="bm-run" id="bm-run" type="button" disabled onclick="runBetaModel()">Run beta model &rarr;</button>
+        </div>
+        <div id="bm-result"></div>
+        <div class="bm-note"><b>Beta.</b> This module runs on its own, with its own image. It does not touch the DR analysis or its grade, is not written into the exported report, and is not saved with your reports.</div>
       </div>
       <div class="upload-disclaimer">
         <div class="disclaimer-title">⚠ Research Tool — Not a Medical Device</div>
@@ -1341,7 +1571,7 @@ footer{padding:52px 60px 28px;}
         <div class="auth-guest-banner" id="auth-guest-banner">
           <div class="auth-guest-banner-title">Sign in to save your results</div>
           <div class="auth-guest-banner-sub">Create a free account to save analyses, track history, and export reports — or continue without an account.</div>
-          <button class="auth-guest-btn" onclick="showPage('upload')">
+          <button class="auth-guest-btn" onclick="showPage('choose')">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v2.5l1.5 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
             Continue as Guest
           </button>
@@ -1557,13 +1787,9 @@ var BETA_LEGENDS = {
 };
 var BETA_NOTE = 'Beta module — research use only, and not part of the DR report. Final diagnosis by an ophthalmologist.';
 
-// From the home-page strip: open the upload page and bring the module into view.
+// From the home-page strip: the module has its own page.
 function openBetaModule() {
-  showPage('upload');
-  setTimeout(function () {
-    var el = document.getElementById('beta-module');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 160);
+  showPage('beta');
 }
 
 function betaPickFile(files) {
@@ -1654,6 +1880,104 @@ function setBetaView(view) {
   var b64 = (_betaScreening.overlays || {})[view];
   img.src = (view === 'orig' || !b64) ? _betaObjUrl : dataUrl(b64);
   if (leg) leg.innerHTML = BETA_LEGENDS[view] || '';
+}
+
+// ── Diabetic Macular Oedema (GRACE-Net) — standalone page ────────────────────
+// Same shape as the beta module: its own image, its own request to /api/dme, its own
+// panel. Nothing here touches the DR analysis state, saved reports or the PDF.
+
+var _dmeFile = null;
+var _dmeObjUrl = null;
+var _dmeResult = null;
+
+function dmePickFile(files) {
+  var f = files && files[0];
+  if (!f) return;
+  if (_dmeObjUrl) URL.revokeObjectURL(_dmeObjUrl);
+  _dmeFile = f;
+  _dmeObjUrl = URL.createObjectURL(f);
+  _dmeResult = null;
+  document.getElementById('dme-file').innerHTML =
+    'Chosen: <b>' + escHtml(f.name) + '</b> &middot; ' + (f.size / 1048576).toFixed(1) + ' MB';
+  var btn = document.getElementById('dme-run');
+  btn.disabled = false;
+  btn.innerHTML = 'Grade DME &rarr;';
+  document.getElementById('dme-result').innerHTML = '';
+}
+
+async function runDmeModel() {
+  if (!_dmeFile) return;
+  var btn = document.getElementById('dme-run');
+  var out = document.getElementById('dme-result');
+  btn.disabled = true;
+  btn.textContent = 'Grading...';
+  out.innerHTML = '<div class="bm-wait">Grading macular oedema with GRACE-Net...</div>';
+  try {
+    var fd = new FormData();
+    fd.append('image', _dmeFile);
+    var r = await fetch(BACKEND_URL + '/api/dme', { method: 'POST', headers: NGROK_HEADER, body: fd });
+    var d = await r.json();
+    if (!d.success) throw new Error(d.error || 'DME grading failed');
+    _dmeResult = d.dme;
+    out.innerHTML = dmePanelHTML(d.dme, d.image_id || _dmeFile.name, d.processing_time);
+  } catch (e) {
+    _dmeResult = null;
+    out.innerHTML = '<div class="bm-err">' + escHtml(e.message || String(e)) + '</div>';
+  }
+  btn.disabled = false;
+  btn.innerHTML = 'Grade again &rarr;';
+}
+
+function dmePanelHTML(dme, filename, procTime) {
+  var grade = Number(dme.grade) || 0;
+  var level = grade === 0 ? 'clear' : (grade === 1 ? 'other' : 'dr');
+  var toggle = dme.overlay
+    ? '<div class="sc-views">' +
+        '<label><input type="radio" name="dme-view" value="orig" checked onchange="setDmeView(\'orig\')"> Original</label>' +
+        '<label><input type="radio" name="dme-view" value="ex" onchange="setDmeView(\'ex\')"> Hard exudates</label>' +
+      '</div>'
+    : '';
+  var lp = dme.lesion_presence || {};
+  var lpKeys = ['MA', 'HE', 'EX', 'SE'].filter(function (k) { return k in lp; });
+  // The fusion steps are two-class (no DME / DME); show P(DME) from each.
+  var st = dme.steps || {};
+  function p1(v) { return Array.isArray(v) && v.length > 1 ? Number(v[1]).toFixed(3) : '&mdash;'; }
+  var steps = dme.steps
+    ? '<div class="sc-sub">Protocol-aware fusion &middot; P(DME)</div>' +
+      '<table class="dm-steps">' +
+        '<tr><td>Direct prediction</td><td>' + p1(st.direct) + '</td></tr>' +
+        '<tr><td>Grading-rule prediction</td><td>' + p1(st.rule) + '</td></tr>' +
+        '<tr><td>Disagreement (total variation)</td><td>' + Number(st.tv || 0).toFixed(3) + '</td></tr>' +
+        '<tr><td>Fusion weight &alpha;</td><td>' + Number(st.alpha || 0).toFixed(2) + '</td></tr>' +
+        '<tr><td>Fused</td><td>' + p1(st.final) + '</td></tr>' +
+      '</table>' +
+      '<div class="sc-detail" style="margin-top:6px;">The two predictions ' +
+        (dme.consistent ? 'agree.' : '<b>disagree</b> &mdash; review this image carefully.') + '</div>'
+    : '';
+  return '<div class="sc-card">' +
+    '<div class="sc-head"><span class="sc-title">Macular Oedema Grading</span>' +
+      '<span class="sc-tag">' + escHtml(dme.model || 'GRACE-Net') + '</span>' +
+      '<span class="bm-time">' + escHtml(filename) + ' &middot; ' + Number(procTime || 0).toFixed(2) + ' s</span></div>' +
+    '<div class="sc-grid">' +
+      '<div><img class="sc-img" id="dme-img" src="' + _dmeObjUrl + '" alt="The image graded for macular oedema">' + toggle +
+        '<div class="sc-leg">' + (dme.overlay ? 'Hard-exudate area: ' + (Number(dme.ex_area || 0) * 100).toFixed(2) + '% of the image' : '') + '</div></div>' +
+      '<div>' +
+        '<div class="sc-verdict ' + level + '">' + escHtml(dme.grade_name) + ' &middot; grade ' + grade + '</div>' +
+        '<div class="sc-detail">DME prob ' + Number(dme.dme_prob || 0).toFixed(3) +
+          ' &middot; hard exudates present ' + Number(dme.ex_presence || 0).toFixed(3) + '</div>' +
+        '<div class="sc-sub">Grade probabilities</div>' + betaBarsHTML(dme.prob_labels, dme.dme_probs) +
+        (lpKeys.length ? '<div class="sc-sub">Lesions (presence)</div>' +
+          betaBarsHTML(lpKeys, lpKeys.map(function (k) { return lp[k]; })) : '') +
+        steps +
+        '<div class="sc-note">Research use only, and not part of the DR report. Final diagnosis by an ophthalmologist.</div>' +
+      '</div>' +
+    '</div></div>';
+}
+
+function setDmeView(view) {
+  var img = document.getElementById('dme-img');
+  if (!img || !_dmeResult) return;
+  img.src = (view === 'ex' && _dmeResult.overlay) ? _dmeResult.overlay : _dmeObjUrl;
 }
 
 function escHtml(s) {
@@ -1754,7 +2078,7 @@ async function loadCurrentUser() {
 function updateNavForUser(user) {
   const name = user.name.split(' ')[0];
   const initial = name.charAt(0).toUpperCase();
-  ['home','upload','analysis'].forEach(p => {
+  ['home','upload','analysis','choose','dme','beta'].forEach(p => {
     const g = document.getElementById('nav-guest-' + p);
     const u = document.getElementById('nav-user-' + p);
     const n = document.getElementById('nav-user-name-' + p);
@@ -1769,7 +2093,7 @@ function updateNavForUser(user) {
 }
 
 function updateNavForGuest() {
-  ['home','upload','analysis'].forEach(p => {
+  ['home','upload','analysis','choose','dme','beta'].forEach(p => {
     const g = document.getElementById('nav-guest-' + p);
     const u = document.getElementById('nav-user-' + p);
     if (g) g.style.display = 'flex';
@@ -1816,7 +2140,7 @@ async function authLogin() {
     updateNavForUser(d.user);
     showToast('Welcome back, ' + d.user.name.split(' ')[0] + '!');
     await checkPendingSave();
-    showPage('upload');
+    showPage('choose');
   } catch { errEl.textContent = 'Connection error. Please try again.'; errEl.style.display = 'block'; }
   btn.disabled = false; btn.textContent = 'Sign in →';
 }
@@ -1848,7 +2172,7 @@ async function authSignup() {
     updateNavForUser(d.user);
     showToast('Account created! Welcome, ' + d.user.name.split(' ')[0] + '!');
     await checkPendingSave();
-    showPage('upload');
+    showPage('choose');
   } catch { errEl.textContent = 'Connection error. Please try again.'; errEl.style.display = 'block'; }
   btn.disabled = false; btn.textContent = 'Create account →';
 }
@@ -1889,7 +2213,7 @@ async function handleAuthCallback() {
     history.replaceState(null, '', '/');
     showToast('Signed in with Google!');
     await checkPendingSave();
-    showPage('upload');
+    showPage('choose');
   } catch (e) {
     showToast('Google sign in failed: ' + e.message, '#F35858');
     history.replaceState(null, '', '/');
@@ -1899,7 +2223,7 @@ async function handleAuthCallback() {
 
 // ── Page system ───────────────────────────────────────────────────────────────
 function showAuthGate() {
-  if (_currentUser) { showPage('upload'); return; }
+  if (_currentUser) { showPage('choose'); return; }
   showPage('auth');
   const b = document.getElementById('auth-guest-banner');
   if (b) b.classList.add('show');
@@ -2855,7 +3179,7 @@ function toggleMobileMenu() {
     menu.innerHTML = `
       <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('home')">Home</a>
       <a class="nav-mobile-link" onclick="closeMobileMenu();document.getElementById('features')&&document.getElementById('features').scrollIntoView({behavior:'smooth'});showPage('home')">About</a>
-      <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('upload')">Try Demo</a>
+      <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('choose')">Try Demo</a>
       <hr class="nav-mobile-divider">
       <a class="nav-mobile-link" id="mm-login" onclick="closeMobileMenu();showPage('auth')" style="color:var(--teal)">Log in / Sign up</a>
       <a class="nav-mobile-link" id="mm-reports" style="display:none;" onclick="closeMobileMenu();showPage('reports')">My Reports</a>
