@@ -1923,7 +1923,7 @@ function screenedOutBlockHTML(scr, imgB64, idx, live, procTime) {
     '<div class="ar-results-row" style="margin-top:16px;">' +
       '<div class="ar-rec-card"><div class="ar-rec-title">Recommendation</div><div class="ar-rec-text">' + escHtml(screeningRecommendation(scr)) + '</div></div>' +
       '<div class="ar-meta-col">' +
-        '<div class="ar-meta-card"><div class="ar-meta-label">Grade</div><div class="ar-meta-val">Grade 0</div></div>' +
+        '<div class="ar-meta-card"><div class="ar-meta-label">Result</div><div class="ar-meta-val">No DR</div></div>' +
         '<div class="ar-meta-card"><div class="ar-meta-label">DR Risk</div><div class="ar-meta-val" style="color:' + color + ';">None</div></div>' +
       '</div>' +
       '<div class="ar-right-col"><div class="ar-proc-card"><div class="ar-proc-label">Processing Time</div><div class="ar-proc-val">' + Number(procTime || 0).toFixed(2) + 's</div></div></div>' +
@@ -2430,18 +2430,22 @@ function exportPDF(savedResults, savedTotalTime) {
     const anyScr = results.some(function (r) { return r.screening; });
     const rows = results.map(function (result, idx) {
       const c = result.classification;
+      const scr0 = result.screening || null;
+      // No DR: only ConfECBL ran, so the grading columns are blank rather than showing
+      // placeholder values that no grading model produced.
+      const noDr = !!(scr0 && scr0.cascade_skipped);
       const sc = severityColors[c.grade];
       return `<tr>
         <td>${escHtml(imageLabel(result, idx))}</td>
-        <td><b style="color:${sc}">Grade ${c.grade}</b></td>
-        <td>${escHtml(c.severity || '')}</td>
-        ${anyScr ? `<td>${result.screening ? escHtml(result.screening.verdict) : '—'}</td>` : ''}
-        <td class="num">${(c.confidence * 100).toFixed(1)}%</td>
+        ${anyScr ? `<td>${scr0 ? escHtml(scr0.verdict) : '—'}</td>` : ''}
+        <td>${noDr ? '—' : `<b style="color:${sc}">Grade ${c.grade}</b>`}</td>
+        <td>${noDr ? '—' : escHtml(c.severity || '')}</td>
+        <td class="num">${noDr ? '—' : (c.confidence * 100).toFixed(1) + '%'}</td>
       </tr>`;
     }).join('');
     summarySection = `<div class="sec">Summary — ${n} images</div>
     <table>
-      <tr><th>Image</th><th>Grade</th><th>Severity</th>${anyScr ? '<th>Screening</th>' : ''}<th class="num">Confidence</th></tr>
+      <tr><th>Image</th>${anyScr ? '<th>Screening (ConfECBL)</th>' : ''}<th>Grade</th><th>Severity</th><th class="num">Confidence</th></tr>
       ${rows}
     </table>`;
   }
@@ -2464,7 +2468,7 @@ function exportPDF(savedResults, savedTotalTime) {
         }).join('') + '</table>';
       };
       const ov = scr.overlays || {};
-      const ovImgs = (ov.lesion || ov.conf) ? `<div class="imgs">
+      const ovImgs = (skipped || ov.lesion || ov.conf) ? `<div class="imgs">
         ${result.original_image ? `<figure><div class="cap">Original</div><img src="${dataUrl(result.original_image)}"></figure>` : ''}
         ${ov.lesion ? `<figure><div class="cap">DR lesions</div><img src="${dataUrl(ov.lesion)}"></figure>` : ''}
         ${ov.conf ? `<figure><div class="cap">Other-disease signs</div><img src="${dataUrl(ov.conf)}"></figure>` : ''}
@@ -2519,6 +2523,29 @@ function exportPDF(savedResults, savedTotalTime) {
     const imgHeading = n > 1
       ? `<div class="sec">Image ${idx + 1} of ${n} — ${escHtml(imageLabel(result, idx))}</div>`
       : '';
+
+    // No DR: the report is ConfECBL's output alone. No grade/severity/confidence block,
+    // stage rows, vessel maps or lesion segmentation exist for this image (none were run).
+    if (skipped) {
+      const refPct = (Number(scr.referable) * 100).toFixed(1);
+      return `<section class="rpt" style="--sc:${sc};--scbg:${sc}0D;--scbd:${sc}40">
+      ${imgHeading}
+      <div class="sec">Screening Result — ConfECBL</div>
+      <div class="hero">
+        <div>
+          <div class="hg">No DR</div>
+          <div class="hs">${escHtml(scr.verdict)}</div>
+        </div>
+        <div class="conf">
+          <div class="cl">Referable DR probability</div>
+          <div class="cv">${refPct}%</div>
+          <div class="bar"><i style="width:${refPct}%"></i></div>
+        </div>
+      </div>
+      <div class="rec"><strong>Recommendation:</strong> ${escHtml(screeningRecommendation(scr))}</div>
+      ${screeningSection}
+      </section>`;
+    }
 
     return `<section class="rpt" style="--sc:${sc};--scbg:${sc}0D;--scbd:${sc}40">
     ${imgHeading}
@@ -2636,7 +2663,9 @@ function shareResult() {
   if (!_lastResult) { showToast('No analysis to share yet.', '#F35858'); return; }
   const cls = _lastResult.result.classification;
   const scr = _lastResult.result.screening;
-  const text = `ChakshurakhsakAI DR Analysis\nGrade ${cls.grade} – ${cls.severity}\nConfidence: ${(cls.confidence*100).toFixed(1)}%` + (scr ? `\nScreening: ${scr.verdict}` : '') + `\n\nTry it at: https://www.chakshurakshakai.com`;
+  const text = (scr && scr.cascade_skipped)
+    ? `ChakshurakhsakAI DR Screening\nScreening (ConfECBL): ${scr.verdict}\n\nTry it at: https://www.chakshurakshakai.com`
+    : `ChakshurakhsakAI DR Analysis\nGrade ${cls.grade} – ${cls.severity}\nConfidence: ${(cls.confidence*100).toFixed(1)}%` + (scr ? `\nScreening: ${scr.verdict}` : '') + `\n\nTry it at: https://www.chakshurakshakai.com`;
   navigator.clipboard.writeText(text).then(() => {
     showToast('Result summary copied to clipboard!');
   }).catch(() => {
