@@ -701,6 +701,15 @@ footer{padding:52px 60px 28px;}
 .hm-soon-label{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-right:6px;}
 .hm-soon .cs-tag{font-size:11px;font-weight:600;letter-spacing:0;padding:5px 12px;border:1px dashed var(--g300);background:var(--white);}
 @media(max-width:900px){.hm-grid,.hm-perks{grid-template-columns:1fr;}.hm-perks{gap:18px;}}
+/* EYE-HEALTH CHAT WIDGET */
+.cw-btn{position:fixed;right:22px;bottom:22px;z-index:200;display:inline-flex;align-items:center;gap:9px;font:700 14px 'Inter',sans-serif;color:var(--white);background:var(--teal);border:none;border-radius:30px;padding:14px 20px;box-shadow:0 10px 30px rgba(12,16,36,.25);cursor:pointer;transition:transform .2s,background .2s;}
+.cw-btn:hover{background:var(--teal-d);transform:translateY(-2px);}
+.cw-btn.hidden{display:none;}
+.cw-panel{position:fixed;right:22px;bottom:22px;z-index:201;width:400px;height:min(640px,calc(100vh - 44px));border-radius:18px;overflow:hidden;background:var(--white);box-shadow:0 24px 70px rgba(12,16,36,.3);display:none;}
+.cw-panel.open{display:block;}
+.cw-panel iframe{width:100%;height:100%;border:0;display:block;}
+@media(max-width:640px){.cw-btn span{display:none;}.cw-btn{padding:15px;}.cw-panel{inset:0;width:auto;height:auto;border-radius:0;}}
+
 /* HOME: clinical validation */
 .val-section{background:var(--white);border-top:1px solid var(--g200);}
 .val-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;align-items:center;max-width:1180px;margin:0 auto;}
@@ -3968,6 +3977,44 @@ function findNearbyClinics() {
 
   await loadCurrentUser();
   initLocationClinic();
+})();
+
+// ── Eye-health chatbot (separate service in chatbot/, deployed on Cloud Run) ──
+// Set CHATBOT_URL to the Cloud Run service URL to show the chat button; while it is
+// empty the button stays hidden and nothing is loaded.
+const CHATBOT_URL = '';
+
+(function initChatWidget() {
+  if (!CHATBOT_URL) return;
+  const origin = new URL(CHATBOT_URL).origin;
+  const btn = document.createElement('button');
+  btn.className = 'cw-btn';
+  btn.type = 'button';
+  btn.setAttribute('aria-label', 'Open the eye-health assistant');
+  btn.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Ask Eye AI</span>';
+  const panel = document.createElement('div');
+  panel.className = 'cw-panel';
+  panel.setAttribute('role', 'dialog');
+  panel.setAttribute('aria-label', 'Eye-health assistant');
+  document.body.appendChild(panel);
+  document.body.appendChild(btn);
+  function setOpen(open) {
+    if (open && !panel.firstChild) {
+      // Loaded on first open only. The microphone permission lets voice input work.
+      const f = document.createElement('iframe');
+      f.src = CHATBOT_URL;
+      f.title = 'Eye-health assistant';
+      f.allow = 'microphone';
+      panel.appendChild(f);
+    }
+    panel.classList.toggle('open', open);
+    btn.classList.toggle('hidden', open);
+  }
+  btn.onclick = () => setOpen(true);
+  window.addEventListener('message', e => {
+    if (e.origin === origin && e.data && e.data.type === 'chakshu-chat-close') setOpen(false);
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
 })();
 
 // ── Mobile menu ───────────────────────────────────────────────────────────────
