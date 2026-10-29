@@ -130,7 +130,7 @@
       <button type="button" aria-label="Remove image" onclick="clearImage()">×</button>
     </div>
     <div class="bar">
-      <textarea id="input" rows="1" placeholder="Ask about your eyes… / अपनी आँखों के बारे में पूछें…" aria-label="Message"></textarea>
+      <textarea id="input" rows="1" enterkeyhint="send" placeholder="Ask about your eyes… / अपनी आँखों के बारे में पूछें…" aria-label="Message"></textarea>
       <div class="tools">
         <button class="icon" id="attach" type="button" title="Attach a fundus or OCT image" aria-label="Attach image">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05 12.25 20.24a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
@@ -327,7 +327,23 @@ async function send() {
   busy = false; refreshSend(); input.focus();
 }
 sendBtn.onclick = send;
-input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+// Enter sends, Shift+Enter makes a new line. keydown covers a physical keyboard, but it
+// is unreliable while an input method is composing (Hindi typing) and on some on-screen
+// keyboards, so beforeinput catches the line break those produce instead.
+let enterWithShift = false;
+input.addEventListener('keydown', e => {
+  enterWithShift = e.shiftKey;
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && e.keyCode !== 229) {
+    e.preventDefault();
+    send();
+  }
+});
+input.addEventListener('beforeinput', e => {
+  if (e.inputType === 'insertLineBreak' && !enterWithShift) {
+    e.preventDefault();
+    send();
+  }
+});
 function autoGrow() { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 140) + 'px'; }
 input.addEventListener('input', () => { autoGrow(); refreshSend(); });
 
