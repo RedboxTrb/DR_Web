@@ -121,8 +121,13 @@
 <script>
 'use strict';
 
-// The page is served by the chatbot service itself, so the API is same-origin.
+// The page is served from the website; the API is the workstation backend behind ngrok.
 const API_URL = 'https://survive-carving-clinking.ngrok-free.dev/api/chat';
+// The same answer, sent as it is written. Generation runs at a few tokens a second on a
+// GPU shared with training, so this is the difference between waiting half a minute and
+// reading along from the second word.
+const STREAM_URL = API_URL + '/stream';
+const HEADERS = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' };
 const MAX_SIDE = 2048;             // downscale larger images before upload
 const HISTORY_TURNS = 12;          // earlier messages sent back for context
 const CLINIC_URL = 'https://www.google.com/maps/search/eye+clinic+near+me/';
@@ -202,6 +207,44 @@ function welcome() {
 
 function refreshSend() { sendBtn.disabled = busy || (!input.value.trim() && !image); }
 
+// Read the streamed answer, handing each piece to `onText` as the whole text so far.
+async function streamReply(payload, onText) {
+  const r = await fetch(STREAM_URL, { method: 'POST', headers: HEADERS, body: JSON.stringify(payload) });
+  if (!r.ok) {
+    const d = await r.json().catch(() => ({}));
+    throw new Error(d.detail && typeof d.detail === 'string' ? d.detail : 'Something went wrong (' + r.status + ').');
+  }
+  if (!r.body || !r.body.getReader) throw new Error('no-stream');
+  const reader = r.body.getReader();
+  const dec = new TextDecoder();
+  let buf = '', full = '', streamErr = null;
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let i;
+    while ((i = buf.indexOf('\n\n')) >= 0) {
+      const line = buf.slice(0, i).split('\n').find(l => l.indexOf('data:') === 0);
+      buf = buf.slice(i + 2);
+      if (!line) continue;
+      let d;
+      try { d = JSON.parse(line.slice(5).trim()); } catch (e) { continue; }
+      if (d.delta) { full += d.delta; onText(full); }
+      else if (d.error) streamErr = d.error;
+    }
+  }
+  if (!full && streamErr) throw new Error(streamErr);
+  return full;
+}
+
+// The whole answer in one response. Used when streaming is not available.
+async function plainReply(payload) {
+  const r = await fetch(API_URL, { method: 'POST', headers: HEADERS, body: JSON.stringify(payload) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.detail && typeof d.detail === 'string' ? d.detail : 'Something went wrong (' + r.status + ').');
+  return d.reply || '';
+}
+
 async function send() {
   const text = input.value.trim();
   if (busy || (!text && !image)) return;
@@ -214,20 +257,39 @@ async function send() {
   input.value = ''; autoGrow(); clearImage();
 
   const typing = addRow('bot', '<span class="typing"><i></i><i></i><i></i></span>');
+  let bubble = null;
+  // The first piece of text replaces the typing dots; later ones rewrite the bubble.
+  const onText = sofar => {
+    if (!bubble) { typing.remove(); bubble = addRow('bot', '').querySelector('.bubble'); }
+    bubble.innerHTML = md(sofar);
+    msgs.scrollTop = msgs.scrollHeight;
+  };
+
   try {
-    const r = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' }, body: JSON.stringify(payload) });
-    const d = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(d.detail && typeof d.detail === 'string' ? d.detail : 'Something went wrong (' + r.status + ').');
-    typing.remove();
-    addBot(d.reply);
-    history.push({ role: 'user', text: text || '[shared an eye image]' }, { role: 'model', text: d.reply });
+    let reply;
+    try {
+      reply = await streamReply(payload, onText);
+    } catch (e) {
+      if (bubble) throw e;                 // part of the answer is already on screen
+      reply = await plainReply(payload);   // nothing shown yet: ask for it in one piece
+    }
+    if (!reply) throw new Error('The assistant did not answer. Please try again.');
+    if (bubble) {
+      if (CLINIC_WORDS.test(reply)) {
+        bubble.insertAdjacentHTML('beforeend',
+          '<a class="clinic" href="' + CLINIC_URL + '" target="_blank" rel="noopener">&#128205; Find Eye Clinics Near Me</a>');
+      }
+    } else {
+      typing.remove();
+      addBot(reply);
+    }
+    history.push({ role: 'user', text: text || '[shared an eye image]' }, { role: 'model', text: reply });
   } catch (e) {
-    typing.remove();
+    if (!bubble) typing.remove();
     addRow('err', esc(e.message || 'Could not reach the assistant. Check your connection and try again.'));
   }
   busy = false; refreshSend(); input.focus();
 }
-
 sendBtn.onclick = send;
 input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
 function autoGrow() { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 140) + 'px'; }
