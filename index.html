@@ -670,7 +670,9 @@ footer{padding:52px 60px 28px;}
 .bf-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;}
 .bf-bar{display:flex;align-items:center;gap:12px;padding:9px 0;}
 .bf-bar-name{width:250px;flex:none;font-size:13.5px;font-weight:600;color:var(--navy);display:inline-flex;align-items:center;gap:8px;}
-.bf-bar-num{width:52px;flex:none;text-align:right;font-size:13px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums;}
+.bf-bar-num{width:86px;flex:none;display:inline-flex;justify-content:flex-end;align-items:baseline;gap:7px;font-variant-numeric:tabular-nums;}
+.bf-bar-num b{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:13.5px;color:var(--navy);}
+.bf-bar-num small{font-size:11px;font-weight:600;color:var(--g400);min-width:30px;text-align:right;}
 .bf-verdict{display:flex;gap:14px;align-items:flex-start;margin-top:16px;border-radius:14px;padding:16px 20px;background:color-mix(in srgb,var(--ac) 9%,#fff);border:1px solid color-mix(in srgb,var(--ac) 35%,#fff);}
 .bf-vdot{width:12px;height:12px;border-radius:50%;background:var(--ac);flex:none;margin-top:6px;box-shadow:0 0 0 5px color-mix(in srgb,var(--ac) 18%,#fff);}
 .bf-vlabel{font-size:11px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;}
@@ -2265,7 +2267,7 @@ function modSummaryHTML(kind) {
     const r = it.res;
     return '<tr class="mm-row"' + go + '><td>' + escHtml(it.file.name) + '</td>' + (isDme
       ? '<td><b>' + escHtml(r.grade_name) + '</b></td><td>Grade ' + (Number(r.grade) || 0) + '</td><td class="num">' + (Number(r.dme_prob || 0) * 100).toFixed(1) + '%</td>'
-      : '<td><b>' + escHtml(r.verdict) + '</b></td><td class="num">' + (Number(r.referable || 0) * 100).toFixed(1) + '%</td><td class="num">' + (Number(r.dme_prob || 0) * 100).toFixed(1) + '%</td>') +
+      : '<td><b>' + escHtml(r.verdict) + '</b></td><td class="num">' + Number(r.referable || 0).toFixed(2) + ' (' + Math.round(Number(r.referable || 0) * 100) + '%)</td><td class="num">' + Number(r.dme_prob || 0).toFixed(2) + ' (' + Math.round(Number(r.dme_prob || 0) * 100) + '%)</td>') +
       '</tr>';
   }).join('');
   const head = isDme ? '<th>Image</th><th>Result</th><th>Grade</th><th class="num">DME prob</th>'
@@ -2385,7 +2387,7 @@ function pctBars(rows) {
     var v = Math.max(0, Math.min(1, Number(x[1]) || 0));
     return '<div class="bf-bar"><span class="bf-bar-name"><i class="bf-dot" style="background:' + x[2] + '"></i>' + escHtml(x[0]) + '</span>' +
       '<div class="mdx-bar"><i style="width:' + (v * 100).toFixed(1) + '%;background:' + x[2] + '"></i></div>' +
-      '<span class="bf-bar-num">' + (v * 100).toFixed(1) + '%</span></div>';
+      '<span class="bf-bar-num"><b>' + v.toFixed(2) + '</b><small>' + Math.round(v * 100) + '%</small></span></div>';
   }).join('');
 }
 
@@ -2407,7 +2409,7 @@ function betaBlockHTML(x, idx) {
       '<div class="bf-card"><div class="bf-title">Diseases</div>' + pctBars(rows.diseases) + '</div>' +
       '<div class="bf-card"><div class="bf-title">DR lesions</div>' + pctBars(rows.lesions) + '</div>' +
     '</div>' +
-    '<div class="bf-note">Percentages are the beta model&rsquo;s probabilities for this image. Final diagnosis by an ophthalmologist.</div>' +
+    '<div class="bf-note">Each value is the beta model&rsquo;s probability for this image (0 to 1), with the same value as a percentage. Final diagnosis by an ophthalmologist.</div>' +
   '</div>';
 }
 
@@ -3614,7 +3616,7 @@ async function exportBetaReport(saved) {
   const patient = saved ? null : readPatientDetails('bm-pt-');
   const summary = n > 1 ? `<div class="sec">Summary — ${n} images</div><table>
     <tr><th>Image</th><th>Model finding</th><th class="num">DR</th><th class="num">DME</th></tr>
-    ${list.map(function (x) { return `<tr><td>${escHtml(x.name)}</td><td><b>${escHtml(x.res.verdict || '')}</b></td><td class="num">${(Number(x.res.referable || 0) * 100).toFixed(1)}%</td><td class="num">${(Number(x.res.dme_prob || 0) * 100).toFixed(1)}%</td></tr>`; }).join('')}
+    ${list.map(function (x) { return `<tr><td>${escHtml(x.name)}</td><td><b>${escHtml(x.res.verdict || '')}</b></td><td class="num">${Number(x.res.referable || 0).toFixed(2)} (${Math.round(Number(x.res.referable || 0) * 100)}%)</td><td class="num">${Number(x.res.dme_prob || 0).toFixed(2)} (${Math.round(Number(x.res.dme_prob || 0) * 100)}%)</td></tr>`; }).join('')}
   </table>` : '';
   const inner = reportPatientHTML(patient) + summary + list.map(function (x, i) { return betaReportSection(x, i, n); }).join('');
   openReportWindow(reportPageHTML('Multi-Disease Report', 'Multi-Disease Screening · Beta', 'Multi-Disease Screening Report', inner));
@@ -3629,7 +3631,7 @@ function betaReportSection(x, idx, n) {
   const pctTable = function (list) {
     return list.map(function (r) {
       const v = Math.max(0, Math.min(1, Number(r[1]) || 0));
-      return `<tr><td>${escHtml(r[0])}</td><td class="num">${(v * 100).toFixed(1)}%</td><td style="width:45%"><div class="bar"><i style="width:${(v * 100).toFixed(1)}%"></i></div></td></tr>`;
+      return `<tr><td>${escHtml(r[0])}</td><td class="num"><b>${v.toFixed(2)}</b> <span style="color:#6B7090">(${Math.round(v * 100)}%)</span></td><td style="width:42%"><div class="bar"><i style="width:${(v * 100).toFixed(1)}%"></i></div></td></tr>`;
     }).join('');
   };
   return `<section class="rpt" style="--sc:${sc};--scbg:${sc}0D;--scbd:${sc}40">
@@ -3645,7 +3647,7 @@ function betaReportSection(x, idx, n) {
     <table>${pctTable(rows.diseases)}</table>
     <div class="sec">DR lesions</div>
     <table>${pctTable(rows.lesions)}</table>
-    <div class="rnote">Percentages are the beta model's (${escHtml(scr.model || 'ConfECBL')}) probabilities for this image. A DR grade for clinical use comes from the DR analysis and its report.</div>
+    <div class="rnote">Values are the beta model's (${escHtml(scr.model || 'ConfECBL')}) probabilities for this image (0 to 1, with the percentage in brackets). A DR grade for clinical use comes from the DR analysis and its report.</div>
     <div class="sec">Imaging</div>
     <div class="imgs">
       ${original ? `<figure><div class="cap">Original</div><img src="${original}"></figure>` : ''}
