@@ -21,8 +21,8 @@
   .head{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--g200);background:var(--white);}
   .logo{width:36px;height:36px;border-radius:50%;background:rgba(34,183,163,.12);display:grid;place-items:center;flex:none;}
   .head-text{flex:1;min-width:0;}
-  .head-title{font-size:15px;font-weight:700;}
-  .head-sub{font-size:11.5px;color:var(--g500);display:flex;align-items:center;gap:6px;}
+  .head-title{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .head-sub{font-size:11.5px;color:var(--g500);display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;}
   .head-sub i{width:7px;height:7px;border-radius:50%;background:#38CC87;display:inline-block;}
   .head-actions{display:flex;align-items:center;gap:8px;flex:none;}
   /* Straight to a clinic search, without having to ask for one first. */
@@ -91,7 +91,7 @@
   .send:disabled{background:var(--g200);color:var(--g400);cursor:not-allowed;}
   .send svg{margin-left:-2px;}
   .foot{font-size:10.5px;color:var(--g400);text-align:center;margin-top:9px;line-height:1.5;}
-  @media (max-width:420px){.hint{display:none;}.find span{display:none;}.find{padding:0 9px;}}
+  @media (max-width:360px){.hint{display:none;}.find span{display:none;}.find{padding:0 9px;}}
   @media (prefers-reduced-motion:reduce){.typing i,.icon.listening,.send{animation:none;transition:none;}}
 </style>
 </head>
@@ -106,7 +106,7 @@
       <div class="head-sub"><i></i>ChakshuRakshakAI · AI, not a doctor</div>
     </div>
     <div class="head-actions">
-      <a class="find" href="https://www.google.com/maps/search/eye+hospital+OR+ophthalmologist+OR+retina+clinic+near+me/" target="_blank" rel="noopener" title="Find an eye hospital, ophthalmologist or retina clinic near you">
+      <a class="find" href="https://www.google.com/maps/search/eye+hospital+OR+ophthalmologist+OR+retina+clinic+near+me/" target="_blank" rel="noopener" aria-label="Find an eye clinic near you" title="Find an eye hospital, ophthalmologist or retina clinic near you">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
         <span>Find a clinic</span>
       </a>
