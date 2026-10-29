@@ -24,9 +24,17 @@
   .head-title{font-size:15px;font-weight:700;}
   .head-sub{font-size:11.5px;color:var(--g500);display:flex;align-items:center;gap:6px;}
   .head-sub i{width:7px;height:7px;border-radius:50%;background:#38CC87;display:inline-block;}
-  .lang{display:flex;background:var(--g100);border-radius:9px;padding:3px;flex:none;}
-  .lang button{font:600 12px 'Inter',sans-serif;border:none;background:none;color:var(--g500);padding:6px 10px;border-radius:7px;cursor:pointer;}
+  .head-actions{display:flex;align-items:center;gap:8px;flex:none;}
+  /* Straight to a clinic search, without having to ask for one first. */
+  .find{display:inline-flex;align-items:center;gap:6px;font:600 12px 'Inter',sans-serif;color:var(--teal-d);background:rgba(34,183,163,.1);border:1px solid rgba(34,183,163,.32);border-radius:20px;padding:0 12px;height:34px;text-decoration:none;white-space:nowrap;transition:background .15s;}
+  .find:hover{background:rgba(34,183,163,.2);}
+  .find:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+  .find svg{flex:none;}
+  .lang{display:flex;background:var(--g100);border-radius:10px;padding:3px;flex:none;}
+  .lang button{font:600 12px 'Inter',sans-serif;border:none;background:none;color:var(--g500);padding:0 10px;height:28px;border-radius:8px;cursor:pointer;transition:color .15s;}
   .lang button.on{background:var(--white);color:var(--navy);box-shadow:0 1px 3px rgba(12,16,36,.12);}
+  .lang button:hover:not(.on){color:var(--navy);}
+  .lang button:focus-visible{outline:2px solid var(--teal);outline-offset:1px;}
   .close{display:none;border:none;background:none;font-size:22px;line-height:1;color:var(--g500);cursor:pointer;padding:4px 6px;}
   body.embedded .close{display:block;}
 
@@ -54,26 +62,37 @@
   .chip{font:500 12.5px 'Inter',sans-serif;color:var(--teal-d);background:var(--white);border:1px solid rgba(34,183,163,.4);border-radius:20px;padding:7px 12px;cursor:pointer;}
   .chip:hover{background:rgba(34,183,163,.06);}
 
-  /* Composer */
-  .composer{border-top:1px solid var(--g200);padding:10px 12px 12px;background:var(--white);}
-  .preview{display:none;align-items:center;gap:10px;background:var(--g100);border-radius:10px;padding:6px 8px;margin-bottom:8px;font-size:12px;color:var(--g600);}
+  /* Composer: the message gets the full width, the controls sit on their own line
+     underneath, so neither crowds the other. */
+  .composer{border-top:1px solid var(--g200);padding:12px 14px 14px;background:var(--white);}
+  .preview{display:none;align-items:center;gap:10px;background:var(--g100);border-radius:12px;padding:7px 9px;margin-bottom:9px;font-size:12px;color:var(--g600);}
   .preview.show{display:flex;}
-  .preview img{width:40px;height:40px;object-fit:cover;border-radius:7px;}
+  .preview img{width:42px;height:42px;object-fit:cover;border-radius:8px;}
   .preview span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .preview button{border:none;background:none;font-size:18px;color:var(--g500);cursor:pointer;padding:0 4px;}
-  .bar{display:flex;align-items:flex-end;gap:6px;background:var(--offwhite);border:1px solid var(--g200);border-radius:14px;padding:6px;}
-  .bar:focus-within{border-color:var(--teal);}
-  .icon{width:38px;height:38px;flex:none;border:none;background:none;border-radius:10px;display:grid;place-items:center;color:var(--g500);cursor:pointer;}
-  .icon:hover{background:var(--g100);color:var(--navy);}
+  .preview button{border:none;background:none;font-size:18px;color:var(--g500);cursor:pointer;padding:0 6px;border-radius:6px;}
+  .preview button:hover{background:var(--g200);color:var(--navy);}
+  .bar{background:var(--offwhite);border:1.5px solid var(--g200);border-radius:18px;padding:10px 12px 8px;transition:border-color .15s,box-shadow .15s;}
+  .bar:focus-within{border-color:var(--teal);box-shadow:0 0 0 3px rgba(34,183,163,.14);background:var(--white);}
+  textarea{display:block;width:100%;resize:none;border:none;background:none;outline:none;font:400 15px/1.55 'Inter',sans-serif;color:var(--navy);max-height:150px;padding:2px 2px 0;}
+  textarea::placeholder{color:var(--g400);}
+  .tools{display:flex;align-items:center;gap:4px;margin-top:4px;}
+  .tools .spacer{flex:1;}
+  .hint{font-size:11px;color:var(--g400);margin-right:8px;white-space:nowrap;}
+  .icon{width:40px;height:40px;flex:none;border:none;background:none;border-radius:12px;display:grid;place-items:center;color:var(--g500);cursor:pointer;transition:background .15s,color .15s;}
+  .icon:hover{background:var(--g200);color:var(--navy);}
+  .icon:focus-visible{outline:2px solid var(--teal);outline-offset:1px;}
   .icon:disabled{opacity:.4;cursor:not-allowed;}
   .icon.listening{background:rgba(243,88,88,.12);color:var(--red);animation:pulse 1.4s infinite;}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(243,88,88,.45);}70%{box-shadow:0 0 0 8px rgba(243,88,88,0);}100%{box-shadow:0 0 0 0 rgba(243,88,88,0);}}
-  textarea{flex:1;min-width:0;resize:none;border:none;background:none;outline:none;font:400 14.5px/1.5 'Inter',sans-serif;color:var(--navy);padding:8px 4px;max-height:140px;}
-  .send{width:38px;height:38px;flex:none;border:none;border-radius:10px;background:var(--teal);color:var(--white);display:grid;place-items:center;cursor:pointer;}
-  .send:hover{background:var(--teal-d);}
+  .send{width:44px;height:44px;flex:none;border:none;border-radius:50%;background:var(--teal);color:var(--white);display:grid;place-items:center;cursor:pointer;transition:background .15s,transform .1s;}
+  .send:hover:enabled{background:var(--teal-d);}
+  .send:active:enabled{transform:scale(.94);}
+  .send:focus-visible{outline:2px solid var(--teal-d);outline-offset:2px;}
   .send:disabled{background:var(--g200);color:var(--g400);cursor:not-allowed;}
-  .foot{font-size:10.5px;color:var(--g400);text-align:center;margin-top:8px;line-height:1.5;}
-  @media (prefers-reduced-motion:reduce){.typing i,.icon.listening{animation:none;}}
+  .send svg{margin-left:-2px;}
+  .foot{font-size:10.5px;color:var(--g400);text-align:center;margin-top:9px;line-height:1.5;}
+  @media (max-width:420px){.hint{display:none;}.find span{display:none;}.find{padding:0 9px;}}
+  @media (prefers-reduced-motion:reduce){.typing i,.icon.listening,.send{animation:none;transition:none;}}
 </style>
 </head>
 <body>
@@ -86,9 +105,16 @@
       <div class="head-title">Eye Health Assistant</div>
       <div class="head-sub"><i></i>ChakshuRakshakAI · AI, not a doctor</div>
     </div>
-    <div class="lang" role="group" aria-label="Voice language">
-      <button type="button" data-lang="en-US" class="on">EN</button>
-      <button type="button" data-lang="hi-IN">हिं</button>
+    <div class="head-actions">
+      <a class="find" href="https://www.google.com/maps/search/eye+hospital+OR+ophthalmologist+OR+retina+clinic+near+me/" target="_blank" rel="noopener" title="Find an eye hospital, ophthalmologist or retina clinic near you">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Find a clinic</span>
+      </a>
+      <div class="lang" role="group" aria-label="Answer language">
+        <button type="button" data-lang="auto" class="on" title="Answer in whichever language you write in">Auto</button>
+        <button type="button" data-lang="en" title="Always answer in English">EN</button>
+        <button type="button" data-lang="hi" title="हमेशा हिंदी में जवाब">हिं</button>
+      </div>
     </div>
     <button class="close" type="button" aria-label="Close chat" onclick="parent.postMessage({type:'chakshu-chat-close'},'*')">×</button>
   </header>
@@ -102,17 +128,21 @@
       <button type="button" aria-label="Remove image" onclick="clearImage()">×</button>
     </div>
     <div class="bar">
-      <button class="icon" id="attach" type="button" title="Attach a fundus or OCT image" aria-label="Attach image">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05 12.25 20.24a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-      </button>
-      <input type="file" id="file" accept="image/*" hidden>
       <textarea id="input" rows="1" placeholder="Ask about your eyes… / अपनी आँखों के बारे में पूछें…" aria-label="Message"></textarea>
-      <button class="icon" id="mic" type="button" title="Speak" aria-label="Speak your question">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4M8 22h8"/></svg>
-      </button>
-      <button class="send" id="send" type="button" aria-label="Send" disabled>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-      </button>
+      <div class="tools">
+        <button class="icon" id="attach" type="button" title="Attach a fundus or OCT image" aria-label="Attach image">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05 12.25 20.24a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        </button>
+        <input type="file" id="file" accept="image/*" hidden>
+        <button class="icon" id="mic" type="button" title="Speak" aria-label="Speak your question">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4M8 22h8"/></svg>
+        </button>
+        <span class="spacer"></span>
+        <span class="hint">Enter to send</span>
+        <button class="send" id="send" type="button" aria-label="Send" disabled>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        </button>
+      </div>
     </div>
     <div class="foot">For information only — not a diagnosis. Always consult a certified ophthalmologist.</div>
   </footer>
@@ -138,7 +168,8 @@ const msgs = $('msgs'), input = $('input'), sendBtn = $('send'), micBtn = $('mic
 let image = null;                  // { dataUrl, name }
 let history = [];                  // [{ role: 'user'|'model', text }]
 let busy = false;
-let lang = 'en-US';
+let answerLang = 'auto';           // 'auto' | 'en' | 'hi' - picked in the header
+let speechLang = 'en-US';          // what the microphone listens for
 
 if (window.self !== window.top) document.body.classList.add('embedded');
 
@@ -253,6 +284,7 @@ async function send() {
 
   addRow('user', (image ? '<img class="att" src="' + image.dataUrl + '" alt="Attached image">' : '') + (text ? md(text) : ''));
   const payload = { message: text, history: history.slice(-HISTORY_TURNS) };
+  if (answerLang !== 'auto') payload.lang = answerLang;
   if (image) payload.image = image.dataUrl;
   input.value = ''; autoGrow(); clearImage();
 
@@ -329,10 +361,17 @@ function clearImage() { image = null; $('preview').classList.remove('show'); $('
 
 // ── Voice input (Web Speech API) ──────────────────────────────────────────────
 
+// The picked language drives both the answer and what the microphone listens for.
+// 'auto' leaves the answer to follow whatever language the question was written in.
 document.querySelectorAll('.lang button').forEach(b => b.onclick = () => {
-  lang = b.dataset.lang;
-  document.querySelectorAll('.lang button').forEach(x => x.classList.toggle('on', x === b));
-  if (recognition) recognition.lang = lang;
+  answerLang = b.dataset.lang;
+  speechLang = answerLang === 'hi' ? 'hi-IN' : 'en-US';
+  document.querySelectorAll('.lang button').forEach(x => {
+    const on = x === b;
+    x.classList.toggle('on', on);
+    x.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  if (recognition) recognition.lang = speechLang;
 });
 
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -342,7 +381,7 @@ if (!SR) {
   micBtn.title = 'Voice input is not supported in this browser (try Chrome or Edge).';
 } else {
   recognition = new SR();
-  recognition.lang = lang;
+  recognition.lang = speechLang;
   recognition.interimResults = true;
   recognition.continuous = false;
   recognition.onresult = e => {
@@ -358,7 +397,7 @@ if (!SR) {
   micBtn.onclick = () => {
     if (listening) { recognition.stop(); return; }
     baseText = input.value.trim();
-    try { recognition.lang = lang; recognition.start(); listening = true; micBtn.classList.add('listening'); micBtn.title = 'Listening… tap to stop'; }
+    try { recognition.lang = speechLang; recognition.start(); listening = true; micBtn.classList.add('listening'); micBtn.title = 'Listening… tap to stop'; }
     catch (e) { /* start() throws if already started */ }
   };
 }
