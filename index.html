@@ -667,17 +667,18 @@ footer{padding:52px 60px 28px;}
 .bf-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:16px;}
 .bf-card{background:var(--white);border:1px solid var(--g200);border-radius:14px;padding:18px 20px;}
 .bf-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
-.bf-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--g100);flex-wrap:wrap;}
-.bf-row:last-child{border-bottom:none;}
-.bf-name{font-size:14px;font-weight:600;color:var(--navy);display:inline-flex;align-items:center;gap:8px;}
-.bf-name small{font-size:11px;font-weight:600;color:var(--g400);}
-.bf-dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
-.bf-list{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;}
-.bf-pill{display:inline-block;font-size:12.5px;font-weight:700;border-radius:20px;padding:5px 12px;white-space:nowrap;}
-.bf-pill.yes{color:#B42323;background:rgba(243,88,88,.1);border:1px solid rgba(243,88,88,.3);}
-.bf-pill.no{color:#1c8a5a;background:rgba(56,204,135,.1);border:1px solid rgba(56,204,135,.3);}
+.bf-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;}
+.bf-bar{display:flex;align-items:center;gap:12px;padding:9px 0;}
+.bf-bar-name{width:250px;flex:none;font-size:13.5px;font-weight:600;color:var(--navy);display:inline-flex;align-items:center;gap:8px;}
+.bf-bar-num{width:52px;flex:none;text-align:right;font-size:13px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums;}
+.bf-verdict{display:flex;gap:14px;align-items:flex-start;margin-top:16px;border-radius:14px;padding:16px 20px;background:color-mix(in srgb,var(--ac) 9%,#fff);border:1px solid color-mix(in srgb,var(--ac) 35%,#fff);}
+.bf-vdot{width:12px;height:12px;border-radius:50%;background:var(--ac);flex:none;margin-top:6px;box-shadow:0 0 0 5px color-mix(in srgb,var(--ac) 18%,#fff);}
+.bf-vlabel{font-size:11px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;}
+.bf-vtitle{font-size:19px;font-weight:800;color:var(--navy);line-height:1.3;margin-top:2px;}
+.bf-vsub{font-size:13px;color:var(--g600);margin-top:3px;}
 .bf-note{font-size:11.5px;color:var(--g500);margin-top:10px;}
-@media(max-width:720px){.bf-grid{grid-template-columns:minmax(0,1fr);}}
+@media(max-width:1000px){.bf-grid{grid-template-columns:minmax(0,1fr);}}
+@media(max-width:560px){.bf-bar{flex-wrap:wrap;gap:6px 10px;}.bf-bar-name{width:100%;}}
 .mm-input{display:none;}
 #dme-result:not(:empty),#bm-result:not(:empty){margin:-6px 0 18px;}
 .bm-done{font-size:13px;font-weight:600;color:#1a7a4a;background:rgba(56,204,135,.1);border-radius:10px;padding:14px 16px;margin-top:16px;}
@@ -2264,12 +2265,11 @@ function modSummaryHTML(kind) {
     const r = it.res;
     return '<tr class="mm-row"' + go + '><td>' + escHtml(it.file.name) + '</td>' + (isDme
       ? '<td><b>' + escHtml(r.grade_name) + '</b></td><td>Grade ' + (Number(r.grade) || 0) + '</td><td class="num">' + (Number(r.dme_prob || 0) * 100).toFixed(1) + '%</td>'
-      : (function () { const f = betaFindings(r); return '<td>' + (f.dr ? '<b>Yes</b> &middot; ' + escHtml(f.drName) : 'No') + '</td><td>' + (f.dme ? '<b>Yes</b>' : 'No') + '</td><td>' +
-          (f.others.length ? '<b>' + f.others.map(function (o) { return escHtml(o.name); }).join(', ') + '</b>' : 'None') + '</td>'; })()) +
+      : '<td><b>' + escHtml(r.verdict) + '</b></td><td class="num">' + (Number(r.referable || 0) * 100).toFixed(1) + '%</td><td class="num">' + (Number(r.dme_prob || 0) * 100).toFixed(1) + '%</td>') +
       '</tr>';
   }).join('');
   const head = isDme ? '<th>Image</th><th>Result</th><th>Grade</th><th class="num">DME prob</th>'
-                     : '<th>Image</th><th>DR</th><th>DME</th><th>Other eye diseases</th>';
+                     : '<th>Image</th><th>Model finding</th><th class="num">DR</th><th class="num">DME</th>';
   return '<div class="mm-sum"><div class="mdx-h">Summary &middot; ' + m.items.length + ' images</div>' +
     '<table><tr>' + head + '</tr>' + rows + '</table></div>';
 }
@@ -2367,52 +2367,47 @@ function dmeBlockHTML(x, idx) {
   '</div>';
 }
 
-// The multi-disease result, reduced to what a screener needs: is there DR, is there DME,
-// which other eye diseases, and which lesions. A finding counts as present when the
-// model's probability reaches BETA_CUTOFF; DR counts as present from ICDR grade 1 up.
-var BETA_CUTOFF = 0.5;
+// The multi-disease result: the model's own one-line finding, then a percentage for
+// every disease it scores and for each DR lesion.
 var BETA_LESION_NAMES = { MA: 'Microaneurysms', HE: 'Haemorrhages', EX: 'Hard exudates', SE: 'Soft exudates' };
-var BETA_COND_NAMES = { AMD: 'Age-related macular degeneration', Myopia: 'Myopic changes', RVO: 'Retinal vein occlusion', Scar: 'Chorioretinal scar', Other: 'Other abnormality' };
+var BETA_COND_NAMES = { AMD: 'Age-related macular degeneration (AMD)', Myopia: 'Myopic changes', RVO: 'Retinal vein occlusion (RVO)', Scar: 'Chorioretinal scar', Other: 'Other abnormality' };
 
-function betaFindings(r) {
-  var grade = Number(r.grade) || 0;
-  var others = (r.conf_labels || []).map(function (n, i) { return { code: n, name: BETA_COND_NAMES[n] || n, v: Number((r.Q || [])[i]) || 0 }; })
-    .filter(function (o) { return o.v >= BETA_CUTOFF; });
-  var lesions = (r.lesion_labels || []).map(function (n, i) {
-    var v = Number((r.P_dr || [])[i]) || 0;
-    return { code: n, name: BETA_LESION_NAMES[n] || n, v: v, on: v >= BETA_CUTOFF };
-  });
-  return {
-    dr: grade >= 1, drName: r.grade_name || ICDR_NAMES[grade] || '',
-    dme: (Number(r.dme_prob) || 0) >= BETA_CUTOFF,
-    others: others, lesions: lesions
-  };
+// Rows of [name, probability, colour] for the diseases and for the lesions.
+function betaRows(r) {
+  var diseases = [['Diabetic retinopathy (referable)', r.referable, '#E5484D'], ['Diabetic macular edema', r.dme_prob, '#3E9BE0']]
+    .concat((r.conf_labels || []).map(function (n, i) { return [BETA_COND_NAMES[n] || n, (r.Q || [])[i], MDX_COND_COL[n] || '#8A8F98']; }));
+  var lesions = (r.lesion_labels || []).map(function (n, i) { return [(BETA_LESION_NAMES[n] || n) + ' (' + n + ')', (r.P_dr || [])[i], MDX_LESION_COL[n] || '#8A8F98']; });
+  return { diseases: diseases, lesions: lesions };
 }
 
-function bfPill(on, text) { return '<span class="bf-pill ' + (on ? 'yes' : 'no') + '">' + text + '</span>'; }
+function pctBars(rows) {
+  return rows.map(function (x) {
+    var v = Math.max(0, Math.min(1, Number(x[1]) || 0));
+    return '<div class="bf-bar"><span class="bf-bar-name"><i class="bf-dot" style="background:' + x[2] + '"></i>' + escHtml(x[0]) + '</span>' +
+      '<div class="mdx-bar"><i style="width:' + (v * 100).toFixed(1) + '%;background:' + x[2] + '"></i></div>' +
+      '<span class="bf-bar-num">' + (v * 100).toFixed(1) + '%</span></div>';
+  }).join('');
+}
 
 function betaBlockHTML(x, idx) {
   var r = x.res, ov = r.overlays || {};
-  var f = betaFindings(r);
+  var lv = MDX_LEVEL[r.verdict_level] || MDX_LEVEL.other;
+  var sub = r.verdict_sub || r.advice || r.recommendation || lv.sub;
+  var rows = betaRows(r);
   var panels = [{ label: 'Original Image', src: x.img, tag: '<span class="ar-img-badge">' + escHtml(x.name) + '</span>' }];
   if (ov.lesion) panels.push({ label: 'DR Lesions', src: dataUrl(ov.lesion), tag: '<span class="ar-img-tag teal">Overlay</span>', legend: BETA_LEGENDS.lesion });
   if (ov.conf) panels.push({ label: 'Other-Disease Signs', src: dataUrl(ov.conf), tag: '<span class="ar-img-tag coral">Overlay</span>', legend: BETA_LEGENDS.conf });
-  var findings = '<div class="bf-card"><div class="bf-title">Findings</div>' +
-    '<div class="bf-row"><span class="bf-name">Diabetic Retinopathy</span>' + bfPill(f.dr, f.dr ? 'Detected &middot; ' + escHtml(f.drName) : 'Not detected') + '</div>' +
-    '<div class="bf-row"><span class="bf-name">Diabetic Macular Edema</span>' + bfPill(f.dme, f.dme ? 'Detected' : 'Not detected') + '</div>' +
-    '<div class="bf-row"><span class="bf-name">Other eye diseases</span><span class="bf-list">' +
-      (f.others.length ? f.others.map(function (o) { return bfPill(true, escHtml(o.name)); }).join('') : bfPill(false, 'None detected')) +
-    '</span></div></div>';
-  var lesions = '<div class="bf-card"><div class="bf-title">Lesions</div>' +
-    f.lesions.map(function (l) {
-      return '<div class="bf-row"><span class="bf-name"><i class="bf-dot" style="background:' + (MDX_LESION_COL[l.code] || '#8A8F98') + '"></i>' +
-        escHtml(l.name) + ' <small>' + escHtml(l.code) + '</small></span>' + bfPill(l.on, l.on ? 'Present' : 'Not seen') + '</div>';
-    }).join('') + '</div>';
   return '<div class="ar-result-block" id="screen-panel-' + idx + '">' +
     arImagesHTML(panels) +
-    '<div class="bf-grid">' + findings + lesions + '</div>' +
-    '<div class="bf-note">Beta research model. A finding is shown when the model&rsquo;s probability is ' + Math.round(BETA_CUTOFF * 100) +
-      '% or more. Final diagnosis by an ophthalmologist.</div>' +
+    '<div class="bf-verdict" style="--ac:' + lv.c + '"><span class="bf-vdot"></span><div>' +
+      '<div class="bf-vlabel">The model reports</div>' +
+      '<div class="bf-vtitle">' + escHtml(r.verdict || '') + '</div>' +
+      '<div class="bf-vsub">' + escHtml(sub) + '</div></div></div>' +
+    '<div class="bf-grid">' +
+      '<div class="bf-card"><div class="bf-title">Diseases</div>' + pctBars(rows.diseases) + '</div>' +
+      '<div class="bf-card"><div class="bf-title">DR lesions</div>' + pctBars(rows.lesions) + '</div>' +
+    '</div>' +
+    '<div class="bf-note">Percentages are the beta model&rsquo;s probabilities for this image. Final diagnosis by an ophthalmologist.</div>' +
   '</div>';
 }
 
@@ -3618,8 +3613,8 @@ async function exportBetaReport(saved) {
   const n = list.length;
   const patient = saved ? null : readPatientDetails('bm-pt-');
   const summary = n > 1 ? `<div class="sec">Summary — ${n} images</div><table>
-    <tr><th>Image</th><th>DR</th><th>DME</th><th>Other eye diseases</th></tr>
-    ${list.map(function (x) { const f = betaFindings(x.res); return `<tr><td>${escHtml(x.name)}</td><td>${f.dr ? 'Yes · ' + escHtml(f.drName) : 'No'}</td><td>${f.dme ? 'Yes' : 'No'}</td><td>${f.others.length ? f.others.map(function (o) { return escHtml(o.name); }).join(', ') : 'None'}</td></tr>`; }).join('')}
+    <tr><th>Image</th><th>Model finding</th><th class="num">DR</th><th class="num">DME</th></tr>
+    ${list.map(function (x) { return `<tr><td>${escHtml(x.name)}</td><td><b>${escHtml(x.res.verdict || '')}</b></td><td class="num">${(Number(x.res.referable || 0) * 100).toFixed(1)}%</td><td class="num">${(Number(x.res.dme_prob || 0) * 100).toFixed(1)}%</td></tr>`; }).join('')}
   </table>` : '';
   const inner = reportPatientHTML(patient) + summary + list.map(function (x, i) { return betaReportSection(x, i, n); }).join('');
   openReportWindow(reportPageHTML('Multi-Disease Report', 'Multi-Disease Screening · Beta', 'Multi-Disease Screening Report', inner));
@@ -3627,24 +3622,30 @@ async function exportBetaReport(saved) {
 
 function betaReportSection(x, idx, n) {
   const scr = x.res, original = x.img;
-  const f = betaFindings(scr);
-  const any = f.dr || f.dme || f.others.length;
-  const sc = any ? '#FABD31' : '#38CC87';
+  const lv = MDX_LEVEL[scr.verdict_level] || MDX_LEVEL.other;
+  const sc = { dr: '#F35858', other: '#FABD31', clear: '#38CC87' }[scr.verdict_level] || '#6B5BD2';
+  const rows = betaRows(scr);
   const ov = scr.overlays || {};
-  const yn = function (on, text) { return `<b style="color:${on ? '#C62C2C' : '#1c8a5a'}">${text}</b>`; };
+  const pctTable = function (list) {
+    return list.map(function (r) {
+      const v = Math.max(0, Math.min(1, Number(r[1]) || 0));
+      return `<tr><td>${escHtml(r[0])}</td><td class="num">${(v * 100).toFixed(1)}%</td><td style="width:45%"><div class="bar"><i style="width:${(v * 100).toFixed(1)}%"></i></div></td></tr>`;
+    }).join('');
+  };
   return `<section class="rpt" style="--sc:${sc};--scbg:${sc}0D;--scbd:${sc}40">
     ${reportImageHeading(x, idx, n)}
-    <div class="sec">Findings · Beta</div>
-    <table class="kv">
-      <tr><td>Diabetic Retinopathy</td><td>${yn(f.dr, f.dr ? 'Detected · ' + escHtml(f.drName) : 'Not detected')}</td></tr>
-      <tr><td>Diabetic Macular Edema</td><td>${yn(f.dme, f.dme ? 'Detected' : 'Not detected')}</td></tr>
-      <tr><td>Other eye diseases</td><td>${f.others.length ? yn(true, f.others.map(function (o) { return escHtml(o.name); }).join(', ')) : yn(false, 'None detected')}</td></tr>
-    </table>
-    <div class="sec">Lesions</div>
-    <table class="kv">
-      ${f.lesions.map(function (l) { return `<tr><td>${escHtml(l.name)} (${escHtml(l.code)})</td><td>${yn(l.on, l.on ? 'Present' : 'Not seen')}</td></tr>`; }).join('')}
-    </table>
-    <div class="rnote">Beta research model (${escHtml(scr.model || 'ConfECBL')}). A finding is listed when the model's probability is ${Math.round(BETA_CUTOFF * 100)}% or more. A DR grade for clinical use comes from the DR analysis and its report.</div>
+    <div class="sec">The model reports · Beta</div>
+    <div class="hero">
+      <div>
+        <div class="hg" style="font-size:19px">${escHtml(scr.verdict || '')}</div>
+        <div class="hs">${escHtml(scr.verdict_sub || scr.advice || scr.recommendation || lv.sub)}</div>
+      </div>
+    </div>
+    <div class="sec">Diseases</div>
+    <table>${pctTable(rows.diseases)}</table>
+    <div class="sec">DR lesions</div>
+    <table>${pctTable(rows.lesions)}</table>
+    <div class="rnote">Percentages are the beta model's (${escHtml(scr.model || 'ConfECBL')}) probabilities for this image. A DR grade for clinical use comes from the DR analysis and its report.</div>
     <div class="sec">Imaging</div>
     <div class="imgs">
       ${original ? `<figure><div class="cap">Original</div><img src="${original}"></figure>` : ''}
