@@ -282,6 +282,8 @@ async function send() {
   const text = input.value.trim();
   if (busy || (!text && !image)) return;
   busy = true; refreshSend();
+  // the message is on its way: stop dictating into the box it just emptied
+  if (recognition && wantListening) { wantListening = false; recognition.stop(); }
   document.querySelectorAll('.chips').forEach(c => c.remove());
 
   addRow('user', (image ? '<img class="att" src="' + image.dataUrl + '" alt="Attached image">' : '') + (text ? md(text) : ''));
@@ -377,7 +379,7 @@ document.querySelectorAll('.lang button').forEach(b => b.onclick = () => {
 });
 
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition = null, listening = false, baseText = '';
+let recognition = null, listening = false, wantListening = false, baseText = '', finalText = '';
 if (!SR) {
   micBtn.disabled = true;
   micBtn.title = 'Voice input is not supported in this browser (try Chrome or Edge).';
@@ -385,25 +387,50 @@ if (!SR) {
   recognition = new SR();
   recognition.lang = speechLang;
   recognition.interimResults = true;
-  recognition.continuous = false;
+  // Keep the microphone open until it is switched off. The browser still ends its own
+  // session on a pause, so onend starts a fresh one while the user still wants to talk.
+  recognition.continuous = true;
   recognition.onresult = e => {
-    let said = '';
-    for (let i = 0; i < e.results.length; i++) said += e.results[i][0].transcript;
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const r = e.results[i];
+      if (r.isFinal) finalText += r[0].transcript;
+      else interim += r[0].transcript;
+    }
+    const said = (finalText + interim).trim();
     input.value = (baseText ? baseText + ' ' : '') + said;
     autoGrow(); refreshSend();
   };
   recognition.onerror = e => {
-    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') addRow('err', 'Microphone permission was denied. Allow the microphone to use voice input.');
+    // A silence ('no-speech') or a restart ('aborted') is normal; onend picks it up again.
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      wantListening = false;
+      addRow('err', 'Microphone permission was denied. Allow the microphone to use voice input.');
+    }
   };
-  recognition.onend = () => { listening = false; micBtn.classList.remove('listening'); micBtn.title = 'Speak'; };
+  recognition.onend = () => {
+    if (wantListening) {
+      try { recognition.start(); return; } catch (e) { /* could not resume: fall through */ }
+    }
+    wantListening = false;
+    listening = false;
+    micBtn.classList.remove('listening');
+    micBtn.title = 'Speak';
+  };
   micBtn.onclick = () => {
-    if (listening) { recognition.stop(); return; }
+    if (wantListening) { wantListening = false; recognition.stop(); return; }
     baseText = input.value.trim();
-    try { recognition.lang = speechLang; recognition.start(); listening = true; micBtn.classList.add('listening'); micBtn.title = 'Listening… tap to stop'; }
-    catch (e) { /* start() throws if already started */ }
+    finalText = '';
+    wantListening = true;
+    try {
+      recognition.lang = speechLang;
+      recognition.start();
+      listening = true;
+      micBtn.classList.add('listening');
+      micBtn.title = 'Listening… tap to stop';
+    } catch (e) { wantListening = false; }
   };
 }
-
 welcome();
 </script>
 </body>
