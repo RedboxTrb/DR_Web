@@ -47,6 +47,18 @@ nav{position:sticky;top:0;z-index:100;background:rgba(248,247,245,0.96);backdrop
 .hero-h1{font-size:62px;font-weight:800;line-height:1.12;color:var(--navy);margin-bottom:24px;}
 .hero-h1 span{color:var(--teal);}
 .hero-sub{font-size:16px;line-height:1.7;color:#0C1024;max-width:520px;margin-bottom:36px;}
+/* The photo is mirrored: the eye sits on the right, its dark side behind the text.
+   Above phone width the text is white over a dark wash; phones keep the light wash. */
+.hero-bg img{transform:scaleX(-1);object-position:45% center;}
+@media(min-width:641px){
+  .hero-bg-overlay{background:linear-gradient(to right, rgba(4,12,12,.78) 0%, rgba(4,12,12,.62) 30%, rgba(4,12,12,.25) 52%, rgba(4,12,12,0) 68%);}
+  .hero-h1{color:#FFFFFF;}
+  .hero-sub{color:#D3DCE0;}
+  .hero-badge{background:rgba(34,183,163,.16);border-color:rgba(34,183,163,.55);color:#86E6D8;}
+}
+@media(min-width:641px) and (max-width:900px){
+  .hero-bg-overlay{background:linear-gradient(to right, rgba(4,12,12,.82) 0%, rgba(4,12,12,.7) 45%, rgba(4,12,12,.3) 70%, rgba(4,12,12,.05) 90%);}
+}
 .hero-ctas{display:flex;gap:16px;margin-bottom:48px;}
 .btn-primary{background:var(--teal);color:var(--white);font-size:15px;font-weight:700;padding:14px 28px;border-radius:12px;border:none;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;}
 .btn-primary:hover{background:var(--teal-d);transform:translateY(-1px);}
