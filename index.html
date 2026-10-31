@@ -1005,7 +1005,7 @@ footer{padding:52px 60px 28px;}
 .profile-chip:not(.open) .profile-dropdown{display:none;}
 
 /* ── Mobile nav hamburger ─────────────────────────────────── */
-.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;border:none;background:none;margin-left:8px;}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;border:none;background:none;margin-left:8px;align-self:center;flex:0 0 auto;}
 .nav-hamburger span{display:block;width:22px;height:2px;background:var(--navy);border-radius:2px;transition:all .25s;}
 .nav-mobile-menu{display:none;position:fixed;top:68px;left:0;right:0;bottom:0;background:rgba(248,247,245,0.98);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:90;padding:24px;flex-direction:column;gap:4px;overflow-y:auto;}
 .nav-mobile-menu.open{display:flex;}
@@ -1032,6 +1032,10 @@ footer{padding:52px 60px 28px;}
   .nav-links{display:none;}
   .nav-hamburger{display:flex;}
   .nav-mobile-menu{top:56px;}
+  #page-reports nav,#page-report-detail nav{padding:0 16px !important;}
+  #page-reports nav>div:last-child,#page-report-detail nav>div:last-child{align-items:center;min-width:0;}
+  /* Logout also lives in the mobile menu, so drop it from the bar to make room. */
+  #page-reports nav .nav-btn-ghost{display:none;}
   .nav-logo-text{font-size:14px;}
   .hero-h1{font-size:32px;line-height:1.18;}
   .hero-sub{font-size:14px;}
@@ -4208,14 +4212,18 @@ const CHATBOT_URL = '/chat.html';
 
 // ── Mobile menu ───────────────────────────────────────────────────────────────
 // Put the menu button into every page's nav (CSS shows it only on narrow screens).
-document.querySelectorAll('nav .nav-right').forEach(function (r) {
+document.querySelectorAll('nav').forEach(function (nav) {
+  if (nav.querySelector('.nav-hamburger')) return;
   const b = document.createElement('button');
   b.className = 'nav-hamburger';
   b.type = 'button';
   b.setAttribute('aria-label', 'Menu');
   b.innerHTML = '<span></span><span></span><span></span>';
   b.onclick = toggleMobileMenu;
-  r.appendChild(b);
+  // Prefer the nav's right-hand cluster; fall back to its last block, then the nav itself.
+  const host = nav.querySelector('.nav-right')
+            || (nav.lastElementChild && nav.lastElementChild.tagName === 'DIV' ? nav.lastElementChild : nav);
+  host.appendChild(b);
 });
 
 function toggleMobileMenu() {
@@ -4228,6 +4236,8 @@ function toggleMobileMenu() {
       <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('home')">Home</a>
       <a class="nav-mobile-link" onclick="closeMobileMenu();document.getElementById('features')&&document.getElementById('features').scrollIntoView({behavior:'smooth'});showPage('home')">About</a>
       <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('choose')">Try Demo</a>
+      <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('clinics')">Find a Clinic</a>
+      <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('validation')">Validation</a>
       <hr class="nav-mobile-divider">
       <a class="nav-mobile-link" id="mm-login" onclick="closeMobileMenu();showPage('auth')" style="color:var(--teal)">Log in / Sign up</a>
       <a class="nav-mobile-link" id="mm-reports" style="display:none;" onclick="closeMobileMenu();showPage('reports')">My Reports</a>
@@ -4244,6 +4254,13 @@ function toggleMobileMenu() {
     if (login) login.style.display = 'none';
     if (reports) reports.style.display = 'block';
     if (logout) logout.style.display = 'block';
+  } else {
+    const login = document.getElementById('mm-login');
+    const reports = document.getElementById('mm-reports');
+    const logout = document.getElementById('mm-logout');
+    if (login) login.style.display = 'block';
+    if (reports) reports.style.display = 'none';
+    if (logout) logout.style.display = 'none';
   }
 }
 function closeMobileMenu() {
