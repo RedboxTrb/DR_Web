@@ -1073,6 +1073,36 @@ footer{padding:52px 60px 28px;}
   .ar-nearby-card{padding:16px 12px;}
   .ar-clinic-card{padding:14px;}
 }
+/* ── Find a clinic ─────────────────────────────────────────────────────────── */
+.cf-wrap{background:var(--offwhite);padding:0 60px 72px;}
+.cf-strip{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:var(--white);border:1px solid var(--g200);border-radius:16px;padding:20px 24px;cursor:pointer;transition:box-shadow .18s,transform .18s;}
+.cf-strip:hover{box-shadow:0 10px 30px rgba(12,16,36,.08);transform:translateY(-1px);}
+.cf-pin{flex:none;width:40px;height:40px;border-radius:12px;background:rgba(34,183,163,.12);color:var(--teal-d);display:flex;align-items:center;justify-content:center;}
+.cf-strip-text{flex:1;min-width:220px;display:flex;flex-direction:column;gap:2px;}
+.cf-strip-text b{font-size:16px;color:var(--navy);}
+.cf-strip-text span{font-size:13px;color:var(--g500);}
+.cf-strip-go{font-size:13px;font-weight:700;color:var(--teal-d);flex:none;}
+.cf-page{max-width:980px;margin:0 auto;padding:48px 24px 80px;}
+.cf-h1{font-size:34px;font-weight:800;color:var(--navy);letter-spacing:-.5px;margin:0 0 10px;}
+.cf-sub{font-size:15px;color:var(--g500);line-height:1.6;max-width:680px;margin:0;}
+.cf-search{display:flex;gap:10px;flex-wrap:wrap;margin:30px 0 8px;}
+.cf-search input{flex:1;min-width:230px;height:48px;padding:0 16px;font-family:inherit;font-size:15px;color:var(--navy);background:var(--white);border:1px solid var(--g200);border-radius:12px;outline:none;transition:border-color .15s,box-shadow .15s;}
+.cf-search input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(34,183,163,.15);}
+.cf-search button{height:48px;padding:0 20px;flex:none;}
+.cf-msg{font-size:12.5px;color:var(--g500);min-height:18px;}
+.cf-kinds{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:14px;margin:26px 0 0;}
+.cf-kind{font-family:inherit;text-align:left;background:var(--white);border:1px solid var(--g200);border-radius:14px;padding:18px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:box-shadow .18s,transform .18s,border-color .18s;}
+.cf-kind:hover{border-color:var(--teal);box-shadow:0 8px 24px rgba(12,16,36,.07);transform:translateY(-1px);}
+.cf-kind b{font-size:15px;color:var(--navy);}
+.cf-kind span{font-size:12.5px;color:var(--g500);line-height:1.55;}
+.cf-tips{margin-top:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:18px;}
+.cf-tip{background:var(--white);border:1px solid var(--g200);border-radius:14px;padding:20px 22px;}
+.cf-tip b{display:block;font-size:14px;color:var(--navy);margin-bottom:10px;}
+.cf-tip ul{margin:0;padding-left:18px;}
+.cf-tip li{font-size:13px;color:var(--g500);line-height:1.75;}
+.cf-disc{margin-top:30px;font-size:12.5px;color:var(--g500);line-height:1.6;background:var(--g100);border-radius:12px;padding:14px 16px;}
+@media(max-width:900px){.cf-wrap{padding:0 24px 56px;}.cf-h1{font-size:28px;}}
+@media(max-width:640px){.cf-wrap{padding:0 16px 44px;}.cf-strip{padding:16px 18px;gap:12px;}.cf-page{padding:32px 16px 56px;}.cf-h1{font-size:24px;}.cf-search button{width:100%;}}
 </style>
 </head>
 <body>
@@ -1090,6 +1120,7 @@ footer{padding:52px 60px 28px;}
       <a href="#home" onclick="showPage('home')">Home</a>
       <a href="#features" onclick="if(document.getElementById('page-home').classList.contains('active')){event.preventDefault();document.getElementById('features').scrollIntoView({behavior:'smooth'});}">About</a>
       <a onclick="showPage('choose')">Demo</a>
+      <a onclick="showPage('clinics')">Find a Clinic</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-home" style="display:flex;gap:16px;align-items:center;">
@@ -1176,6 +1207,16 @@ footer{padding:52px 60px 28px;}
       <span class="val-live"><i></i>Clinical validation in progress</span>
       <span class="val-strip-text"><b>Real-world testing at SMS Hospital, Jaipur</b><span>Pilot approved by the Government of Rajasthan for DR and DME screening.</span></span>
       <span class="val-strip-go">View details &rarr;</span>
+    </a>
+  </div>
+  <!-- Find a clinic: a short strip; the finder has its own page -->
+  <div class="cf-wrap">
+    <a class="cf-strip" onclick="showPage('clinics')">
+      <span class="cf-pin">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </span>
+      <span class="cf-strip-text"><b>Find an eye clinic near you</b><span>Eye hospitals, ophthalmologists, retina specialists and optometrists &mdash; by your city, PIN code or current location.</span></span>
+      <span class="cf-strip-go">Find a clinic &rarr;</span>
     </a>
   </div>
   <!-- CTA BANNER -->
@@ -1679,6 +1720,7 @@ footer{padding:52px 60px 28px;}
       <a onclick="showPage('home')">Home</a>
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Analysis</a>
       <a onclick="showPage('upload')">New Analysis</a>
+      <a onclick="showPage('clinics')">Find a Clinic</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <div id="nav-guest-analysis" style="display:flex;gap:10px;align-items:center;">
@@ -1788,6 +1830,7 @@ footer{padding:52px 60px 28px;}
       <a onclick="showPage('home')">Home</a>
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Analysis</a>
       <a onclick="showPage('dme')">New Analysis</a>
+      <a onclick="showPage('clinics')">Find a Clinic</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <div id="nav-guest-dmeres" style="display:flex;gap:10px;align-items:center;">
@@ -1833,6 +1876,7 @@ footer{padding:52px 60px 28px;}
       <a onclick="showPage('home')">Home</a>
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Analysis</a>
       <a onclick="showPage('beta')">New Analysis</a>
+      <a onclick="showPage('clinics')">Find a Clinic</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <div id="nav-guest-betares" style="display:flex;gap:10px;align-items:center;">
@@ -1868,6 +1912,93 @@ footer{padding:52px 60px 28px;}
 <!-- ═══════════════════════════════════
      PAGE 4: AUTH (Login / Sign Up)
 ══════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════
+     PAGE: FIND A CLINIC
+═══════════════════════════════════════════════ -->
+<div class="page" id="page-clinics">
+  <nav>
+    <a class="nav-logo" onclick="showPage('home')">
+      <svg width="28" height="28" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><path d="M27 9 A12 12 0 1 0 27 27" fill="none" stroke="#0C1024" stroke-width="3.5" stroke-linecap="round"/><circle cx="19" cy="18" r="4" fill="#22B7A3"/></svg>
+      <span class="nav-logo-text">ChakshuRakshakAI</span>
+    </a>
+    <div class="nav-links">
+      <a onclick="showPage('home')">Home</a>
+      <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Find a Clinic</a>
+      <a onclick="showPage('choose')">Demo</a>
+    </div>
+    <div class="nav-right">
+      <button class="nav-btn-ghost" onclick="showPage('home')">&larr; Back to home</button>
+    </div>
+  </nav>
+
+  <div class="cf-page">
+    <h1 class="cf-h1">Find an eye clinic near you</h1>
+    <p class="cf-sub">An AI screen is a starting point, not a diagnosis. Whatever the result says, a fundus photograph should be read by an eye doctor. Search for an eye hospital, ophthalmologist, retina specialist or optometrist near you.</p>
+
+    <div class="cf-search">
+      <input id="cf-where" type="text" placeholder="City, area or PIN code &mdash; e.g. Jaipur, 302017" autocomplete="address-level2" aria-label="City, area or PIN code" onkeydown="if(event.key==='Enter'){event.preventDefault();cfSearch('eye hospital');}">
+      <button class="btn-primary" type="button" onclick="cfSearch('eye hospital')">Search on map</button>
+      <button class="btn-ghost" type="button" onclick="cfLocate()">Use my location</button>
+    </div>
+    <div class="cf-msg" id="cf-msg">Leave the box empty to search around wherever you are.</div>
+
+    <div class="cf-kinds">
+      <button class="cf-kind" type="button" onclick="cfSearch('eye hospital')">
+        <b>Eye hospital</b>
+        <span>Full eye care in one place &mdash; examination, dilated fundus check, lasers and surgery.</span>
+      </button>
+      <button class="cf-kind" type="button" onclick="cfSearch('ophthalmologist')">
+        <b>Ophthalmologist</b>
+        <span>An eye doctor (MBBS, MS/MD) who can examine your retina and treat disease.</span>
+      </button>
+      <button class="cf-kind" type="button" onclick="cfSearch('retina specialist')">
+        <b>Retina specialist</b>
+        <span>A vitreoretinal surgeon &mdash; the right choice for diabetic retinopathy, macular edema or an AMD referral.</span>
+      </button>
+      <button class="cf-kind" type="button" onclick="cfSearch('optometrist')">
+        <b>Optometrist</b>
+        <span>Vision testing, glasses and basic screening. They will refer you on if they see something.</span>
+      </button>
+    </div>
+
+    <div class="cf-tips">
+      <div class="cf-tip">
+        <b>Take these with you</b>
+        <ul>
+          <li>The report this site produced, printed or on your phone</li>
+          <li>Your fundus photographs, if you have them</li>
+          <li>Recent blood sugar, HbA1c and blood pressure readings</li>
+          <li>A list of the medicines you take</li>
+          <li>Dark glasses &mdash; your pupils may be dilated, so arrange a ride home</li>
+        </ul>
+      </div>
+      <div class="cf-tip">
+        <b>Worth asking</b>
+        <ul>
+          <li>Do you do a dilated retinal examination?</li>
+          <li>Is OCT or fundus photography available here?</li>
+          <li>What grade of diabetic retinopathy do you see?</li>
+          <li>Do I need treatment now, or a follow-up date?</li>
+          <li>How soon should I come back?</li>
+        </ul>
+      </div>
+      <div class="cf-tip">
+        <b>Don't wait if you notice</b>
+        <ul>
+          <li>Sudden loss or blurring of vision</li>
+          <li>A curtain or shadow across your sight</li>
+          <li>Many new floaters, or flashes of light</li>
+          <li>Straight lines looking bent or wavy</li>
+          <li>Pain with redness, or a red eye that will not settle</li>
+        </ul>
+        <p style="margin:10px 0 0;font-size:12.5px;color:var(--coral);font-weight:600;">Any of these means same-day care, not a search.</p>
+      </div>
+    </div>
+
+    <div class="cf-disc">The search opens Google Maps in a new tab and shows whatever is listed there. We do not run, verify, rank or endorse any of those clinics, and we receive nothing from them &mdash; please check qualifications, timings and fees yourself before you go.</div>
+  </div>
+</div>
+
 <div class="page" id="page-auth">
   <div class="auth-page">
 
@@ -2705,6 +2836,65 @@ function showAuthGate() {
   const b = document.getElementById('auth-guest-banner');
   if (b) b.classList.add('show');
 }
+
+// ── Find a clinic ─────────────────────────────────────────────────────────────
+// The search opens Google Maps: around a coordinate when the browser gives us
+// one, around whatever the person typed otherwise.
+let _cfCoords = null;
+
+function cfMsg(text) {
+  const el = document.getElementById('cf-msg');
+  if (el) el.textContent = text;
+}
+
+function cfSearch(kind) {
+  const box = document.getElementById('cf-where');
+  const where = box ? box.value.trim() : '';
+  const base = 'https://www.google.com/maps/search/';
+  let url;
+  if (where) {
+    url = base + encodeURIComponent(kind + ' in ' + where) + '/';
+  } else if (_cfCoords) {
+    url = base + encodeURIComponent(kind) + '/@' + _cfCoords.lat + ',' + _cfCoords.lng + ',13z';
+  } else {
+    url = base + encodeURIComponent(kind + ' near me') + '/';
+  }
+  window.open(url, '_blank', 'noopener');
+}
+
+function cfLocate() {
+  if (!navigator.geolocation) {
+    cfMsg('This browser cannot share a location. Type your city or PIN code instead.');
+    return;
+  }
+  cfMsg('Asking your browser for your location…');
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      _cfCoords = { lat: pos.coords.latitude.toFixed(5), lng: pos.coords.longitude.toFixed(5) };
+      const box = document.getElementById('cf-where');
+      if (box) box.value = '';
+      cfMsg('Using your current location — now pick what you are looking for.');
+    },
+    err => {
+      cfMsg(err && err.code === 1
+        ? 'Location was not allowed. Type your city or PIN code instead.'
+        : 'Your location could not be read. Type your city or PIN code instead.');
+    },
+    { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+  );
+}
+
+// A link from anywhere can open the finder directly with #clinics.
+function cfOpenFromHash() {
+  if (location.hash === '#clinics') showPage('clinics');
+}
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', cfOpenFromHash);
+} else {
+  cfOpenFromHash();
+}
+// Changing only the hash does not reload the page, so catch that too.
+window.addEventListener('hashchange', cfOpenFromHash);
 
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));

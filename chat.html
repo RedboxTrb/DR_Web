@@ -26,10 +26,6 @@
   .head-sub i{width:7px;height:7px;border-radius:50%;background:#38CC87;display:inline-block;}
   .head-actions{display:flex;align-items:center;gap:8px;flex:none;}
   /* Straight to a clinic search, without having to ask for one first. */
-  .find{display:inline-flex;align-items:center;gap:6px;font:600 12px 'Inter',sans-serif;color:var(--teal-d);background:rgba(34,183,163,.1);border:1px solid rgba(34,183,163,.32);border-radius:20px;padding:0 12px;height:34px;text-decoration:none;white-space:nowrap;transition:background .15s;}
-  .find:hover{background:rgba(34,183,163,.2);}
-  .find:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
-  .find svg{flex:none;}
   .lang{display:flex;background:var(--g100);border-radius:10px;padding:3px;flex:none;}
   .lang button{font:600 12px 'Inter',sans-serif;border:none;background:none;color:var(--g500);padding:0 10px;height:28px;border-radius:8px;cursor:pointer;transition:color .15s;}
   .lang button.on{background:var(--white);color:var(--navy);box-shadow:0 1px 3px rgba(12,16,36,.12);}
@@ -93,7 +89,7 @@
   .foot{font-size:10.5px;color:var(--g400);text-align:center;margin-top:9px;line-height:1.5;}
   /* The widget panel is 400px wide wherever it is embedded, so the pin goes label-less
      there and keeps its name through aria-label; the full-page view is wide enough. */
-  @media (max-width:430px){.hint{display:none;}.find span{display:none;}.find{padding:0 9px;}}
+  @media (max-width:430px){.hint{display:none;}}
   @media (prefers-reduced-motion:reduce){.typing i,.icon.listening,.send{animation:none;transition:none;}}
 </style>
 </head>
@@ -108,10 +104,6 @@
       <div class="head-sub"><i></i>ChakshuRakshakAI · AI, not a doctor</div>
     </div>
     <div class="head-actions">
-      <a class="find" href="https://www.google.com/maps/search/eye+hospital+OR+ophthalmologist+OR+retina+clinic+near+me/" target="_blank" rel="noopener" aria-label="Find an eye clinic near you" title="Find an eye hospital, ophthalmologist or retina clinic near you">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>Find a clinic</span>
-      </a>
       <div class="lang" role="group" aria-label="Answer language">
         <button type="button" data-lang="auto" class="on" title="Answer in whichever language you write in">Auto</button>
         <button type="button" data-lang="en" title="Always answer in English">EN</button>
