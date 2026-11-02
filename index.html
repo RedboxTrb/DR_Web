@@ -1045,18 +1045,6 @@ footer{padding:52px 60px 28px;}
 /* close dropdown when clicking outside */
 .profile-chip:not(.open) .profile-dropdown{display:none;}
 
-/* ── Rejected upload dialog ───────────────────────────────── */
-.fx-overlay{position:fixed;inset:0;background:rgba(12,16,36,.55);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;}
-.fx-card{background:var(--white);border-radius:16px;max-width:440px;width:100%;padding:26px;box-shadow:0 24px 60px rgba(12,16,36,.32);}
-.fx-icon{width:40px;height:40px;border-radius:10px;background:rgba(243,88,88,.12);color:var(--red);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;}
-.fx-title{font-size:17px;font-weight:800;color:var(--navy);margin-bottom:6px;}
-.fx-sub{font-size:13.5px;color:var(--g500);line-height:1.55;margin-bottom:14px;}
-.fx-item{background:var(--g100);border-radius:9px;padding:10px 12px;margin-bottom:8px;}
-.fx-name{font-size:12.5px;font-weight:700;color:var(--navy);word-break:break-all;}
-.fx-why{font-size:12px;color:var(--g500);margin-top:2px;}
-.fx-btn{width:100%;margin-top:8px;background:var(--teal);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
-.fx-btn:hover{background:var(--teal-d);}
-
 /* ── Mobile nav hamburger ─────────────────────────────────── */
 .nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;border:none;background:none;margin-left:8px;align-self:center;flex:0 0 auto;}
 .nav-hamburger span{display:block;width:22px;height:2px;background:var(--navy);border-radius:2px;transition:all .25s;}
@@ -2392,11 +2380,9 @@ function modRender(kind) {
   btn.innerHTML = '<span>' + modRunLabel(m) + '</span>';
 }
 
-async function modPick(kind, files) {
+function modPick(kind, files) {
   const m = MODS[kind];
-  let list = Array.from(files || []).filter(function (f) { return /^image\//.test(f.type) || /\.(jpe?g|png|tiff?)$/i.test(f.name); });
-  if (!list.length) return;
-  list = await keepFundusImages(list);
+  const list = Array.from(files || []).filter(function (f) { return /^image\//.test(f.type) || /\.(jpe?g|png|tiff?)$/i.test(f.name); });
   if (!list.length) return;
   m.items.forEach(function (it) { URL.revokeObjectURL(it.url); });
   m.items = list.map(function (f) { return { file: f, url: URL.createObjectURL(f), res: null, time: 0, err: null }; });
@@ -2971,166 +2957,13 @@ function setToggle(btn) {
 }
 
 // ── File handling ─────────────────────────────────────────────────────────────
-// ── Is this actually a retinal photograph? ────────────────────────────────────
-// A fundus photograph is lit through the pupil and comes back overwhelmingly
-// red/orange, because the retina absorbs blue almost completely; it is also
-// framed by the camera's circular field of view. Nothing people upload by
-// mistake — a screenshot, a document, a landscape, a selfie, an iris close-up —
-// matches both. The check runs in the browser, so a wrong file never leaves
-// the machine, and it only rejects when it is confident: anything it cannot
-// judge is allowed through, since blocking a real fundus photograph is the
-// worse failure. Rejected files log their measurements to the console.
-function assessFundusImage(img) {
-  const W = 192;
-  const H = Math.max(1, Math.round((img.naturalHeight || img.height) * (W / (img.naturalWidth || img.width))));
-  const c = document.createElement('canvas');
-  c.width = W; c.height = H;
-  const ctx = c.getContext('2d', { willReadFrequently: true });
-  ctx.drawImage(img, 0, 0, W, H);
-  let d;
-  try { d = ctx.getImageData(0, 0, W, H).data; }
-  catch (e) { return { ok: true, why: 'could not be read' }; }
-
-  const lit = new Uint8Array(W * H);
-  let n = 0, red = 0, off = 0, grey = 0, sR = 0, sB = 0;
-  let minX = W, maxX = -1, minY = H, maxY = -1, cx = 0, cy = 0;
-  for (let y = 0, i = 0, k = 0; y < H; y++) for (let x = 0; x < W; x++, k++, i += 4) {
-    const r = d[i], g = d[i + 1], b = d[i + 2];
-    if (0.299 * r + 0.587 * g + 0.114 * b < 26) continue;   // outside the lit field
-    lit[k] = 1; n++; sR += r; sB += b; cx += x; cy += y;
-    if (x < minX) minX = x; if (x > maxX) maxX = x;
-    if (y < minY) minY = y; if (y > maxY) maxY = y;
-    const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
-    if (mx - mn < 18) grey++; else if (r >= g && r >= b) red++; else off++;
-  }
-  if (n < 400) return { ok: true, why: 'too dark to judge' };
-  cx /= n; cy /= n;
-
-  const m = {
-    litFrac: +(n / (W * H)).toFixed(3), redFrac: +(red / n).toFixed(3),
-    offFrac: +(off / n).toFixed(3), greyFrac: +(grey / n).toFixed(3),
-    rb: +((sR / n) / Math.max(1, sB / n)).toFixed(2)
-  };
-
-  // How disc-like is the lit area? A fundus camera's field of view is a circle.
-  const bw = maxX - minX + 1, bh = maxY - minY + 1;
-  m.aspect = +(Math.min(bw, bh) / Math.max(bw, bh)).toFixed(2);
-  const rad = Math.sqrt(n / Math.PI);
-  let inside = 0, insideLit = 0;
-  for (let y = 0, k = 0; y < H; y++) for (let x = 0; x < W; x++, k++) {
-    const dx = x - cx, dy = y - cy;
-    if (dx * dx + dy * dy <= rad * rad) { inside++; if (lit[k]) insideLit++; }
-  }
-  m.circleFill = +(insideLit / Math.max(1, inside)).toFixed(2);
-
-  if (m.offFrac  > 0.15) return { ok: false, why: 'green or blue dominates — a retinal photograph is red/orange', m };
-  if (m.greyFrac > 0.55) return { ok: false, why: 'almost no colour — this looks like a document or a screenshot', m };
-  if (m.redFrac  < 0.75) return { ok: false, why: 'not red/orange enough to be a retinal photograph', m };
-  // Strongly red: no skin tone reaches this red/blue ratio, so colour settles it.
-  if (m.rb >= 2.4) return { ok: true, why: 'fundus-like (colour)', m };
-  // Paler retina: also require the circular field of view.
-  if (m.rb >= 1.7 && m.litFrac <= 0.95 && m.aspect >= 0.85 && m.circleFill >= 0.9)
-    return { ok: true, why: 'fundus-like (colour and circular field)', m };
-  return { ok: false, why: 'does not look like a retinal photograph', m };
-}
-
-function checkFundusFile(file) {
-  return new Promise(function (resolve) {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload  = function () { const v = assessFundusImage(img); URL.revokeObjectURL(url); resolve(v); };
-    img.onerror = function () { URL.revokeObjectURL(url); resolve({ ok: true, why: 'could not be read' }); };
-    img.src = url;
-  });
-}
-
-// Returns only the files that look like retinal photographs, and tells the user
-// about the ones it turned away.
-async function keepFundusImages(files) {
-  const kept = [], rejected = [];
-  for (const f of Array.from(files || [])) {
-    const v = await checkFundusFile(f);
-    if (v.ok) kept.push(f);
-    else {
-      rejected.push({ name: f.name, why: v.why });
-      console.warn('[fundus-check] rejected ' + f.name + ' — ' + v.why, v.m);
-    }
-  }
-  if (rejected.length) showFundusRejection(rejected);
-  return kept;
-}
-
-function showFundusRejection(rejected) {
-  const prev = document.getElementById('fx-overlay');
-  if (prev) prev.remove();
-
-  const overlay = document.createElement('div');
-  overlay.className = 'fx-overlay';
-  overlay.id = 'fx-overlay';
-
-  const card = document.createElement('div');
-  card.className = 'fx-card';
-  card.setAttribute('role', 'alertdialog');
-  card.setAttribute('aria-labelledby', 'fx-title');
-
-  const icon = document.createElement('div');
-  icon.className = 'fx-icon';
-  icon.textContent = '!';
-
-  const title = document.createElement('div');
-  title.className = 'fx-title';
-  title.id = 'fx-title';
-  title.textContent = rejected.length > 1
-    ? rejected.length + ' files were not uploaded'
-    : 'That file was not uploaded';
-
-  const sub = document.createElement('div');
-  sub.className = 'fx-sub';
-  sub.textContent = 'This tool analyses fundus photographs — the picture a retinal camera takes of the inside of the eye. A photo of a face or an eye from the outside cannot be graded.';
-
-  card.append(icon, title, sub);
-
-  rejected.slice(0, 6).forEach(function (r) {
-    const item = document.createElement('div');
-    item.className = 'fx-item';
-    const nm = document.createElement('div');
-    nm.className = 'fx-name';
-    nm.textContent = r.name;
-    const why = document.createElement('div');
-    why.className = 'fx-why';
-    why.textContent = r.why;
-    item.append(nm, why);
-    card.appendChild(item);
-  });
-
-  const btn = document.createElement('button');
-  btn.className = 'fx-btn';
-  btn.type = 'button';
-  btn.textContent = 'OK';
-  function close() { overlay.remove(); document.removeEventListener('keydown', onKey); }
-  function onKey(e) { if (e.key === 'Escape') close(); }
-  btn.addEventListener('click', close);
-  overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
-  document.addEventListener('keydown', onKey);
-  card.appendChild(btn);
-
-  overlay.appendChild(card);
-  document.body.appendChild(overlay);
-  btn.focus();
-}
-
 const _origHandleFiles = handleFilesBase;
-function handleFiles(files) { handleFilesBase(files); }
-async function handleFilesBase(files) {
+function handleFiles(files) { _uploadedFiles = Array.from(files); handleFilesBase(files); }
+function handleFilesBase(files) {
   if (!files || !files.length) return;
-  // Non-retinal images are turned away here, before anything is previewed or
-  // uploaded. If none survive, the previous selection is left as it was.
-  const accepted = await keepFundusImages(files);
-  if (!accepted.length) return;
-  _uploadedFiles = accepted;
   const grid = document.getElementById('preview-grid');
   grid.innerHTML = '';
-  accepted.forEach(file => {
+  Array.from(files).forEach(file => {
     const reader = new FileReader();
     reader.onload = e => {
       const item = document.createElement('div');
@@ -4287,7 +4120,7 @@ const dz = document.getElementById('dropzone');
 if (dz) {
   dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragging'); });
   dz.addEventListener('dragleave', () => dz.classList.remove('dragging'));
-  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragging'); handleFilesBase(e.dataTransfer.files); });
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragging'); _uploadedFiles = Array.from(e.dataTransfer.files); handleFilesBase(e.dataTransfer.files); });
 }
 
 // ── Scroll nav highlight ──────────────────────────────────────────────────────
