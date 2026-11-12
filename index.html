@@ -1150,6 +1150,35 @@ footer{padding:52px 60px 28px;}
 .cf-disc{margin-top:30px;font-size:12.5px;color:var(--g500);line-height:1.6;background:var(--g100);border-radius:12px;padding:14px 16px;}
 @media(max-width:900px){.cf-wrap{padding:0 24px 56px;}.cf-h1{font-size:28px;}}
 @media(max-width:640px){.cf-wrap{padding:0 16px 44px;}.cf-strip{padding:16px 18px;gap:12px;}.cf-page{padding:32px 16px 56px;}.cf-h1{font-size:24px;}.cf-search button{width:100%;}}
+/* ── Image explorer ───────────────────────────────────────── */
+.ex-note{font-size:13px;color:var(--g500);line-height:1.6;background:var(--g100);border-radius:10px;padding:12px 14px;margin:0 0 18px;}
+.ex-group{margin-top:28px;}
+.ex-group:first-of-type{margin-top:4px;}
+.ex-group-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+.ex-group-title{font-size:15px;font-weight:700;color:var(--navy);}
+.ex-group-sub{font-size:12.5px;color:var(--g500);}
+.ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;}
+.ex-panel{background:var(--white);border:1px solid var(--g200);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:8px;}
+.ex-box{position:relative;border-radius:10px;overflow:hidden;background:#0C1024;aspect-ratio:1;}
+.ex-box img{width:100%;height:100%;object-fit:contain;display:block;}
+.ex-cap{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.ex-cap-text{display:flex;flex-direction:column;gap:1px;min-width:0;}
+.ex-cap-text b{font-size:12.5px;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ex-cap-text span{font-size:11px;color:var(--g500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ex-dl{flex:none;width:28px;height:28px;border:1px solid var(--g200);border-radius:8px;background:var(--white);color:var(--g600);display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;transition:border-color .15s,color .15s;}
+.ex-dl:hover{border-color:var(--teal);color:var(--teal-d);}
+.ex-status{font-size:13px;color:var(--g500);display:flex;align-items:center;gap:9px;padding:14px 16px;background:var(--g100);border-radius:10px;}
+.ex-err{font-size:13px;color:var(--red);background:rgba(243,88,88,.08);border:1px solid rgba(243,88,88,.25);border-radius:10px;padding:14px 16px;line-height:1.55;}
+.ex-spin{width:14px;height:14px;flex:none;border:2px solid var(--g300);border-top-color:var(--teal);border-radius:50%;animation:ex-spin .7s linear infinite;}
+@keyframes ex-spin{to{transform:rotate(360deg);}}
+.ex-stats{margin-top:12px;font-size:12.5px;color:var(--g500);line-height:1.8;}
+.ex-stats b{color:var(--navy);font-weight:700;}
+.ex-conf{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;border-radius:20px;padding:2px 9px;}
+.ex-conf.ok{background:rgba(56,204,135,.14);color:#227a52;}
+.ex-conf.low{background:rgba(250,189,49,.18);color:#8a6400;}
+@media(max-width:640px){.ex-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}}
+:root{--expl:#378ADD;--expl-d:#185FA5;--expl-bg:rgba(55,138,221,.08);}
+.ch-explore{--ac:var(--expl);--ac-d:var(--expl-d);--ac-bg:var(--expl-bg);}
 </style>
 </head>
 <body>
@@ -1216,7 +1245,7 @@ footer{padding:52px 60px 28px;}
 
   <!-- FEATURES: the three analyses, each its own page and model -->
   <div id="features" class="section" style="background:var(--offwhite);">
-    <div class="section-title">Three analyses. One photograph.</div>
+    <div class="section-title">Four ways to read one photograph.</div>
     <div class="section-sub">Pick the analysis you need &mdash; each one runs its own model on the fundus image you give it.</div>
     <div class="hm-grid">
       <button type="button" class="ch-card ch-dr hm-card" onclick="showPage('upload')">
@@ -1236,6 +1265,12 @@ footer{padding:52px 60px 28px;}
         <span class="ch-title">Multi-Disease Screening</span>
         <span class="ch-desc">A research preview that looks past diabetic retinopathy &mdash; AMD, myopic changes, retinal vein occlusion and chorioretinal scarring &mdash; with referable-DR and DME probabilities. Several images at once.</span>
         <span class="ch-go">Try the beta &rarr;</span>
+      </button>
+      <button type="button" class="ch-card ch-explore hm-card" onclick="showPage('explore')">
+        <span class="ch-badge">EXPLORE</span>
+        <span class="ch-title">Image Explorer</span>
+        <span class="ch-desc">Takes one fundus photograph apart &mdash; red, green and blue channels, contrast-enhanced green, the vessel maps, each lesion type on its own, and a close-up of the optic disc. Every panel downloads as an image.</span>
+        <span class="ch-go">Open the explorer &rarr;</span>
       </button>
     </div>
     <div class="hm-perks">
@@ -1530,6 +1565,12 @@ footer{padding:52px 60px 28px;}
           <span class="ch-title">Multi-Disease Screening</span>
           <span class="ch-desc">A research preview that looks past DR &mdash; AMD, myopic changes, retinal vein occlusion and chorioretinal scarring &mdash; on one or several fundus photographs. ConfECBL.</span>
           <span class="ch-go">Try the beta &rarr;</span>
+        </button>
+        <button type="button" class="ch-card ch-explore" onclick="showPage('explore')">
+          <span class="ch-badge">EXPLORE</span>
+          <span class="ch-title">Image Explorer</span>
+          <span class="ch-desc">Not a grade &mdash; the picture itself, taken apart. Colour channels, contrast-enhanced green, vessel maps, the four lesion types separately, and a cropped optic disc. One image at a time; every panel downloads.</span>
+          <span class="ch-go">Open the explorer &rarr;</span>
         </button>
       </div>
       <div class="cs-head">Coming soon</div>
@@ -2043,6 +2084,61 @@ footer{padding:52px 60px 28px;}
     </div>
 
     <div class="cf-disc">The search opens Google Maps in a new tab and shows whatever is listed there. We do not run, verify, rank or endorse any of those clinics, and we receive nothing from them &mdash; please check qualifications, timings and fees yourself before you go.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     IMAGE EXPLORER: one photograph, taken apart. Colour channels and the optic
+     disc are worked out in the browser; vessels and lesions come from the backend.
+══════════════════════════════════ -->
+<div class="page" id="page-explore">
+  <nav>
+    <a class="nav-logo" onclick="showPage('home')">
+      <svg width="28" height="28" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><path d="M27 9 A12 12 0 1 0 27 27" fill="none" stroke="#0C1024" stroke-width="3.5" stroke-linecap="round"/><circle cx="19" cy="18" r="4" fill="#22B7A3"/></svg>
+      <span class="nav-logo-text">ChakshuRakshakAI</span>
+    </a>
+    <div class="nav-links">
+      <a onclick="showPage('home')">Home</a>
+      <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
+      <a style="color:var(--teal);font-weight:600;" onclick="showPage('choose')">Demo</a>
+    </div>
+    <div class="nav-right">
+      <div id="nav-guest-explore" style="display:flex;gap:12px;align-items:center;">
+        <button class="nav-btn-ghost" onclick="showPage('auth');const b=document.getElementById('auth-guest-banner');if(b)b.classList.remove('show');">Log in</button>
+        <button class="nav-btn" onclick="showPage('choose')">Try Demo &rarr;</button>
+      </div>
+      <div id="nav-user-explore" class="profile-chip" style="display:none;" onclick="this.classList.toggle('open')" tabindex="0">
+        <div class="profile-avatar" id="nav-avatar-explore">?</div>
+        <span id="nav-user-name-explore"></span>
+        <span class="profile-chevron">&#9660;</span>
+        <div class="profile-dropdown">
+          <a onclick="event.stopPropagation();document.getElementById('nav-user-explore').classList.remove('open');showPage('reports')">My Reports</a>
+          <hr>
+          <a class="dd-logout" onclick="event.stopPropagation();document.getElementById('nav-user-explore').classList.remove('open');authLogout()">Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="upload-hero">
+    <h1>Image <span>Explorer</span></h1>
+    <p>One fundus photograph, taken apart &mdash; colour channels, vessels, lesion maps and the optic disc, each one its own image you can download.</p>
+  </div>
+  <div class="upload-body">
+    <div class="upload-container">
+      <div class="preview-area" id="ex-preview-area">
+        <div class="preview-grid" id="ex-thumbs"></div>
+      </div>
+      <div class="dropzone" id="ex-dropzone" onclick="document.getElementById('ex-input').click()">
+        <div class="dz-icon">&#128269;</div>
+        <div class="dz-title">Drop a fundus photograph here</div>
+        <div class="dz-sub">One image at a time &mdash; drag and drop, or browse to upload</div>
+        <button class="dz-btn" onclick="event.stopPropagation();document.getElementById('ex-input').click()">Browse File</button>
+        <div class="dz-formats">Supported: JPG, PNG, TIFF &middot; Max 20MB</div>
+      </div>
+      <input type="file" id="ex-input" class="mm-input" accept="image/*" onchange="exPick(this.files)">
+      <button class="analyze-btn" id="ex-run" disabled onclick="exRun()"><span>Select an image to explore</span></button>
+      <div id="ex-out"></div>
+    </div>
   </div>
 </div>
 
@@ -2942,6 +3038,470 @@ if (document.readyState === 'loading') {
 }
 // Changing only the hash does not reload the page, so catch that too.
 window.addEventListener('hashchange', cfOpenFromHash);
+
+// ── Image explorer ────────────────────────────────────────────────────────────
+// One photograph, taken apart. The colour channels and the optic disc are worked
+// out here in the browser, so they still work when the backend is down; the
+// vessel maps and the lesion masks come from /api/predict and /api/lesions.
+
+var EXPLORER = { file: null, url: null, img: null, panels: [], running: false, disc: null };
+
+var EX_GROUPS = [
+  { id: 'src',    title: 'Source and colour channels', sub: 'worked out in your browser' },
+  { id: 'vessel', title: 'Vessels',                    sub: 'from the backend' },
+  { id: 'lesion', title: 'Lesions',                    sub: 'FLA-Net, from the backend' },
+  { id: 'disc',   title: 'Optic disc',                 sub: 'located in your browser, approximate' }
+];
+
+function exCanvas(w, h) {
+  var c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  return c;
+}
+
+// Everything is worked out on a copy no larger than this, so a 4000px photograph
+// does not freeze the page. Downloads are of that copy, not the original.
+function exFitted(img, max) {
+  var w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+  var s = Math.min(1, max / Math.max(w, h));
+  var c = exCanvas(Math.max(1, Math.round(w * s)), Math.max(1, Math.round(h * s)));
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  return c;
+}
+
+// One channel on its own, as grey levels: the way a fundus image is usually read
+// channel by channel. Green carries the lesion contrast, red the choroid.
+function exChannelCanvas(id, pickFn) {
+  var c = exCanvas(id.width, id.height);
+  var ctx = c.getContext('2d');
+  var out = ctx.createImageData(id.width, id.height);
+  var s = id.data, d = out.data;
+  for (var i = 0; i < s.length; i += 4) {
+    var v = pickFn(s[i], s[i + 1], s[i + 2]);
+    d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255;
+  }
+  ctx.putImageData(out, 0, 0);
+  return c;
+}
+
+function exGreyFrom(id, pickFn) {
+  var g = new Uint8Array(id.width * id.height), s = id.data;
+  for (var i = 0, k = 0; i < s.length; i += 4, k++) g[k] = pickFn(s[i], s[i + 1], s[i + 2]);
+  return g;
+}
+
+function exGreyCanvas(g, w, h) {
+  var c = exCanvas(w, h);
+  var ctx = c.getContext('2d');
+  var out = ctx.createImageData(w, h), d = out.data;
+  for (var k = 0, i = 0; k < g.length; k++, i += 4) { d[i] = d[i + 1] = d[i + 2] = g[k]; d[i + 3] = 255; }
+  ctx.putImageData(out, 0, 0);
+  return c;
+}
+
+// Contrast-limited adaptive histogram equalisation: the usual way to make
+// microaneurysms and exudates legible in the green channel. Tiles are equalised
+// separately with the histogram clipped, then blended so no tile edges show.
+function exClahe(src, w, h, tiles, clip) {
+  var tx = tiles, ty = tiles;
+  var tw = Math.ceil(w / tx), th = Math.ceil(h / ty);
+  var maps = [];
+  var i;
+  for (var gy = 0; gy < ty; gy++) {
+    for (var gx = 0; gx < tx; gx++) {
+      var hist = new Float32Array(256), n = 0;
+      var x0 = gx * tw, y0 = gy * th;
+      var x1 = Math.min(w, x0 + tw), y1 = Math.min(h, y0 + th);
+      for (var y = y0; y < y1; y++) for (var x = x0; x < x1; x++) { hist[src[y * w + x]]++; n++; }
+      if (!n) { maps.push(null); continue; }
+      var limit = Math.max(1, clip * n / 256), excess = 0;
+      for (i = 0; i < 256; i++) if (hist[i] > limit) { excess += hist[i] - limit; hist[i] = limit; }
+      var add = excess / 256;
+      var lut = new Uint8Array(256), c = 0;
+      for (i = 0; i < 256; i++) { c += hist[i] + add; lut[i] = Math.max(0, Math.min(255, Math.round(255 * c / n))); }
+      maps.push(lut);
+    }
+  }
+  var flat = null;
+  for (i = 0; i < maps.length; i++) if (maps[i]) { flat = maps[i]; break; }
+  if (!flat) return src;
+  var out = new Uint8Array(w * h);
+  for (var yy = 0; yy < h; yy++) {
+    for (var xx = 0; xx < w; xx++) {
+      var fx = (xx + 0.5) / tw - 0.5, fy = (yy + 0.5) / th - 0.5;
+      var ix = Math.floor(fx), iy = Math.floor(fy);
+      var ax = fx - ix, ay = fy - iy;
+      var xa = Math.min(tx - 1, Math.max(0, ix)), xb = Math.min(tx - 1, Math.max(0, ix + 1));
+      var ya = Math.min(ty - 1, Math.max(0, iy)), yb = Math.min(ty - 1, Math.max(0, iy + 1));
+      var v = src[yy * w + xx];
+      var a = (maps[ya * tx + xa] || flat)[v], b = (maps[ya * tx + xb] || flat)[v];
+      var cc = (maps[yb * tx + xa] || flat)[v], dd = (maps[yb * tx + xb] || flat)[v];
+      out[yy * w + xx] = Math.round((a * (1 - ax) + b * ax) * (1 - ay) + (cc * (1 - ax) + dd * ax) * ay);
+    }
+  }
+  return out;
+}
+
+// Mean over a square window, via a summed-area table, so the blur below costs the
+// same whatever the window size.
+function exBoxMean(g, w, h, r) {
+  var sat = new Float64Array((w + 1) * (h + 1));
+  var x, y;
+  for (y = 0; y < h; y++) {
+    var row = 0;
+    for (x = 0; x < w; x++) {
+      row += g[y * w + x];
+      sat[(y + 1) * (w + 1) + (x + 1)] = sat[y * (w + 1) + (x + 1)] + row;
+    }
+  }
+  var out = new Float32Array(w * h);
+  for (y = 0; y < h; y++) {
+    var ya = Math.max(0, y - r), yb = Math.min(h - 1, y + r);
+    for (x = 0; x < w; x++) {
+      var xa = Math.max(0, x - r), xb = Math.min(w - 1, x + r);
+      var s = sat[(yb + 1) * (w + 1) + (xb + 1)] - sat[ya * (w + 1) + (xb + 1)] -
+              sat[(yb + 1) * (w + 1) + xa] + sat[ya * (w + 1) + xa];
+      out[y * w + x] = s / ((yb - ya + 1) * (xb - xa + 1));
+    }
+  }
+  return out;
+}
+
+// Where is the optic disc? It is the brightest disc-sized patch of retina, and it
+// is where the vessels converge. This looks for the first and, when a vessel map
+// has arrived, uses the second to choose between close candidates. It is a
+// heuristic, not a trained segmentation: bright exudates can fool it, so the
+// result carries how confident it is and says so when it is not.
+function exFindDisc(img, vesselImg) {
+  var c = exFitted(img, 256);
+  var w = c.width, h = c.height;
+  var id = c.getContext('2d').getImageData(0, 0, w, h);
+  var bright = exGreyFrom(id, function (r, g) { return (r + g) >> 1; });
+  var lum = exGreyFrom(id, function (r, g, b) { return (0.299 * r + 0.587 * g + 0.114 * b) | 0; });
+
+  var inside = new Uint8Array(w * h), nIn = 0, i;
+  for (i = 0; i < lum.length; i++) if (lum[i] > 26) { inside[i] = 1; nIn++; }
+  if (nIn < 400) return null;
+
+  var r = Math.max(3, Math.round(0.055 * Math.max(w, h)));   // optic disc radius
+  var mean = exBoxMean(bright, w, h, r);
+
+  var sum = 0, sum2 = 0;
+  for (i = 0; i < mean.length; i++) if (inside[i]) { sum += mean[i]; sum2 += mean[i] * mean[i]; }
+  var mu = sum / nIn;
+  var sd = Math.sqrt(Math.max(1e-6, sum2 / nIn - mu * mu));
+
+  // Candidate peaks, kept apart so they are not all the same blob.
+  var cand = [];
+  for (var y = 0; y < h; y++) {
+    for (var x = 0; x < w; x++) {
+      var k = y * w + x;
+      if (!inside[k]) continue;
+      var v = mean[k];
+      var near = null;
+      for (var j = 0; j < cand.length; j++) {
+        if (Math.abs(cand[j].x - x) < 2 * r && Math.abs(cand[j].y - y) < 2 * r) { near = cand[j]; break; }
+      }
+      if (near) { if (v > near.v) { near.x = x; near.y = y; near.v = v; } continue; }
+      if (cand.length < 6) { cand.push({ x: x, y: y, v: v }); continue; }
+      var worst = cand[0];
+      for (j = 1; j < cand.length; j++) if (cand[j].v < worst.v) worst = cand[j];
+      if (v > worst.v) { worst.x = x; worst.y = y; worst.v = v; }
+    }
+  }
+  if (!cand.length) return null;
+
+  // With a vessel map, prefer the candidate the vessels crowd around.
+  var vdens = null;
+  if (vesselImg) {
+    try {
+      var vc = exCanvas(w, h);
+      var vctx = vc.getContext('2d');
+      vctx.drawImage(vesselImg, 0, 0, w, h);
+      var vid = vctx.getImageData(0, 0, w, h);
+      var vg = exGreyFrom(vid, function (rr, gg, bb) { return (0.299 * rr + 0.587 * gg + 0.114 * bb) | 0; });
+      vdens = exBoxMean(vg, w, h, 2 * r);
+    } catch (e) { vdens = null; }
+  }
+
+  var vMax = 0;
+  if (vdens) for (i = 0; i < vdens.length; i++) if (vdens[i] > vMax) vMax = vdens[i];
+  var bMax = 1;
+  for (i = 0; i < cand.length; i++) if (cand[i].v > bMax) bMax = cand[i].v;
+
+  for (i = 0; i < cand.length; i++) {
+    var sb = cand[i].v / bMax;
+    var sv = (vdens && vMax) ? vdens[cand[i].y * w + cand[i].x] / vMax : 0;
+    cand[i].score = vdens ? 0.65 * sb + 0.35 * sv : sb;
+  }
+  var best = cand[0];
+  for (i = 1; i < cand.length; i++) if (cand[i].score > best.score) best = cand[i];
+
+  var z = (best.v - mu) / sd;
+  var scale = (img.naturalWidth || img.width) / w;
+  return {
+    cx: best.x * scale, cy: best.y * scale, r: r * scale,
+    z: z, confident: z >= 2.2, usedVessels: !!vdens
+  };
+}
+
+function exAddPanel(group, key, title, note, canvasOrSrc) {
+  var src = typeof canvasOrSrc === 'string' ? canvasOrSrc : canvasOrSrc.toDataURL('image/png');
+  var panel = { group: group, key: key, title: title, note: note, src: src };
+  for (var i = 0; i < EXPLORER.panels.length; i++) {
+    if (EXPLORER.panels[i].key === key) { EXPLORER.panels[i] = panel; return; }
+  }
+  EXPLORER.panels.push(panel);
+}
+
+function exBaseName() {
+  var n = (EXPLORER.file && EXPLORER.file.name) || 'fundus';
+  return n.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]+/g, '_').slice(0, 40) || 'fundus';
+}
+
+function exRenderPanels(status) {
+  var out = document.getElementById('ex-out');
+  if (!out) return;
+  var base = exBaseName();
+  var html = '<div class="ex-note">The colour channels and the optic disc are worked out in your browser and never leave this device. The vessel and lesion maps come from the models on the backend. Every panel downloads as a PNG.</div>';
+  EX_GROUPS.forEach(function (g) {
+    var mine = EXPLORER.panels.filter(function (p) { return p.group === g.id; });
+    var st = (status && status[g.id]) || '';
+    if (!mine.length && !st) return;
+    html += '<div class="ex-group"><div class="ex-group-head">' +
+      '<span class="ex-group-title">' + g.title + '</span>' +
+      '<span class="ex-group-sub">' + g.sub + '</span></div>';
+    if (mine.length) {
+      html += '<div class="ex-grid">' + mine.map(function (p) {
+        return '<div class="ex-panel">' +
+          '<div class="ex-box"><img src="' + p.src + '" alt="' + escHtml(p.title) + '"></div>' +
+          '<div class="ex-cap"><span class="ex-cap-text"><b>' + escHtml(p.title) + '</b>' +
+          (p.note ? '<span>' + escHtml(p.note) + '</span>' : '') + '</span>' +
+          '<a class="ex-dl" href="' + p.src + '" download="' + base + '_' + p.key + '.png" aria-label="Download ' + escHtml(p.title) + '">' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16"/></svg></a></div></div>';
+      }).join('') + '</div>';
+    }
+    if (st) html += st;
+    html += '</div>';
+  });
+  out.innerHTML = html;
+}
+
+function exThumbs() {
+  var t = document.getElementById('ex-thumbs');
+  var area = document.getElementById('ex-preview-area');
+  if (!t || !area) return;
+  if (!EXPLORER.file) { t.innerHTML = ''; area.classList.remove('show'); return; }
+  t.innerHTML = '<div class="preview-item"><img src="' + EXPLORER.url + '" alt="' + escHtml(EXPLORER.file.name) +
+    '" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#0C1024;">' +
+    '<div class="preview-label">' + escHtml(EXPLORER.file.name) + '</div>' +
+    '<button class="preview-remove" type="button" onclick="exClear()">&times;</button></div>';
+  area.classList.add('show');
+}
+
+function exSetButton() {
+  var b = document.getElementById('ex-run');
+  if (!b) return;
+  b.disabled = EXPLORER.running || !EXPLORER.file;
+  b.innerHTML = '<span>' + (EXPLORER.running ? 'Working&hellip;' :
+    (EXPLORER.file ? 'Explore this image &rarr;' : 'Select an image to explore')) + '</span>';
+}
+
+function exClear() {
+  if (EXPLORER.url) URL.revokeObjectURL(EXPLORER.url);
+  EXPLORER.file = null; EXPLORER.url = null; EXPLORER.img = null;
+  EXPLORER.panels = []; EXPLORER.disc = null;
+  var out = document.getElementById('ex-out');
+  if (out) out.innerHTML = '';
+  var inp = document.getElementById('ex-input');
+  if (inp) inp.value = '';
+  exThumbs(); exSetButton();
+}
+
+function exPick(files) {
+  var list = Array.from(files || []).filter(function (f) {
+    return /^image\//.test(f.type) || /\.(jpe?g|png|tiff?)$/i.test(f.name);
+  });
+  if (!list.length) return;
+  exClear();
+  EXPLORER.file = list[0];
+  EXPLORER.url = URL.createObjectURL(EXPLORER.file);
+  exThumbs(); exSetButton();
+}
+
+function exLoadImage(src) {
+  return new Promise(function (resolve, reject) {
+    var im = new Image();
+    im.onload = function () { resolve(im); };
+    im.onerror = function () { reject(new Error('could not be read')); };
+    im.src = src;
+  });
+}
+
+function exBuildLocal(img) {
+  var c = exFitted(img, 1600);
+  var id = c.getContext('2d').getImageData(0, 0, c.width, c.height);
+
+  exAddPanel('src', 'original', 'Original', c.width + ' x ' + c.height, c);
+  exAddPanel('src', 'red',   'Red channel',   'choroid, strongest signal', exChannelCanvas(id, function (r) { return r; }));
+  exAddPanel('src', 'green', 'Green channel', 'best lesion contrast',      exChannelCanvas(id, function (r, g) { return g; }));
+  exAddPanel('src', 'blue',  'Blue channel',  'noisiest, least used',      exChannelCanvas(id, function (r, g, b) { return b; }));
+  exAddPanel('src', 'grey',  'Grayscale',     'luminance',                 exChannelCanvas(id, function (r, g, b) { return (0.299 * r + 0.587 * g + 0.114 * b) | 0; }));
+
+  var green = exGreyFrom(id, function (r, g) { return g; });
+  var cl = exClahe(green, c.width, c.height, 8, 3);
+  exAddPanel('src', 'clahe', 'CLAHE green', 'contrast-limited equalisation', exGreyCanvas(cl, c.width, c.height));
+
+  var inv = new Uint8Array(green.length);
+  for (var i = 0; i < green.length; i++) inv[i] = 255 - green[i];
+  exAddPanel('src', 'green_inv', 'Inverted green', 'dark lesions turn bright', exGreyCanvas(inv, c.width, c.height));
+  return c;
+}
+
+function exBuildDisc(img, base, vesselImg) {
+  var d = null;
+  try { d = exFindDisc(img, vesselImg); } catch (e) { d = null; }
+  EXPLORER.disc = d;
+  if (!d) return null;
+
+  var scale = base.width / (img.naturalWidth || img.width);
+  var cx = d.cx * scale, cy = d.cy * scale, rr = d.r * scale;
+
+  var marked = exCanvas(base.width, base.height);
+  var mx = marked.getContext('2d');
+  mx.drawImage(base, 0, 0);
+  mx.strokeStyle = d.confident ? '#FABD31' : '#F6815E';
+  mx.lineWidth = Math.max(2, base.width / 320);
+  mx.beginPath();
+  mx.arc(cx, cy, rr * 1.5, 0, Math.PI * 2);
+  mx.stroke();
+  exAddPanel('disc', 'od_marked', 'Located on the image',
+    (d.usedVessels ? 'brightness and vessel density' : 'brightness only'), marked);
+
+  var side = Math.round(rr * 4);
+  var sx = Math.max(0, Math.min(base.width - side, Math.round(cx - side / 2)));
+  var sy = Math.max(0, Math.min(base.height - side, Math.round(cy - side / 2)));
+  var crop = exCanvas(side, side);
+  crop.getContext('2d').drawImage(base, sx, sy, side, side, 0, 0, side, side);
+  exAddPanel('disc', 'od_crop', 'Cropped close-up', side + ' x ' + side + ' px', crop);
+  return d;
+}
+
+function exDiscStatus() {
+  var d = EXPLORER.disc;
+  if (!d) return '<div class="ex-status">The optic disc could not be located in this image &mdash; it may be too dark, or cropped out of frame.</div>';
+  return '<div class="ex-stats"><span class="ex-conf ' + (d.confident ? 'ok' : 'low') + '">' +
+    (d.confident ? 'Confident' : 'Low confidence') + '</span> Found by looking for the brightest disc-sized patch of retina' +
+    (d.usedVessels ? ', then checking where the vessels crowd together' : '') +
+    '. This is a heuristic, not a trained model &mdash; bright exudates can pull it off the disc, so check the crop before relying on it.</div>';
+}
+
+async function exRun() {
+  if (EXPLORER.running || !EXPLORER.file) return;
+  EXPLORER.running = true;
+  EXPLORER.panels = [];
+  exSetButton();
+
+  var status = {};
+  var base;
+  try {
+    EXPLORER.img = await exLoadImage(EXPLORER.url);
+    base = exBuildLocal(EXPLORER.img);
+  } catch (e) {
+    EXPLORER.running = false; exSetButton();
+    document.getElementById('ex-out').innerHTML =
+      '<div class="ex-err">That image could not be read. Try a JPG or PNG fundus photograph.</div>';
+    return;
+  }
+
+  exBuildDisc(EXPLORER.img, base, null);
+  status.disc = exDiscStatus();
+  status.vessel = '<div class="ex-status"><span class="ex-spin"></span>Asking the backend for the vessel maps&hellip;</div>';
+  exRenderPanels(status);
+
+  var jobId = null;
+  try {
+    var fd = new FormData();
+    fd.append('images', EXPLORER.file);
+    var r = await fetch(BACKEND_URL + '/api/predict', { method: 'POST', headers: NGROK_HEADER, body: fd });
+    var d = await r.json();
+    var res = d && d.results && d.results[0];
+    if (!res) throw new Error((d && d.error) || 'no result came back');
+    if (res.vessel_map) exAddPanel('vessel', 'vessel_overlay', 'Vessel overlay', 'segmentation on your image', dataUrl(res.vessel_map));
+    if (res.binary_vessel_map) exAddPanel('vessel', 'vessel_binary', 'Binary vessel map', 'segmentation alone', dataUrl(res.binary_vessel_map));
+    status.vessel = (res.vessel_map || res.binary_vessel_map) ? '' :
+      '<div class="ex-status">The backend returned no vessel map for this image.</div>';
+    jobId = res.lesion_job_id || null;
+
+    // The vessel map says where the vessels converge, which is the better clue to
+    // the optic disc, so the disc panels are worked out again with it.
+    if (res.binary_vessel_map) {
+      try {
+        var vimg = await exLoadImage(dataUrl(res.binary_vessel_map));
+        exBuildDisc(EXPLORER.img, base, vimg);
+        status.disc = exDiscStatus();
+      } catch (e2) { /* keep the brightness-only result */ }
+    }
+  } catch (e3) {
+    status.vessel = '<div class="ex-err">The vessel maps need the analysis backend, and it could not be reached (' +
+      escHtml(e3.message || String(e3)) + '). The channels and the optic disc above were worked out here and are unaffected.</div>';
+  }
+
+  if (jobId) {
+    status.lesion = '<div class="ex-status"><span class="ex-spin"></span>Segmenting lesions&hellip; this runs after grading and may take a moment.</div>';
+    exRenderPanels(status);
+    var les = await exPollLesions(jobId);
+    if (les && les.status === 'done') {
+      var byCode = {};
+      (les.stats || []).forEach(function (s) { byCode[s.code] = s; });
+      if (les.overlay) exAddPanel('lesion', 'lesions_all', 'All four lesions', 'combined overlay', dataUrl(les.overlay));
+      LESION_TYPES.forEach(function (l) {
+        var b64 = (les.masks || {})[l.code];
+        if (!b64) return;
+        var s = byCode[l.code];
+        exAddPanel('lesion', 'lesion_' + l.code, l.code + ' - ' + l.name,
+          s ? Number(s.percent).toFixed(3) + '% of the image' : '', dataUrl(b64));
+      });
+      status.lesion = '<div class="ex-stats">' + LESION_TYPES.map(function (l) {
+        var s = byCode[l.code] || { percent: 0 };
+        return l.code + ' <b>' + Number(s.percent).toFixed(3) + '%</b>';
+      }).join(' &nbsp;&middot;&nbsp; ') + '</div>';
+    } else {
+      status.lesion = '<div class="ex-status">Lesion segmentation did not finish' +
+        (les && les.error ? ' &mdash; ' + escHtml(les.error) : '') + '.</div>';
+    }
+  }
+
+  exRenderPanels(status);
+  EXPLORER.running = false;
+  exSetButton();
+}
+
+async function exPollLesions(jobId) {
+  var delay = 2000;
+  var deadline = Date.now() + 10 * 60 * 1000;
+  while (Date.now() < deadline) {
+    try {
+      var r = await fetch(BACKEND_URL + '/api/lesions/' + encodeURIComponent(jobId), { headers: NGROK_HEADER });
+      if (r.status === 404) return { status: 'error', error: 'job expired' };
+      var d = await r.json();
+      if (d.status === 'done' || d.status === 'error') return d;
+    } catch (e) { /* transient - keep polling */ }
+    await new Promise(function (res) { setTimeout(res, delay); });
+    delay = Math.min(delay * 1.3, 10000);
+  }
+  return { status: 'error', error: 'timed out' };
+}
+
+window.addEventListener('load', function () {
+  var z = document.getElementById('ex-dropzone');
+  if (!z) return;
+  z.addEventListener('dragover', function (e) { e.preventDefault(); z.classList.add('dragging'); });
+  z.addEventListener('dragleave', function () { z.classList.remove('dragging'); });
+  z.addEventListener('drop', function (e) {
+    e.preventDefault(); z.classList.remove('dragging'); exPick(e.dataTransfer.files);
+  });
+});
 
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
