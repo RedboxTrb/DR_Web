@@ -1179,6 +1179,22 @@ footer{padding:52px 60px 28px;}
 @media(max-width:640px){.ex-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}}
 :root{--expl:#378ADD;--expl-d:#185FA5;--expl-bg:rgba(55,138,221,.08);}
 .ch-explore{--ac:var(--expl);--ac-d:var(--expl-d);--ac-bg:var(--expl-bg);}
+/* ── Overlay builder ──────────────────────────────────────── */
+.ex-ov{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(240px,1fr);gap:16px;align-items:start;}
+.ex-ov-canvas-box{border-radius:14px;overflow:hidden;background:#0C1024;border:1px solid var(--g200);}
+.ex-ov-canvas-box canvas{width:100%;height:auto;display:block;}
+.ex-ov-controls{background:var(--white);border:1px solid var(--g200);border-radius:14px;padding:15px 16px;display:flex;flex-direction:column;gap:13px;}
+.ex-ov-row{display:flex;flex-direction:column;gap:5px;}
+.ex-ov-head{display:flex;align-items:center;gap:8px;}
+.ex-ov-dot{width:11px;height:11px;border-radius:50%;flex:none;}
+.ex-ov-name{font-size:12.5px;font-weight:700;color:var(--navy);flex:1;min-width:0;}
+.ex-ov-val{font-size:11.5px;color:var(--g500);font-variant-numeric:tabular-nums;flex:none;}
+.ex-ov-slider{width:100%;height:20px;cursor:pointer;}
+.ex-ov-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;padding-top:12px;border-top:1px solid var(--g200);}
+.ex-ov-btn{font-family:inherit;font-size:12px;font-weight:700;color:var(--g600);background:var(--white);border:1px solid var(--g200);border-radius:8px;padding:7px 12px;cursor:pointer;text-decoration:none;transition:border-color .15s,color .15s;}
+.ex-ov-btn:hover{border-color:var(--teal);color:var(--teal-d);}
+.ex-ov-hint{font-size:11.5px;color:var(--g500);line-height:1.5;}
+@media(max-width:860px){.ex-ov{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -3044,7 +3060,7 @@ window.addEventListener('hashchange', cfOpenFromHash);
 // out here in the browser, so they still work when the backend is down; the
 // vessel maps and the lesion masks come from /api/predict and /api/lesions.
 
-var EXPLORER = { file: null, url: null, img: null, panels: [], running: false, disc: null };
+var EXPLORER = { file: null, url: null, img: null, panels: [], running: false, disc: null, base: null, layers: [] };
 
 var EX_GROUPS = [
   { id: 'src',    title: 'Source and colour channels', sub: 'worked out in your browser' },
@@ -3052,6 +3068,113 @@ var EX_GROUPS = [
   { id: 'lesion', title: 'Lesions',                    sub: 'FLA-Net, from the backend' },
   { id: 'disc',   title: 'Optic disc',                 sub: 'located in your browser, approximate' }
 ];
+
+// ── Overlay builder ───────────────────────────────────────────────────────────
+// Every map the models return is a binary mask, white where the structure is.
+// Tinting one and drawing it over the photograph with an alpha you control lets
+// you bring a layer in as far as you want, and read two of them against each
+// other, instead of looking at each mask alone on a black field.
+
+function exHexRgb(h) {
+  var n = parseInt(h.replace('#', ''), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function exTint(img, hex) {
+  var c = exCanvas(img.naturalWidth || img.width, img.naturalHeight || img.height);
+  var ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  var id = ctx.getImageData(0, 0, c.width, c.height);
+  var d = id.data, rgb = exHexRgb(hex);
+  for (var i = 0; i < d.length; i += 4) {
+    var v = d[i];                       // white in the mask, black everywhere else
+    d[i] = rgb[0]; d[i + 1] = rgb[1]; d[i + 2] = rgb[2]; d[i + 3] = v;
+  }
+  ctx.putImageData(id, 0, 0);
+  return c;
+}
+
+async function exAddLayer(key, name, colour, src) {
+  try {
+    var img = await exLoadImage(src);
+    var layer = { key: key, name: name, colour: colour, canvas: exTint(img, colour), value: 0 };
+    for (var i = 0; i < EXPLORER.layers.length; i++) {
+      if (EXPLORER.layers[i].key === key) { layer.value = EXPLORER.layers[i].value; EXPLORER.layers[i] = layer; return; }
+    }
+    EXPLORER.layers.push(layer);
+  } catch (e) { /* a layer that will not load is simply not offered */ }
+}
+
+function exLayer(key, v) {
+  var n = Math.max(0, Math.min(100, Number(v) || 0));
+  for (var i = 0; i < EXPLORER.layers.length; i++) {
+    if (EXPLORER.layers[i].key === key) EXPLORER.layers[i].value = n;
+  }
+  var out = document.getElementById('ex-ov-' + key + '-val');
+  if (out) out.textContent = Math.round(n) + '%';
+  exCompose();
+}
+
+function exLayersAll(v) {
+  EXPLORER.layers.forEach(function (l) {
+    l.value = v;
+    var s = document.getElementById('ex-ov-' + l.key);
+    if (s) s.value = v;
+    var o = document.getElementById('ex-ov-' + l.key + '-val');
+    if (o) o.textContent = v + '%';
+  });
+  exCompose();
+}
+
+function exCompose() {
+  var c = document.getElementById('ex-ov-canvas');
+  if (!c || !EXPLORER.base) return;
+  var b = EXPLORER.base;
+  if (c.width !== b.width || c.height !== b.height) { c.width = b.width; c.height = b.height; }
+  var ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.drawImage(b, 0, 0);
+  EXPLORER.layers.forEach(function (l) {
+    if (l.value <= 0) return;
+    ctx.globalAlpha = l.value / 100;
+    ctx.drawImage(l.canvas, 0, 0, c.width, c.height);
+  });
+  ctx.globalAlpha = 1;
+  var dl = document.getElementById('ex-ov-dl');
+  if (dl) { dl.download = exBaseName() + '_overlay.png'; dl.href = c.toDataURL('image/png'); }
+}
+
+function exOverlayHTML() {
+  if (!EXPLORER.base || !EXPLORER.layers.length) return '';
+  var rows = EXPLORER.layers.map(function (l) {
+    return '<div class="ex-ov-row">' +
+      '<div class="ex-ov-head">' +
+        '<span class="ex-ov-dot" style="background:' + l.colour + ';"></span>' +
+        '<span class="ex-ov-name">' + escHtml(l.name) + '</span>' +
+        '<span class="ex-ov-val" id="ex-ov-' + l.key + '-val">' + Math.round(l.value) + '%</span>' +
+      '</div>' +
+      '<input class="ex-ov-slider" type="range" min="0" max="100" step="1" value="' + l.value + '"' +
+        ' id="ex-ov-' + l.key + '" style="accent-color:' + l.colour + ';"' +
+        ' oninput="exLayer(\'' + l.key + '\', this.value)"' +
+        ' aria-label="' + escHtml(l.name) + ' strength">' +
+    '</div>';
+  }).join('');
+  return '<div class="ex-group"><div class="ex-group-head">' +
+      '<span class="ex-group-title">Overlay</span>' +
+      '<span class="ex-group-sub">drag a layer in as far as you want</span>' +
+    '</div>' +
+    '<div class="ex-ov">' +
+      '<div class="ex-ov-canvas-box"><canvas id="ex-ov-canvas"></canvas></div>' +
+      '<div class="ex-ov-controls">' + rows +
+        '<div class="ex-ov-actions">' +
+          '<button type="button" class="ex-ov-btn" onclick="exLayersAll(70)">Show all</button>' +
+          '<button type="button" class="ex-ov-btn" onclick="exLayersAll(0)">Clear</button>' +
+          '<a class="ex-ov-btn" id="ex-ov-dl" download="overlay.png" href="#">Download</a>' +
+        '</div>' +
+        '<div class="ex-ov-hint">Each slider is one map drawn over your photograph. The colours match the lesion legend; vessels are cyan.</div>' +
+      '</div>' +
+    '</div></div>';
+}
 
 function exCanvas(w, h) {
   var c = document.createElement('canvas');
@@ -3264,6 +3387,7 @@ function exRenderPanels(status) {
   if (!out) return;
   var base = exBaseName();
   var html = '<div class="ex-note">The colour channels and the optic disc are worked out in your browser and never leave this device. The vessel and lesion maps come from the models on the backend. Every panel downloads as a PNG.</div>';
+  html += exOverlayHTML();
   EX_GROUPS.forEach(function (g) {
     var mine = EXPLORER.panels.filter(function (p) { return p.group === g.id; });
     var st = (status && status[g.id]) || '';
@@ -3285,6 +3409,7 @@ function exRenderPanels(status) {
     html += '</div>';
   });
   out.innerHTML = html;
+  exCompose();
 }
 
 function exThumbs() {
@@ -3310,7 +3435,7 @@ function exSetButton() {
 function exClear() {
   if (EXPLORER.url) URL.revokeObjectURL(EXPLORER.url);
   EXPLORER.file = null; EXPLORER.url = null; EXPLORER.img = null;
-  EXPLORER.panels = []; EXPLORER.disc = null;
+  EXPLORER.panels = []; EXPLORER.disc = null; EXPLORER.layers = []; EXPLORER.base = null;
   var out = document.getElementById('ex-out');
   if (out) out.innerHTML = '';
   var inp = document.getElementById('ex-input');
@@ -3340,6 +3465,7 @@ function exLoadImage(src) {
 
 function exBuildLocal(img) {
   var c = exFitted(img, 1600);
+  EXPLORER.base = c;
   var id = c.getContext('2d').getImageData(0, 0, c.width, c.height);
 
   exAddPanel('src', 'original', 'Original', c.width + ' x ' + c.height, c);
@@ -3400,6 +3526,7 @@ async function exRun() {
   if (EXPLORER.running || !EXPLORER.file) return;
   EXPLORER.running = true;
   EXPLORER.panels = [];
+  EXPLORER.layers = [];
   exSetButton();
 
   var status = {};
@@ -3429,6 +3556,7 @@ async function exRun() {
     if (!res) throw new Error((d && d.error) || 'no result came back');
     if (res.vessel_map) exAddPanel('vessel', 'vessel_overlay', 'Vessel overlay', 'segmentation on your image', dataUrl(res.vessel_map));
     if (res.binary_vessel_map) exAddPanel('vessel', 'vessel_binary', 'Binary vessel map', 'segmentation alone', dataUrl(res.binary_vessel_map));
+    if (res.binary_vessel_map) await exAddLayer('vessels', 'Vessels', '#00D5FF', dataUrl(res.binary_vessel_map));
     status.vessel = (res.vessel_map || res.binary_vessel_map) ? '' :
       '<div class="ex-status">The backend returned no vessel map for this image.</div>';
     jobId = res.lesion_job_id || null;
@@ -3462,6 +3590,10 @@ async function exRun() {
         exAddPanel('lesion', 'lesion_' + l.code, l.code + ' - ' + l.name,
           s ? Number(s.percent).toFixed(3) + '% of the image' : '', dataUrl(b64));
       });
+      for (var li = 0; li < LESION_TYPES.length; li++) {
+        var lt = LESION_TYPES[li], mb = (les.masks || {})[lt.code];
+        if (mb) await exAddLayer('lesion_' + lt.code, lt.code + ' - ' + lt.name, lt.colour, dataUrl(mb));
+      }
       status.lesion = '<div class="ex-stats">' + LESION_TYPES.map(function (l) {
         var s = byCode[l.code] || { percent: 0 };
         return l.code + ' <b>' + Number(s.percent).toFixed(3) + '%</b>';
