@@ -1195,6 +1195,23 @@ footer{padding:52px 60px 28px;}
 .ex-ov-btn:hover{border-color:var(--teal);color:var(--teal-d);}
 .ex-ov-hint{font-size:11.5px;color:var(--g500);line-height:1.5;}
 @media(max-width:860px){.ex-ov{grid-template-columns:1fr;}}
+/* ── Image explorer: results page ─────────────────────────── */
+.exres-page{max-width:1180px;margin:0 auto;padding:30px 24px 72px;}
+.exres-top{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;}
+.exres-title{font-size:26px;font-weight:800;color:var(--navy);letter-spacing:-.4px;}
+.exres-title span{color:var(--teal);}
+.exres-meta{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--g500);}
+.exres-name{font-weight:700;color:var(--navy);max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.exres-count{background:var(--g100);border-radius:20px;padding:3px 11px;font-size:11.5px;font-weight:700;}
+.ex-strip{display:flex;gap:9px;overflow-x:auto;padding:4px 2px 10px;margin-bottom:14px;}
+.ex-strip-item{flex:none;width:76px;font-family:inherit;background:var(--white);border:1px solid var(--g200);border-radius:11px;padding:5px;cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:border-color .15s,box-shadow .15s;}
+.ex-strip-item img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:7px;background:#0C1024;display:block;}
+.ex-strip-item span{font-size:10.5px;font-weight:700;color:var(--g500);}
+.ex-strip-item:hover{border-color:var(--teal);}
+.ex-strip-item.on{border-color:var(--teal);box-shadow:0 0 0 2px rgba(34,183,163,.2);}
+.ex-strip-item.on span{color:var(--teal-d);}
+#ex-msg{margin-top:14px;}
+@media(max-width:640px){.exres-page{padding:22px 16px 56px;}.exres-title{font-size:21px;}}
 </style>
 </head>
 <body>
@@ -1585,7 +1602,7 @@ footer{padding:52px 60px 28px;}
         <button type="button" class="ch-card ch-explore" onclick="showPage('explore')">
           <span class="ch-badge">EXPLORE</span>
           <span class="ch-title">Image Explorer</span>
-          <span class="ch-desc">Not a grade &mdash; the picture itself, taken apart. Colour channels, contrast-enhanced green, vessel maps, the four lesion types separately, and a cropped optic disc. One image at a time; every panel downloads.</span>
+          <span class="ch-desc">Not a grade &mdash; the picture itself, taken apart. Colour channels, contrast-enhanced green, vessel maps, the four lesion types separately, and a cropped optic disc. Several images at once; every panel downloads, and the set exports as a report.</span>
           <span class="ch-go">Open the explorer &rarr;</span>
         </button>
       </div>
@@ -2146,15 +2163,55 @@ footer{padding:52px 60px 28px;}
       </div>
       <div class="dropzone" id="ex-dropzone" onclick="document.getElementById('ex-input').click()">
         <div class="dz-icon">&#128269;</div>
-        <div class="dz-title">Drop a fundus photograph here</div>
-        <div class="dz-sub">One image at a time &mdash; drag and drop, or browse to upload</div>
-        <button class="dz-btn" onclick="event.stopPropagation();document.getElementById('ex-input').click()">Browse File</button>
-        <div class="dz-formats">Supported: JPG, PNG, TIFF &middot; Max 20MB</div>
+        <div class="dz-title">Drop fundus photographs here</div>
+        <div class="dz-sub">Up to 10 at once &mdash; drag and drop, or browse to upload</div>
+        <button class="dz-btn" onclick="event.stopPropagation();document.getElementById('ex-input').click()">Browse Files</button>
+        <div class="dz-formats">Supported: JPG, PNG, TIFF &middot; Max 20MB per image &middot; Several images supported</div>
       </div>
-      <input type="file" id="ex-input" class="mm-input" accept="image/*" onchange="exPick(this.files)">
-      <button class="analyze-btn" id="ex-run" disabled onclick="exRun()"><span>Select an image to explore</span></button>
-      <div id="ex-out"></div>
+      <input type="file" id="ex-input" class="mm-input" accept="image/*" multiple onchange="exPick(this.files)">
+      <div class="patient-box">
+        <div class="pb-title">Report Details <span>optional &mdash; printed on the report, never uploaded</span></div>
+        <div class="pb-grid">
+          <label>Patient name<input type="text" id="ex-pt-name" placeholder="e.g. A. Sharma" autocomplete="off"></label>
+          <label>Patient ID<input type="text" id="ex-pt-id" placeholder="e.g. MRN-10482" autocomplete="off"></label>
+          <label>Age<input type="text" id="ex-pt-age" placeholder="e.g. 58" autocomplete="off"></label>
+          <label>Sex<select id="ex-pt-sex"><option value="">&mdash;</option><option>Female</option><option>Male</option><option>Other</option></select></label>
+          <label>Eye<select id="ex-pt-eye"><option value="">&mdash;</option><option>OD (right)</option><option>OS (left)</option><option>Both</option></select></label>
+          <label>Referred by<input type="text" id="ex-pt-ref" placeholder="e.g. Dr. R. Verma" autocomplete="off"></label>
+        </div>
+      </div>
+      <button class="analyze-btn" id="ex-run" disabled onclick="exRun()"><span>Select images to explore</span></button>
+      <div id="ex-msg"></div>
     </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     IMAGE EXPLORER RESULTS: its own page, so the uploader is left behind.
+     One image at a time, switched with the strip; the whole set exports as a report.
+══════════════════════════════════ -->
+<div class="page" id="page-exres">
+  <nav>
+    <a class="nav-logo" onclick="showPage('home')">
+      <svg width="28" height="28" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><path d="M27 9 A12 12 0 1 0 27 27" fill="none" stroke="#0C1024" stroke-width="3.5" stroke-linecap="round"/><circle cx="19" cy="18" r="4" fill="#22B7A3"/></svg>
+      <span class="nav-logo-text">ChakshuRakshakAI</span>
+    </a>
+    <div class="nav-links">
+      <a onclick="showPage('home')">Home</a>
+      <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Explorer</a>
+      <a onclick="showPage('clinics')">Find a Clinic</a>
+    </div>
+    <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
+      <button class="nav-btn-ghost" onclick="exNewAnalysis()">New analysis</button>
+      <button class="nav-btn" id="exres-report" onclick="exReport()">Export report</button>
+    </div>
+  </nav>
+  <div class="exres-page">
+    <div class="exres-top">
+      <div class="exres-title">Image <span>Explorer</span></div>
+      <div class="exres-meta" id="exres-head"></div>
+    </div>
+    <div id="exres-out"></div>
   </div>
 </div>
 
@@ -3069,112 +3126,24 @@ var EX_GROUPS = [
   { id: 'disc',   title: 'Optic disc',                 sub: 'located in your browser, approximate' }
 ];
 
-// ── Overlay builder ───────────────────────────────────────────────────────────
-// Every map the models return is a binary mask, white where the structure is.
-// Tinting one and drawing it over the photograph with an alpha you control lets
-// you bring a layer in as far as you want, and read two of them against each
-// other, instead of looking at each mask alone on a black field.
+// ── Image explorer ────────────────────────────────────────────────────────────
+// Several photographs, each taken apart. The colour channels and the optic disc
+// are worked out here in the browser, so they still work when the backend is
+// down and the image never leaves the machine; the vessel maps and the lesion
+// masks come from /api/predict and /api/lesions. Results open on their own page,
+// one image at a time, and the whole set exports as a printable report.
 
-function exHexRgb(h) {
-  var n = parseInt(h.replace('#', ''), 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-}
+var EXPLORER = { items: [], active: 0, running: false };
+var EX_MAX_IMAGES = 10;
 
-function exTint(img, hex) {
-  var c = exCanvas(img.naturalWidth || img.width, img.naturalHeight || img.height);
-  var ctx = c.getContext('2d');
-  ctx.drawImage(img, 0, 0);
-  var id = ctx.getImageData(0, 0, c.width, c.height);
-  var d = id.data, rgb = exHexRgb(hex);
-  for (var i = 0; i < d.length; i += 4) {
-    var v = d[i];                       // white in the mask, black everywhere else
-    d[i] = rgb[0]; d[i + 1] = rgb[1]; d[i + 2] = rgb[2]; d[i + 3] = v;
-  }
-  ctx.putImageData(id, 0, 0);
-  return c;
-}
+var EX_GROUPS = [
+  { id: 'src',    title: 'Source and colour channels', sub: 'worked out in your browser' },
+  { id: 'vessel', title: 'Vessels',                    sub: 'from the backend' },
+  { id: 'lesion', title: 'Lesions',                    sub: 'FLA-Net, from the backend' },
+  { id: 'disc',   title: 'Optic disc',                 sub: 'located in your browser, approximate' }
+];
 
-async function exAddLayer(key, name, colour, src) {
-  try {
-    var img = await exLoadImage(src);
-    var layer = { key: key, name: name, colour: colour, canvas: exTint(img, colour), value: 0 };
-    for (var i = 0; i < EXPLORER.layers.length; i++) {
-      if (EXPLORER.layers[i].key === key) { layer.value = EXPLORER.layers[i].value; EXPLORER.layers[i] = layer; return; }
-    }
-    EXPLORER.layers.push(layer);
-  } catch (e) { /* a layer that will not load is simply not offered */ }
-}
-
-function exLayer(key, v) {
-  var n = Math.max(0, Math.min(100, Number(v) || 0));
-  for (var i = 0; i < EXPLORER.layers.length; i++) {
-    if (EXPLORER.layers[i].key === key) EXPLORER.layers[i].value = n;
-  }
-  var out = document.getElementById('ex-ov-' + key + '-val');
-  if (out) out.textContent = Math.round(n) + '%';
-  exCompose();
-}
-
-function exLayersAll(v) {
-  EXPLORER.layers.forEach(function (l) {
-    l.value = v;
-    var s = document.getElementById('ex-ov-' + l.key);
-    if (s) s.value = v;
-    var o = document.getElementById('ex-ov-' + l.key + '-val');
-    if (o) o.textContent = v + '%';
-  });
-  exCompose();
-}
-
-function exCompose() {
-  var c = document.getElementById('ex-ov-canvas');
-  if (!c || !EXPLORER.base) return;
-  var b = EXPLORER.base;
-  if (c.width !== b.width || c.height !== b.height) { c.width = b.width; c.height = b.height; }
-  var ctx = c.getContext('2d');
-  ctx.clearRect(0, 0, c.width, c.height);
-  ctx.drawImage(b, 0, 0);
-  EXPLORER.layers.forEach(function (l) {
-    if (l.value <= 0) return;
-    ctx.globalAlpha = l.value / 100;
-    ctx.drawImage(l.canvas, 0, 0, c.width, c.height);
-  });
-  ctx.globalAlpha = 1;
-  var dl = document.getElementById('ex-ov-dl');
-  if (dl) { dl.download = exBaseName() + '_overlay.png'; dl.href = c.toDataURL('image/png'); }
-}
-
-function exOverlayHTML() {
-  if (!EXPLORER.base || !EXPLORER.layers.length) return '';
-  var rows = EXPLORER.layers.map(function (l) {
-    return '<div class="ex-ov-row">' +
-      '<div class="ex-ov-head">' +
-        '<span class="ex-ov-dot" style="background:' + l.colour + ';"></span>' +
-        '<span class="ex-ov-name">' + escHtml(l.name) + '</span>' +
-        '<span class="ex-ov-val" id="ex-ov-' + l.key + '-val">' + Math.round(l.value) + '%</span>' +
-      '</div>' +
-      '<input class="ex-ov-slider" type="range" min="0" max="100" step="1" value="' + l.value + '"' +
-        ' id="ex-ov-' + l.key + '" style="accent-color:' + l.colour + ';"' +
-        ' oninput="exLayer(\'' + l.key + '\', this.value)"' +
-        ' aria-label="' + escHtml(l.name) + ' strength">' +
-    '</div>';
-  }).join('');
-  return '<div class="ex-group"><div class="ex-group-head">' +
-      '<span class="ex-group-title">Overlay</span>' +
-      '<span class="ex-group-sub">drag a layer in as far as you want</span>' +
-    '</div>' +
-    '<div class="ex-ov">' +
-      '<div class="ex-ov-canvas-box"><canvas id="ex-ov-canvas"></canvas></div>' +
-      '<div class="ex-ov-controls">' + rows +
-        '<div class="ex-ov-actions">' +
-          '<button type="button" class="ex-ov-btn" onclick="exLayersAll(70)">Show all</button>' +
-          '<button type="button" class="ex-ov-btn" onclick="exLayersAll(0)">Clear</button>' +
-          '<a class="ex-ov-btn" id="ex-ov-dl" download="overlay.png" href="#">Download</a>' +
-        '</div>' +
-        '<div class="ex-ov-hint">Each slider is one map drawn over your photograph. The colours match the lesion legend; vessels are cyan.</div>' +
-      '</div>' +
-    '</div></div>';
-}
+function exActive() { return EXPLORER.items[EXPLORER.active] || null; }
 
 function exCanvas(w, h) {
   var c = document.createElement('canvas');
@@ -3368,29 +3337,436 @@ function exFindDisc(img, vesselImg) {
   };
 }
 
-function exAddPanel(group, key, title, note, canvasOrSrc) {
-  var src = typeof canvasOrSrc === 'string' ? canvasOrSrc : canvasOrSrc.toDataURL('image/png');
-  var panel = { group: group, key: key, title: title, note: note, src: src };
-  for (var i = 0; i < EXPLORER.panels.length; i++) {
-    if (EXPLORER.panels[i].key === key) { EXPLORER.panels[i] = panel; return; }
-  }
-  EXPLORER.panels.push(panel);
+// ── Overlay: the maps drawn onto the photograph ───────────────────────────────
+// Every map the models return is a binary mask, white where the structure is.
+// Tinting one and drawing it over the photograph with an alpha you control lets
+// you bring a layer in as far as you want, and read two of them against each
+// other, instead of looking at each mask alone on a black field.
+
+function exHexRgb(h) {
+  var n = parseInt(h.replace('#', ''), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
-function exBaseName() {
-  var n = (EXPLORER.file && EXPLORER.file.name) || 'fundus';
+function exTint(img, hex) {
+  var c = exCanvas(img.naturalWidth || img.width, img.naturalHeight || img.height);
+  var ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  var id = ctx.getImageData(0, 0, c.width, c.height);
+  var d = id.data, rgb = exHexRgb(hex);
+  for (var i = 0; i < d.length; i += 4) {
+    var v = d[i];                       // white in the mask, black everywhere else
+    d[i] = rgb[0]; d[i + 1] = rgb[1]; d[i + 2] = rgb[2]; d[i + 3] = v;
+  }
+  ctx.putImageData(id, 0, 0);
+  return c;
+}
+
+async function exAddLayer(item, key, name, colour, src) {
+  try {
+    var img = await exLoadImage(src);
+    var layer = { key: key, name: name, colour: colour, canvas: exTint(img, colour), value: 0 };
+    for (var i = 0; i < item.layers.length; i++) {
+      if (item.layers[i].key === key) { layer.value = item.layers[i].value; item.layers[i] = layer; return; }
+    }
+    item.layers.push(layer);
+  } catch (e) { /* a layer that will not load is simply not offered */ }
+}
+
+function exLayer(key, v) {
+  var it = exActive();
+  if (!it) return;
+  var n = Math.max(0, Math.min(100, Number(v) || 0));
+  for (var i = 0; i < it.layers.length; i++) if (it.layers[i].key === key) it.layers[i].value = n;
+  var out = document.getElementById('ex-ov-' + key + '-val');
+  if (out) out.textContent = Math.round(n) + '%';
+  exCompose();
+}
+
+function exLayersAll(v) {
+  var it = exActive();
+  if (!it) return;
+  it.layers.forEach(function (l) {
+    l.value = v;
+    var s = document.getElementById('ex-ov-' + l.key);
+    if (s) s.value = v;
+    var o = document.getElementById('ex-ov-' + l.key + '-val');
+    if (o) o.textContent = v + '%';
+  });
+  exCompose();
+}
+
+// Paints the active image with its layers onto a canvas; with no canvas given it
+// paints the one on the page and refreshes the download link.
+function exComposeInto(it, canvas) {
+  if (!it || !it.base) return null;
+  var c = canvas || exCanvas(it.base.width, it.base.height);
+  if (c.width !== it.base.width || c.height !== it.base.height) { c.width = it.base.width; c.height = it.base.height; }
+  var ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.drawImage(it.base, 0, 0);
+  it.layers.forEach(function (l) {
+    if (l.value <= 0) return;
+    ctx.globalAlpha = l.value / 100;
+    ctx.drawImage(l.canvas, 0, 0, c.width, c.height);
+  });
+  ctx.globalAlpha = 1;
+  return c;
+}
+
+function exCompose() {
+  var c = document.getElementById('ex-ov-canvas');
+  var it = exActive();
+  if (!c || !it) return;
+  exComposeInto(it, c);
+  var dl = document.getElementById('ex-ov-dl');
+  if (dl) { dl.download = exBaseName(it) + '_overlay.png'; dl.href = c.toDataURL('image/png'); }
+}
+
+function exOverlayHTML(it) {
+  if (!it || !it.base || !it.layers.length) return '';
+  var rows = it.layers.map(function (l) {
+    return '<div class="ex-ov-row">' +
+      '<div class="ex-ov-head">' +
+        '<span class="ex-ov-dot" style="background:' + l.colour + ';"></span>' +
+        '<span class="ex-ov-name">' + escHtml(l.name) + '</span>' +
+        '<span class="ex-ov-val" id="ex-ov-' + l.key + '-val">' + Math.round(l.value) + '%</span>' +
+      '</div>' +
+      '<input class="ex-ov-slider" type="range" min="0" max="100" step="1" value="' + l.value + '"' +
+        ' id="ex-ov-' + l.key + '" style="accent-color:' + l.colour + ';"' +
+        ' oninput="exLayer(\'' + l.key + '\', this.value)"' +
+        ' aria-label="' + escHtml(l.name) + ' strength">' +
+    '</div>';
+  }).join('');
+  return '<div class="ex-group"><div class="ex-group-head">' +
+      '<span class="ex-group-title">Overlay</span>' +
+      '<span class="ex-group-sub">drag a layer in as far as you want</span>' +
+    '</div>' +
+    '<div class="ex-ov">' +
+      '<div class="ex-ov-canvas-box"><canvas id="ex-ov-canvas"></canvas></div>' +
+      '<div class="ex-ov-controls">' + rows +
+        '<div class="ex-ov-actions">' +
+          '<button type="button" class="ex-ov-btn" onclick="exLayersAll(70)">Show all</button>' +
+          '<button type="button" class="ex-ov-btn" onclick="exLayersAll(0)">Clear</button>' +
+          '<a class="ex-ov-btn" id="ex-ov-dl" download="overlay.png" href="#">Download</a>' +
+        '</div>' +
+        '<div class="ex-ov-hint">Each slider is one map drawn over your photograph. The colours match the lesion legend; vessels are cyan.</div>' +
+      '</div>' +
+    '</div></div>';
+}
+
+// ── Panels ────────────────────────────────────────────────────────────────────
+
+function exAddPanel(it, group, key, title, note, canvasOrSrc) {
+  var src = typeof canvasOrSrc === 'string' ? canvasOrSrc : canvasOrSrc.toDataURL('image/png');
+  var panel = { group: group, key: key, title: title, note: note, src: src };
+  for (var i = 0; i < it.panels.length; i++) {
+    if (it.panels[i].key === key) { it.panels[i] = panel; return; }
+  }
+  it.panels.push(panel);
+}
+
+function exBaseName(it) {
+  var n = (it && it.file && it.file.name) || 'fundus';
   return n.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]+/g, '_').slice(0, 40) || 'fundus';
 }
 
-function exRenderPanels(status) {
-  var out = document.getElementById('ex-out');
+function exLoadImage(src) {
+  return new Promise(function (resolve, reject) {
+    var im = new Image();
+    im.onload = function () { resolve(im); };
+    im.onerror = function () { reject(new Error('could not be read')); };
+    im.src = src;
+  });
+}
+
+function exBuildLocal(it) {
+  var c = exFitted(it.img, 1600);
+  it.base = c;
+  var id = c.getContext('2d').getImageData(0, 0, c.width, c.height);
+
+  exAddPanel(it, 'src', 'original', 'Original', c.width + ' x ' + c.height, c);
+  exAddPanel(it, 'src', 'red',   'Red channel',   'choroid, strongest signal', exChannelCanvas(id, function (r) { return r; }));
+  exAddPanel(it, 'src', 'green', 'Green channel', 'best lesion contrast',      exChannelCanvas(id, function (r, g) { return g; }));
+  exAddPanel(it, 'src', 'blue',  'Blue channel',  'noisiest, least used',      exChannelCanvas(id, function (r, g, b) { return b; }));
+  exAddPanel(it, 'src', 'grey',  'Grayscale',     'luminance',                 exChannelCanvas(id, function (r, g, b) { return (0.299 * r + 0.587 * g + 0.114 * b) | 0; }));
+
+  var green = exGreyFrom(id, function (r, g) { return g; });
+  var cl = exClahe(green, c.width, c.height, 8, 3);
+  exAddPanel(it, 'src', 'clahe', 'CLAHE green', 'contrast-limited equalisation', exGreyCanvas(cl, c.width, c.height));
+
+  var inv = new Uint8Array(green.length);
+  for (var i = 0; i < green.length; i++) inv[i] = 255 - green[i];
+  exAddPanel(it, 'src', 'green_inv', 'Inverted green', 'dark lesions turn bright', exGreyCanvas(inv, c.width, c.height));
+}
+
+function exBuildDisc(it, vesselImg) {
+  var d = null;
+  try { d = exFindDisc(it.img, vesselImg); } catch (e) { d = null; }
+  it.disc = d;
+  if (!d) return;
+
+  var base = it.base;
+  var scale = base.width / (it.img.naturalWidth || it.img.width);
+  var cx = d.cx * scale, cy = d.cy * scale, rr = d.r * scale;
+
+  var marked = exCanvas(base.width, base.height);
+  var mx = marked.getContext('2d');
+  mx.drawImage(base, 0, 0);
+  mx.strokeStyle = d.confident ? '#FABD31' : '#F6815E';
+  mx.lineWidth = Math.max(2, base.width / 320);
+  mx.beginPath();
+  mx.arc(cx, cy, rr * 1.5, 0, Math.PI * 2);
+  mx.stroke();
+  exAddPanel(it, 'disc', 'od_marked', 'Located on the image',
+    (d.usedVessels ? 'brightness and vessel density' : 'brightness only'), marked);
+
+  var side = Math.round(rr * 4);
+  var sx = Math.max(0, Math.min(base.width - side, Math.round(cx - side / 2)));
+  var sy = Math.max(0, Math.min(base.height - side, Math.round(cy - side / 2)));
+  var crop = exCanvas(side, side);
+  crop.getContext('2d').drawImage(base, sx, sy, side, side, 0, 0, side, side);
+  exAddPanel(it, 'disc', 'od_crop', 'Cropped close-up', side + ' x ' + side + ' px', crop);
+}
+
+function exDiscStatus(it) {
+  var d = it.disc;
+  if (!d) return '<div class="ex-status">The optic disc could not be located in this image &mdash; it may be too dark, or cropped out of frame.</div>';
+  return '<div class="ex-stats"><span class="ex-conf ' + (d.confident ? 'ok' : 'low') + '">' +
+    (d.confident ? 'Confident' : 'Low confidence') + '</span> Found by looking for the brightest disc-sized patch of retina' +
+    (d.usedVessels ? ', then checking where the vessels crowd together' : '') +
+    '. This is a heuristic, not a trained model &mdash; bright exudates can pull it off the disc, so check the crop before relying on it.</div>';
+}
+
+// ── The upload page ───────────────────────────────────────────────────────────
+
+function exThumbs() {
+  var t = document.getElementById('ex-thumbs');
+  var area = document.getElementById('ex-preview-area');
+  if (!t || !area) return;
+  if (!EXPLORER.items.length) { t.innerHTML = ''; area.classList.remove('show'); return; }
+  t.innerHTML = EXPLORER.items.map(function (it, i) {
+    return '<div class="preview-item"><img src="' + it.url + '" alt="' + escHtml(it.file.name) +
+      '" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#0C1024;">' +
+      '<div class="preview-label">' + escHtml(it.file.name) + '</div>' +
+      '<button class="preview-remove" type="button" onclick="exRemove(' + i + ')">&times;</button></div>';
+  }).join('');
+  area.classList.add('show');
+}
+
+function exSetButton() {
+  var b = document.getElementById('ex-run');
+  if (!b) return;
+  var n = EXPLORER.items.length;
+  b.disabled = EXPLORER.running || !n;
+  b.innerHTML = '<span>' + (EXPLORER.running ? 'Working&hellip;' :
+    (n ? 'Explore ' + n + ' image' + (n > 1 ? 's' : '') + ' &rarr;' : 'Select images to explore')) + '</span>';
+}
+
+function exClear() {
+  EXPLORER.items.forEach(function (it) { if (it.url) URL.revokeObjectURL(it.url); });
+  EXPLORER.items = [];
+  EXPLORER.active = 0;
+  var inp = document.getElementById('ex-input');
+  if (inp) inp.value = '';
+  var msg = document.getElementById('ex-msg');
+  if (msg) msg.innerHTML = '';
+  exThumbs(); exSetButton();
+}
+
+function exRemove(i) {
+  var it = EXPLORER.items.splice(i, 1)[0];
+  if (it && it.url) URL.revokeObjectURL(it.url);
+  exThumbs(); exSetButton();
+}
+
+function exPick(files) {
+  var list = Array.from(files || []).filter(function (f) {
+    return /^image\//.test(f.type) || /\.(jpe?g|png|tiff?)$/i.test(f.name);
+  });
+  if (!list.length) return;
+  var room = EX_MAX_IMAGES - EXPLORER.items.length;
+  var msg = document.getElementById('ex-msg');
+  if (room <= 0) {
+    if (msg) msg.innerHTML = '<div class="ex-status">That is already ' + EX_MAX_IMAGES + ' images, the most this page takes at once.</div>';
+    return;
+  }
+  if (msg) msg.innerHTML = list.length > room
+    ? '<div class="ex-status">Only the first ' + room + ' of those were added &mdash; ' + EX_MAX_IMAGES + ' images at a time is the limit.</div>'
+    : '';
+  list.slice(0, room).forEach(function (f) {
+    EXPLORER.items.push({ file: f, url: URL.createObjectURL(f), img: null, base: null,
+                          panels: [], layers: [], disc: null, error: null, status: {} });
+  });
+  var inp = document.getElementById('ex-input');
+  if (inp) inp.value = '';
+  exThumbs(); exSetButton();
+}
+
+// ── Running ───────────────────────────────────────────────────────────────────
+
+function exProgress(text) {
+  var el = document.getElementById('ex-msg');
+  if (el) el.innerHTML = '<div class="ex-status"><span class="ex-spin"></span>' + text + '</div>';
+}
+
+async function exRun() {
+  if (EXPLORER.running || !EXPLORER.items.length) return;
+  EXPLORER.running = true;
+  exSetButton();
+
+  var n = EXPLORER.items.length;
+  for (var i = 0; i < n; i++) {
+    var it = EXPLORER.items[i];
+    it.panels = []; it.layers = []; it.status = {}; it.error = null;
+    var label = n > 1 ? 'Image ' + (i + 1) + ' of ' + n + ' &mdash; ' + escHtml(it.file.name) : escHtml(it.file.name);
+    exProgress(label + ': reading the channels&hellip;');
+    try {
+      it.img = await exLoadImage(it.url);
+      exBuildLocal(it);
+      exBuildDisc(it, null);
+      it.status.disc = exDiscStatus(it);
+    } catch (e) {
+      it.error = 'That image could not be read.';
+      continue;
+    }
+    exProgress(label + ': asking the backend for the vessel maps&hellip;');
+    await exBackend(it, label);
+  }
+
+  EXPLORER.running = false;
+  exSetButton();
+  var ok = EXPLORER.items.filter(function (x) { return !x.error; }).length;
+  if (!ok) {
+    var msg = document.getElementById('ex-msg');
+    if (msg) msg.innerHTML = '<div class="ex-err">None of those images could be read. Try JPG or PNG fundus photographs.</div>';
+    return;
+  }
+  var el = document.getElementById('ex-msg');
+  if (el) el.innerHTML = '';
+  EXPLORER.active = 0;
+  for (var k = 0; k < EXPLORER.items.length; k++) if (!EXPLORER.items[k].error) { EXPLORER.active = k; break; }
+  showPage('exres');
+  exRenderResults();
+}
+
+async function exBackend(it, label) {
+  var jobId = null;
+  try {
+    var fd = new FormData();
+    fd.append('images', it.file);
+    var r = await fetch(BACKEND_URL + '/api/predict', { method: 'POST', headers: NGROK_HEADER, body: fd });
+    var d = await r.json();
+    var res = d && d.results && d.results[0];
+    if (!res) throw new Error((d && d.error) || 'no result came back');
+    if (res.vessel_map) exAddPanel(it, 'vessel', 'vessel_overlay', 'Vessel overlay', 'segmentation on your image', dataUrl(res.vessel_map));
+    if (res.binary_vessel_map) {
+      exAddPanel(it, 'vessel', 'vessel_binary', 'Binary vessel map', 'segmentation alone', dataUrl(res.binary_vessel_map));
+      await exAddLayer(it, 'vessels', 'Vessels', '#00D5FF', dataUrl(res.binary_vessel_map));
+    }
+    it.status.vessel = (res.vessel_map || res.binary_vessel_map) ? '' :
+      '<div class="ex-status">The backend returned no vessel map for this image.</div>';
+    jobId = res.lesion_job_id || null;
+
+    // The vessel map says where the vessels converge, which is the better clue to
+    // the optic disc, so the disc panels are worked out again with it.
+    if (res.binary_vessel_map) {
+      try {
+        var vimg = await exLoadImage(dataUrl(res.binary_vessel_map));
+        exBuildDisc(it, vimg);
+        it.status.disc = exDiscStatus(it);
+      } catch (e2) { /* keep the brightness-only result */ }
+    }
+  } catch (e3) {
+    it.status.vessel = '<div class="ex-err">The vessel maps need the analysis backend, and it could not be reached (' +
+      escHtml(e3.message || String(e3)) + '). The channels and the optic disc were worked out here and are unaffected.</div>';
+  }
+
+  if (!jobId) return;
+  exProgress(label + ': segmenting lesions&hellip;');
+  var les = await exPollLesions(jobId);
+  if (les && les.status === 'done') {
+    var byCode = {};
+    (les.stats || []).forEach(function (s) { byCode[s.code] = s; });
+    it.lesionStats = byCode;
+    if (les.overlay) exAddPanel(it, 'lesion', 'lesions_all', 'All four lesions', 'combined overlay', dataUrl(les.overlay));
+    for (var li = 0; li < LESION_TYPES.length; li++) {
+      var l = LESION_TYPES[li];
+      var b64 = (les.masks || {})[l.code];
+      if (!b64) continue;
+      var s = byCode[l.code];
+      exAddPanel(it, 'lesion', 'lesion_' + l.code, l.code + ' - ' + l.name,
+        s ? Number(s.percent).toFixed(3) + '% of the image' : '', dataUrl(b64));
+      await exAddLayer(it, 'lesion_' + l.code, l.code + ' - ' + l.name, l.colour, dataUrl(b64));
+    }
+    it.status.lesion = '<div class="ex-stats">' + LESION_TYPES.map(function (l) {
+      var s = byCode[l.code] || { percent: 0 };
+      return l.code + ' <b>' + Number(s.percent).toFixed(3) + '%</b>';
+    }).join(' &nbsp;&middot;&nbsp; ') + '</div>';
+  } else {
+    it.status.lesion = '<div class="ex-status">Lesion segmentation did not finish' +
+      (les && les.error ? ' &mdash; ' + escHtml(les.error) : '') + '.</div>';
+  }
+}
+
+async function exPollLesions(jobId) {
+  var delay = 2000;
+  var deadline = Date.now() + 10 * 60 * 1000;
+  while (Date.now() < deadline) {
+    try {
+      var r = await fetch(BACKEND_URL + '/api/lesions/' + encodeURIComponent(jobId), { headers: NGROK_HEADER });
+      if (r.status === 404) return { status: 'error', error: 'job expired' };
+      var d = await r.json();
+      if (d.status === 'done' || d.status === 'error') return d;
+    } catch (e) { /* transient - keep polling */ }
+    await new Promise(function (res) { setTimeout(res, delay); });
+    delay = Math.min(delay * 1.3, 10000);
+  }
+  return { status: 'error', error: 'timed out' };
+}
+
+// ── The results page ──────────────────────────────────────────────────────────
+
+function exSelect(i) {
+  if (i < 0 || i >= EXPLORER.items.length) return;
+  EXPLORER.active = i;
+  exRenderResults();
+  var out = document.getElementById('exres-out');
+  if (out) out.scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
+
+function exStripHTML() {
+  if (EXPLORER.items.length < 2) return '';
+  return '<div class="ex-strip">' + EXPLORER.items.map(function (it, i) {
+    return '<button type="button" class="ex-strip-item' + (i === EXPLORER.active ? ' on' : '') + '"' +
+      ' onclick="exSelect(' + i + ')" title="' + escHtml(it.file.name) + '">' +
+      '<img src="' + it.url + '" alt="">' +
+      '<span>' + (i + 1) + (it.error ? ' &middot; failed' : '') + '</span></button>';
+  }).join('') + '</div>';
+}
+
+function exRenderResults() {
+  var out = document.getElementById('exres-out');
   if (!out) return;
-  var base = exBaseName();
-  var html = '<div class="ex-note">The colour channels and the optic disc are worked out in your browser and never leave this device. The vessel and lesion maps come from the models on the backend. Every panel downloads as a PNG.</div>';
-  html += exOverlayHTML();
+  var it = exActive();
+  var head = document.getElementById('exres-head');
+  if (head) {
+    head.innerHTML = it
+      ? '<span class="exres-name">' + escHtml(it.file.name) + '</span>' +
+        '<span class="exres-count">' + (EXPLORER.active + 1) + ' of ' + EXPLORER.items.length + '</span>'
+      : '';
+  }
+  if (!it) { out.innerHTML = ''; return; }
+  if (it.error) { out.innerHTML = exStripHTML() + '<div class="ex-err">' + escHtml(it.error) + '</div>'; return; }
+
+  var base = exBaseName(it);
+  var html = exStripHTML() +
+    '<div class="ex-note">The colour channels and the optic disc are worked out in your browser and never leave this device. The vessel and lesion maps come from the models on the backend. Every panel downloads as a PNG.</div>' +
+    exOverlayHTML(it);
+
   EX_GROUPS.forEach(function (g) {
-    var mine = EXPLORER.panels.filter(function (p) { return p.group === g.id; });
-    var st = (status && status[g.id]) || '';
+    var mine = it.panels.filter(function (p) { return p.group === g.id; });
+    var st = it.status[g.id] || '';
     if (!mine.length && !st) return;
     html += '<div class="ex-group"><div class="ex-group-head">' +
       '<span class="ex-group-title">' + g.title + '</span>' +
@@ -3408,221 +3784,100 @@ function exRenderPanels(status) {
     if (st) html += st;
     html += '</div>';
   });
+
   out.innerHTML = html;
   exCompose();
 }
 
-function exThumbs() {
-  var t = document.getElementById('ex-thumbs');
-  var area = document.getElementById('ex-preview-area');
-  if (!t || !area) return;
-  if (!EXPLORER.file) { t.innerHTML = ''; area.classList.remove('show'); return; }
-  t.innerHTML = '<div class="preview-item"><img src="' + EXPLORER.url + '" alt="' + escHtml(EXPLORER.file.name) +
-    '" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#0C1024;">' +
-    '<div class="preview-label">' + escHtml(EXPLORER.file.name) + '</div>' +
-    '<button class="preview-remove" type="button" onclick="exClear()">&times;</button></div>';
-  area.classList.add('show');
-}
-
-function exSetButton() {
-  var b = document.getElementById('ex-run');
-  if (!b) return;
-  b.disabled = EXPLORER.running || !EXPLORER.file;
-  b.innerHTML = '<span>' + (EXPLORER.running ? 'Working&hellip;' :
-    (EXPLORER.file ? 'Explore this image &rarr;' : 'Select an image to explore')) + '</span>';
-}
-
-function exClear() {
-  if (EXPLORER.url) URL.revokeObjectURL(EXPLORER.url);
-  EXPLORER.file = null; EXPLORER.url = null; EXPLORER.img = null;
-  EXPLORER.panels = []; EXPLORER.disc = null; EXPLORER.layers = []; EXPLORER.base = null;
-  var out = document.getElementById('ex-out');
-  if (out) out.innerHTML = '';
-  var inp = document.getElementById('ex-input');
-  if (inp) inp.value = '';
-  exThumbs(); exSetButton();
-}
-
-function exPick(files) {
-  var list = Array.from(files || []).filter(function (f) {
-    return /^image\//.test(f.type) || /\.(jpe?g|png|tiff?)$/i.test(f.name);
-  });
-  if (!list.length) return;
+function exNewAnalysis() {
   exClear();
-  EXPLORER.file = list[0];
-  EXPLORER.url = URL.createObjectURL(EXPLORER.file);
-  exThumbs(); exSetButton();
+  showPage('explore');
 }
 
-function exLoadImage(src) {
-  return new Promise(function (resolve, reject) {
-    var im = new Image();
-    im.onload = function () { resolve(im); };
-    im.onerror = function () { reject(new Error('could not be read')); };
-    im.src = src;
-  });
+// ── The report ────────────────────────────────────────────────────────────────
+// Panels are full-size PNGs, which would make a report of tens of megabytes, so
+// each one is redrawn small as a JPEG before it goes in.
+
+function exReportImage(src, width) {
+  return exLoadImage(src).then(function (img) {
+    var w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+    var s = Math.min(1, width / w);
+    var c = exCanvas(Math.max(1, Math.round(w * s)), Math.max(1, Math.round(h * s)));
+    var ctx = c.getContext('2d');
+    ctx.fillStyle = '#0C1024';
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', 0.82);
+  }).catch(function () { return null; });
 }
 
-function exBuildLocal(img) {
-  var c = exFitted(img, 1600);
-  EXPLORER.base = c;
-  var id = c.getContext('2d').getImageData(0, 0, c.width, c.height);
-
-  exAddPanel('src', 'original', 'Original', c.width + ' x ' + c.height, c);
-  exAddPanel('src', 'red',   'Red channel',   'choroid, strongest signal', exChannelCanvas(id, function (r) { return r; }));
-  exAddPanel('src', 'green', 'Green channel', 'best lesion contrast',      exChannelCanvas(id, function (r, g) { return g; }));
-  exAddPanel('src', 'blue',  'Blue channel',  'noisiest, least used',      exChannelCanvas(id, function (r, g, b) { return b; }));
-  exAddPanel('src', 'grey',  'Grayscale',     'luminance',                 exChannelCanvas(id, function (r, g, b) { return (0.299 * r + 0.587 * g + 0.114 * b) | 0; }));
-
-  var green = exGreyFrom(id, function (r, g) { return g; });
-  var cl = exClahe(green, c.width, c.height, 8, 3);
-  exAddPanel('src', 'clahe', 'CLAHE green', 'contrast-limited equalisation', exGreyCanvas(cl, c.width, c.height));
-
-  var inv = new Uint8Array(green.length);
-  for (var i = 0; i < green.length; i++) inv[i] = 255 - green[i];
-  exAddPanel('src', 'green_inv', 'Inverted green', 'dark lesions turn bright', exGreyCanvas(inv, c.width, c.height));
-  return c;
+async function exReportFigures(panels, width) {
+  var out = [];
+  for (var i = 0; i < panels.length; i++) {
+    var src = await exReportImage(panels[i].src, width);
+    if (src) out.push('<figure><div class="cap">' + escHtml(panels[i].title) + '</div><img src="' + src + '"></figure>');
+  }
+  return out.join('');
 }
 
-function exBuildDisc(img, base, vesselImg) {
-  var d = null;
-  try { d = exFindDisc(img, vesselImg); } catch (e) { d = null; }
-  EXPLORER.disc = d;
-  if (!d) return null;
+async function exReportSection(it, idx, n) {
+  var parts = '<div class="rpt">';
+  parts += '<div class="sec">' + (n > 1 ? 'Image ' + (idx + 1) + ' of ' + n + ' &mdash; ' : '') + escHtml(it.file.name) + '</div>';
 
-  var scale = base.width / (img.naturalWidth || img.width);
-  var cx = d.cx * scale, cy = d.cy * scale, rr = d.r * scale;
+  var composite = exComposeInto(it, null);
+  var anyLayer = it.layers.some(function (l) { return l.value > 0; });
+  if (composite && anyLayer) {
+    var cs = await exReportImage(composite.toDataURL('image/png'), 700);
+    var key = it.layers.filter(function (l) { return l.value > 0; }).map(function (l) {
+      return '<span><i class="dot" style="color:' + l.colour + ';">&#9679;</i>' + escHtml(l.name) + ' ' + Math.round(l.value) + '%</span>';
+    }).join('');
+    if (cs) parts += '<div class="legend">' + key + '</div><div class="imgs" style="grid-template-columns:1fr;"><figure><div class="cap">Overlay as you set it</div><img src="' + cs + '"></figure></div>';
+  }
 
-  var marked = exCanvas(base.width, base.height);
-  var mx = marked.getContext('2d');
-  mx.drawImage(base, 0, 0);
-  mx.strokeStyle = d.confident ? '#FABD31' : '#F6815E';
-  mx.lineWidth = Math.max(2, base.width / 320);
-  mx.beginPath();
-  mx.arc(cx, cy, rr * 1.5, 0, Math.PI * 2);
-  mx.stroke();
-  exAddPanel('disc', 'od_marked', 'Located on the image',
-    (d.usedVessels ? 'brightness and vessel density' : 'brightness only'), marked);
+  var byGroup = {};
+  it.panels.forEach(function (p) { (byGroup[p.group] = byGroup[p.group] || []).push(p); });
+  for (var gi = 0; gi < EX_GROUPS.length; gi++) {
+    var g = EX_GROUPS[gi];
+    var list = byGroup[g.id] || [];
+    if (!list.length) continue;
+    parts += '<div class="sec">' + g.title + '</div>';
+    parts += '<div class="imgs">' + (await exReportFigures(list, 320)) + '</div>';
+  }
 
-  var side = Math.round(rr * 4);
-  var sx = Math.max(0, Math.min(base.width - side, Math.round(cx - side / 2)));
-  var sy = Math.max(0, Math.min(base.height - side, Math.round(cy - side / 2)));
-  var crop = exCanvas(side, side);
-  crop.getContext('2d').drawImage(base, sx, sy, side, side, 0, 0, side, side);
-  exAddPanel('disc', 'od_crop', 'Cropped close-up', side + ' x ' + side + ' px', crop);
-  return d;
+  if (it.lesionStats) {
+    var rows = LESION_TYPES.map(function (l) {
+      var s = it.lesionStats[l.code] || { pixels: 0, percent: 0 };
+      return '<tr><td><i class="dot" style="color:' + l.colour + ';">&#9679;</i>' + l.name + '</td>' +
+        '<td class="num">' + Number(s.pixels || 0).toLocaleString() + '</td>' +
+        '<td class="num">' + Number(s.percent || 0).toFixed(3) + '%</td></tr>';
+    }).join('');
+    parts += '<div class="sec">Lesion area</div><table><tr><th>Lesion</th><th class="num">Pixels</th><th class="num">% of image</th></tr>' + rows + '</table>';
+  }
+
+  if (it.disc) {
+    parts += '<div class="rnote"><b>Optic disc:</b> located by brightness' +
+      (it.disc.usedVessels ? ' and vessel convergence' : '') + ', ' +
+      (it.disc.confident ? 'confidently' : 'with low confidence') +
+      ' (z = ' + it.disc.z.toFixed(1) + '). This is a heuristic, not a trained segmentation.</div>';
+  }
+  return parts + '</div>';
 }
 
-function exDiscStatus() {
-  var d = EXPLORER.disc;
-  if (!d) return '<div class="ex-status">The optic disc could not be located in this image &mdash; it may be too dark, or cropped out of frame.</div>';
-  return '<div class="ex-stats"><span class="ex-conf ' + (d.confident ? 'ok' : 'low') + '">' +
-    (d.confident ? 'Confident' : 'Low confidence') + '</span> Found by looking for the brightest disc-sized patch of retina' +
-    (d.usedVessels ? ', then checking where the vessels crowd together' : '') +
-    '. This is a heuristic, not a trained model &mdash; bright exudates can pull it off the disc, so check the crop before relying on it.</div>';
-}
-
-async function exRun() {
-  if (EXPLORER.running || !EXPLORER.file) return;
-  EXPLORER.running = true;
-  EXPLORER.panels = [];
-  EXPLORER.layers = [];
-  exSetButton();
-
-  var status = {};
-  var base;
+async function exReport() {
+  var list = EXPLORER.items.filter(function (it) { return !it.error && it.panels.length; });
+  if (!list.length) { showToast('Nothing to put in a report yet.', '#F35858'); return; }
+  var btn = document.getElementById('exres-report');
+  if (btn) { btn.disabled = true; btn.textContent = 'Building…'; }
   try {
-    EXPLORER.img = await exLoadImage(EXPLORER.url);
-    base = exBuildLocal(EXPLORER.img);
+    var patient = readPatientDetails('ex-pt-');
+    var inner = reportPatientHTML(patient);
+    inner += '<div class="rnote">This report lays out what each photograph is made of: its colour channels, the vessel segmentation, the lesion maps and the optic disc. It carries no diagnosis and no grade.</div>';
+    for (var i = 0; i < list.length; i++) inner += await exReportSection(list[i], i, list.length);
+    openReportWindow(reportPageHTML('Retinal Image Analysis', 'Retinal Image Analysis', 'Image Analysis Report', inner));
   } catch (e) {
-    EXPLORER.running = false; exSetButton();
-    document.getElementById('ex-out').innerHTML =
-      '<div class="ex-err">That image could not be read. Try a JPG or PNG fundus photograph.</div>';
-    return;
+    showToast('The report could not be built: ' + (e.message || e), '#F35858');
   }
-
-  exBuildDisc(EXPLORER.img, base, null);
-  status.disc = exDiscStatus();
-  status.vessel = '<div class="ex-status"><span class="ex-spin"></span>Asking the backend for the vessel maps&hellip;</div>';
-  exRenderPanels(status);
-
-  var jobId = null;
-  try {
-    var fd = new FormData();
-    fd.append('images', EXPLORER.file);
-    var r = await fetch(BACKEND_URL + '/api/predict', { method: 'POST', headers: NGROK_HEADER, body: fd });
-    var d = await r.json();
-    var res = d && d.results && d.results[0];
-    if (!res) throw new Error((d && d.error) || 'no result came back');
-    if (res.vessel_map) exAddPanel('vessel', 'vessel_overlay', 'Vessel overlay', 'segmentation on your image', dataUrl(res.vessel_map));
-    if (res.binary_vessel_map) exAddPanel('vessel', 'vessel_binary', 'Binary vessel map', 'segmentation alone', dataUrl(res.binary_vessel_map));
-    if (res.binary_vessel_map) await exAddLayer('vessels', 'Vessels', '#00D5FF', dataUrl(res.binary_vessel_map));
-    status.vessel = (res.vessel_map || res.binary_vessel_map) ? '' :
-      '<div class="ex-status">The backend returned no vessel map for this image.</div>';
-    jobId = res.lesion_job_id || null;
-
-    // The vessel map says where the vessels converge, which is the better clue to
-    // the optic disc, so the disc panels are worked out again with it.
-    if (res.binary_vessel_map) {
-      try {
-        var vimg = await exLoadImage(dataUrl(res.binary_vessel_map));
-        exBuildDisc(EXPLORER.img, base, vimg);
-        status.disc = exDiscStatus();
-      } catch (e2) { /* keep the brightness-only result */ }
-    }
-  } catch (e3) {
-    status.vessel = '<div class="ex-err">The vessel maps need the analysis backend, and it could not be reached (' +
-      escHtml(e3.message || String(e3)) + '). The channels and the optic disc above were worked out here and are unaffected.</div>';
-  }
-
-  if (jobId) {
-    status.lesion = '<div class="ex-status"><span class="ex-spin"></span>Segmenting lesions&hellip; this runs after grading and may take a moment.</div>';
-    exRenderPanels(status);
-    var les = await exPollLesions(jobId);
-    if (les && les.status === 'done') {
-      var byCode = {};
-      (les.stats || []).forEach(function (s) { byCode[s.code] = s; });
-      if (les.overlay) exAddPanel('lesion', 'lesions_all', 'All four lesions', 'combined overlay', dataUrl(les.overlay));
-      LESION_TYPES.forEach(function (l) {
-        var b64 = (les.masks || {})[l.code];
-        if (!b64) return;
-        var s = byCode[l.code];
-        exAddPanel('lesion', 'lesion_' + l.code, l.code + ' - ' + l.name,
-          s ? Number(s.percent).toFixed(3) + '% of the image' : '', dataUrl(b64));
-      });
-      for (var li = 0; li < LESION_TYPES.length; li++) {
-        var lt = LESION_TYPES[li], mb = (les.masks || {})[lt.code];
-        if (mb) await exAddLayer('lesion_' + lt.code, lt.code + ' - ' + lt.name, lt.colour, dataUrl(mb));
-      }
-      status.lesion = '<div class="ex-stats">' + LESION_TYPES.map(function (l) {
-        var s = byCode[l.code] || { percent: 0 };
-        return l.code + ' <b>' + Number(s.percent).toFixed(3) + '%</b>';
-      }).join(' &nbsp;&middot;&nbsp; ') + '</div>';
-    } else {
-      status.lesion = '<div class="ex-status">Lesion segmentation did not finish' +
-        (les && les.error ? ' &mdash; ' + escHtml(les.error) : '') + '.</div>';
-    }
-  }
-
-  exRenderPanels(status);
-  EXPLORER.running = false;
-  exSetButton();
-}
-
-async function exPollLesions(jobId) {
-  var delay = 2000;
-  var deadline = Date.now() + 10 * 60 * 1000;
-  while (Date.now() < deadline) {
-    try {
-      var r = await fetch(BACKEND_URL + '/api/lesions/' + encodeURIComponent(jobId), { headers: NGROK_HEADER });
-      if (r.status === 404) return { status: 'error', error: 'job expired' };
-      var d = await r.json();
-      if (d.status === 'done' || d.status === 'error') return d;
-    } catch (e) { /* transient - keep polling */ }
-    await new Promise(function (res) { setTimeout(res, delay); });
-    delay = Math.min(delay * 1.3, 10000);
-  }
-  return { status: 'error', error: 'timed out' };
+  if (btn) { btn.disabled = false; btn.textContent = 'Export report'; }
 }
 
 window.addEventListener('load', function () {
