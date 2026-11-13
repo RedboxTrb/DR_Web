@@ -3698,7 +3698,7 @@ function exOverlayHTML(it) {
           '<button type="button" class="ex-ov-btn" onclick="exLayersAll(0)">Clear</button>' +
           '<a class="ex-ov-btn" id="ex-ov-dl" download="overlay.png" href="#">Download</a>' +
         '</div>' +
-        '<div class="ex-ov-hint">Each slider is one map drawn over your photograph. The colours match the lesion legend; vessels are cyan.</div>' +
+        '<div class="ex-ov-hint">Each slider is one map drawn over your photograph. The colours match the lesion legend; vessels are cyan and the optic disc magenta.</div>' +
       '</div>' +
     '</div></div>';
 }
@@ -3748,7 +3748,7 @@ function exBuildLocal(it) {
   exAddPanel(it, 'src', 'green_inv', 'Inverted green', 'dark lesions turn bright', exGreyCanvas(inv, c.width, c.height));
 }
 
-function exBuildDisc(it) {
+async function exBuildDisc(it) {
   var r = null;
   try { r = odSegment(it.img); } catch (e) { r = null; }
   it.disc = r;
@@ -3799,6 +3799,21 @@ function exBuildDisc(it) {
   var crop = exCanvas(side, side);
   crop.getContext('2d').drawImage(base, sx, sy, side, side, 0, 0, side, side);
   exAddPanel(it, 'disc', 'od_crop', 'Cropped close-up', side + ' x ' + side + ' px', crop);
+
+  // The disc as a layer too, so it can be dialled onto the photograph beside
+  // the vessels and the lesions. exTint reads the mask's own red channel as
+  // the alpha, so the layer is drawn white-on-black exactly like the binary
+  // masks the backend returns, and needs no special case downstream.
+  var lay = exCanvas(r.w, r.h);
+  var lctx = lay.getContext('2d');
+  var limg = lctx.createImageData(r.w, r.h);
+  for (var j = 0; j < r.mask.length; j++) {
+    var q = j * 4, v = r.mask[j] ? 255 : 0;
+    limg.data[q] = limg.data[q + 1] = limg.data[q + 2] = v;
+    limg.data[q + 3] = 255;
+  }
+  lctx.putImageData(limg, 0, 0);
+  await exAddLayer(it, 'optic_disc', 'Optic disc', '#D946EF', lay.toDataURL('image/png'));
 }
 
 function exDiscStatus(it) {
@@ -3897,7 +3912,7 @@ async function exRun() {
     try {
       it.img = await exLoadImage(it.url);
       exBuildLocal(it);
-      exBuildDisc(it);
+      await exBuildDisc(it);
       it.status.disc = exDiscStatus(it);
     } catch (e) {
       it.error = 'That image could not be read.';
