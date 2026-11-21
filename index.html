@@ -1278,9 +1278,24 @@ footer{padding:52px 60px 28px;}
 .sim-legend div{display:flex;align-items:center;gap:8px;line-height:1.35;}
 .sim-legend i{flex:none;width:12px;height:12px;border-radius:50%;border:1px solid rgba(12,16,36,.25);}
 .sim-cap{font-size:11.5px;color:var(--g400);margin-top:10px;line-height:1.5;}
+/* laptops and desktops: camera views, then camera buttons, then severity, then the condition list */
+@media(min-width:901px){
+  #page-sim .upload-container{display:flex;flex-direction:column;gap:14px;}
+  #page-sim .sim-top{display:contents;}
+  #page-sim .sim-views{order:1;}
+  #page-sim .sim-btns{order:2;margin:0;}
+  #page-sim .sim-sevcard{order:3;}
+  #page-sim .sim-picker{order:4;margin:0;}
+  #page-sim .sim-detail{order:5;margin:0;}
+  #page-sim .upload-disclaimer{order:6;}
+  #page-sim .sim-sevcard .sim-sevbar{margin:0;padding:0;border:0;}
+}
 /* phones and small tablets: views + condition strip + severity stay pinned at the top */
 @media(max-width:900px){
-  .sim-top{position:sticky;top:56px;z-index:20;background:var(--white);padding:6px 0 4px;margin-bottom:10px;}
+  .sim-top{position:sticky;top:56px;z-index:20;background:var(--white);padding:6px 0 4px;margin-bottom:10px;display:flex;flex-direction:column;}
+  .sim-views{order:1;}
+  .sim-picker{order:2;}
+  .sim-sevcard{order:3;margin-top:0;padding:0;border:0;border-radius:0;}
   .sim-views{gap:6px;}
   .sim-view{min-height:120px;border-radius:10px;}
   .sim-view canvas{max-height:30vh;}
@@ -1301,6 +1316,12 @@ footer{padding:52px 60px 28px;}
   .sim-seg label{flex:1;}
   .sim-row .sim-btn{flex:1 1 calc(50% - 8px);padding:10px 8px;font-size:13px;}
   .sim-row .sim-btn.primary{flex-basis:100%;}
+}
+/* laptops and desktops: content uses 90% of the window width instead of a narrow centred column */
+@media(min-width:901px){
+  .upload-container,.ch-container,.ar-page,.cf-page,.exres-page,.val-grid,.val-strip,
+  #page-reports > div[style*="max-width:960px"]{max-width:90vw !important;}
+  .upload-hero p{max-width:min(720px,90vw);}
 }
 </style>
 </head>
@@ -2368,17 +2389,19 @@ footer{padding:52px 60px 28px;}
           <div class="sim-view" id="sim-origWrap"><span class="sim-tag">Normal</span><canvas id="sim-orig" width="640" height="480"></canvas></div>
           <div class="sim-view" id="sim-mainWrap"><span class="sim-tag" id="sim-t_sim">Simulation</span><canvas id="sim-out" width="640" height="480"></canvas><div id="sim-placeholder">Start your camera or choose a photo.<br>Then pick a condition below.</div></div>
         </div>
+        <div class="sim-sevcard sim-card">
+          <div class="sim-sevbar">
+            <div class="sim-sevrow"><label for="sim-sev">Severity</label><span id="sim-sevVal">50% &middot; Moderate</span></div>
+            <input type="range" id="sim-sev" min="0" max="100" value="50">
+            <label class="sim-chk"><input type="checkbox" id="sim-cmp" checked> <span>Show normal vision next to it</span></label>
+          </div>
+        </div>
         <div class="sim-picker sim-card">
           <span class="sim-lbl">Condition</span>
           <div class="sim-pills" id="sim-condPills"></div>
           <div id="sim-catWrap" style="display:none">
             <span class="sim-lbl">Cataract type</span>
             <div class="sim-pills sim-pills-sub" id="sim-catPills"></div>
-          </div>
-          <div class="sim-sevbar">
-            <div class="sim-sevrow"><label for="sim-sev">Severity</label><span id="sim-sevVal">50% &middot; Moderate</span></div>
-            <input type="range" id="sim-sev" min="0" max="100" value="50">
-            <label class="sim-chk"><input type="checkbox" id="sim-cmp" checked> <span>Show normal vision next to it</span></label>
           </div>
         </div>
       </div>
