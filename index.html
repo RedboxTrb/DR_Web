@@ -1212,6 +1212,43 @@ footer{padding:52px 60px 28px;}
 .ex-strip-item.on span{color:var(--teal-d);}
 #ex-msg{margin-top:14px;}
 @media(max-width:640px){.exres-page{padding:22px 16px 56px;}.exres-title{font-size:21px;}}
+/* ── Vision Simulator (educational; browser-only, no model) ── */
+:root{--sim:#E8780A;--sim-d:#C45F00;--sim-bg:rgba(232,120,10,.1);}
+.ch-sim{--ac:var(--sim);--ac-d:var(--sim-d);--ac-bg:var(--sim-bg);}
+.sim-grid{display:grid;grid-template-columns:1.7fr 1fr;gap:18px;margin-bottom:20px;}
+@media(max-width:900px){.sim-grid{grid-template-columns:1fr;}}
+.sim-card{background:var(--white);border:1px solid var(--g200);border-top:3px solid var(--sim);border-radius:14px;padding:16px;}
+.sim-views{display:grid;gap:10px;grid-template-columns:1fr;}
+.sim-views.compare{grid-template-columns:1fr 1fr;}
+.sim-view{position:relative;background:var(--navy);border-radius:10px;overflow:hidden;min-height:220px;display:flex;align-items:center;justify-content:center;}
+.sim-view canvas{width:100%;height:auto;display:block;}
+.sim-tag{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;padding:2px 8px;border-radius:6px;}
+#sim-origWrap{display:none;}
+.sim-views.compare #sim-origWrap{display:flex;}
+#sim-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--g300);padding:20px;font-size:14px;}
+.sim-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.sim-btn{font-family:inherit;font-size:13px;font-weight:600;border:1px solid var(--g200);background:var(--white);color:var(--navy);padding:10px 14px;min-height:44px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;}
+.sim-btn:hover{border-color:var(--sim);}
+.sim-btn.primary{background:var(--sim);border-color:var(--sim);color:#fff;}
+.sim-btn.primary:hover{background:var(--sim-d);}
+.sim-btn:disabled{opacity:.5;cursor:default;}
+.sim-btn:focus-visible,.sim-pills input:focus-visible+label{outline:2px solid var(--sim-d);outline-offset:2px;}
+#sim-msg{color:var(--red);font-size:13px;margin-top:8px;min-height:1.2em;}
+.sim-lbl{display:block;font-weight:600;font-size:13px;margin:14px 0 6px;color:var(--navy);}
+.sim-lbl:first-child{margin-top:0;}
+.sim-pills{display:flex;flex-wrap:wrap;gap:6px;}
+.sim-pills input{position:absolute;opacity:0;pointer-events:none;}
+.sim-pills label{border:1px solid var(--g200);border-radius:999px;padding:7px 13px;cursor:pointer;font-size:13px;background:var(--white);color:var(--navy);}
+.sim-pills input:checked+label{background:var(--sim);border-color:var(--sim);color:#fff;}
+#sim-sev{width:100%;accent-color:var(--sim);}
+.sim-chk{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;}
+.sim-info{background:var(--sim-bg);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:13px;line-height:1.6;}
+.sim-info b{display:block;margin-bottom:2px;}
+.sim-lang{display:inline-flex;margin-bottom:12px;}
+.sim-lang button{font-family:inherit;font-size:13px;border:1px solid var(--g200);background:var(--white);color:var(--navy);padding:6px 12px;cursor:pointer;}
+.sim-lang button:first-child{border-radius:8px 0 0 8px;}
+.sim-lang button:last-child{border-radius:0 8px 8px 0;border-left:0;}
+.sim-lang button[aria-pressed="true"]{background:var(--sim);border-color:var(--sim);color:#fff;}
 </style>
 </head>
 <body>
@@ -1604,6 +1641,12 @@ footer{padding:52px 60px 28px;}
           <span class="ch-title">Image Explorer</span>
           <span class="ch-desc">Not a grade &mdash; the picture itself, taken apart. Colour channels, contrast-enhanced green, vessel maps, the four lesion types separately, and a cropped optic disc. Several images at once; every panel downloads, and the set exports as a report.</span>
           <span class="ch-go">Open the explorer &rarr;</span>
+        </button>
+        <button type="button" class="ch-card ch-sim" onclick="showPage('sim')">
+          <span class="ch-badge">LEARN</span>
+          <span class="ch-title">Vision Simulator</span>
+          <span class="ch-desc">Not an analysis &mdash; an educational demo. Point your camera at a room, or load a photo, and see roughly how glaucoma, cataract, diabetic retinopathy or macular degeneration can change what a person sees. Runs in your browser; nothing is uploaded.</span>
+          <span class="ch-go">Open the simulator &rarr;</span>
         </button>
       </div>
       <div class="cs-head">Coming soon</div>
@@ -2212,6 +2255,84 @@ footer{padding:52px 60px 28px;}
       <div class="exres-meta" id="exres-head"></div>
     </div>
     <div id="exres-out"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     VISION SIMULATOR: educational only. Pure browser canvas filters; no model, no upload,
+     nothing is sent or saved. Camera/photo never leaves the page.
+══════════════════════════════════ -->
+<div class="page" id="page-sim">
+  <nav>
+    <a class="nav-logo" onclick="showPage('home')">
+      <svg width="28" height="28" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><path d="M27 9 A12 12 0 1 0 27 27" fill="none" stroke="#0C1024" stroke-width="3.5" stroke-linecap="round"/><circle cx="19" cy="18" r="4" fill="#22B7A3"/></svg>
+      <span class="nav-logo-text">ChakshuRakshakAI</span>
+    </a>
+    <div class="nav-links">
+      <a onclick="showPage('home')">Home</a>
+      <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
+      <a style="color:var(--teal);font-weight:600;" onclick="showPage('choose')">Demo</a>
+    </div>
+    <div class="nav-right">
+      <div id="nav-guest-sim" style="display:flex;gap:12px;align-items:center;">
+        <button class="nav-btn-ghost" onclick="showPage('auth');const b=document.getElementById('auth-guest-banner');if(b)b.classList.remove('show');">Log in</button>
+        <button class="nav-btn" onclick="showPage('choose')">Try Demo &rarr;</button>
+      </div>
+      <div id="nav-user-sim" class="profile-chip" style="display:none;" onclick="this.classList.toggle('open')" tabindex="0">
+        <div class="profile-avatar" id="nav-avatar-sim">?</div>
+        <span id="nav-user-name-sim"></span>
+        <span class="profile-chevron">&#9660;</span>
+        <div class="profile-dropdown">
+          <a onclick="event.stopPropagation();document.getElementById('nav-user-sim').classList.remove('open');showPage('reports')">My Reports</a>
+          <hr>
+          <a class="dd-logout" onclick="event.stopPropagation();document.getElementById('nav-user-sim').classList.remove('open');authLogout()">Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="upload-hero">
+    <h1>Vision <span>Simulator</span></h1>
+    <p id="sim-t_sub"></p>
+  </div>
+  <div class="upload-body">
+    <div class="upload-container">
+      <div class="sim-lang" role="group" aria-label="Language">
+        <button type="button" id="sim-lhi" aria-pressed="false">हिंदी</button><button type="button" id="sim-len" aria-pressed="true">English</button>
+      </div>
+      <div class="sim-grid">
+        <section class="sim-card">
+          <div class="sim-views" id="sim-views">
+            <div class="sim-view" id="sim-origWrap"><span class="sim-tag" id="sim-t_orig"></span><canvas id="sim-orig" width="640" height="480"></canvas></div>
+            <div class="sim-view" id="sim-mainWrap"><span class="sim-tag" id="sim-t_sim"></span><canvas id="sim-out" width="640" height="480"></canvas><div id="sim-placeholder"></div></div>
+          </div>
+          <div class="sim-row">
+            <button type="button" class="sim-btn primary" id="sim-camBtn"></button>
+            <button type="button" class="sim-btn" id="sim-stopBtn" disabled></button>
+            <label class="sim-btn" for="sim-file" id="sim-t_upload"></label>
+            <input type="file" id="sim-file" accept="image/*" hidden>
+            <button type="button" class="sim-btn" id="sim-snapBtn" disabled></button>
+          </div>
+          <div id="sim-msg" role="status"></div>
+        </section>
+        <aside class="sim-card">
+          <span class="sim-lbl" id="sim-t_cond"></span>
+          <div class="sim-pills" id="sim-condPills"></div>
+          <div id="sim-catWrap" style="display:none">
+            <span class="sim-lbl" id="sim-t_cattype"></span>
+            <div class="sim-pills" id="sim-catPills"></div>
+          </div>
+          <label class="sim-lbl" for="sim-sev"><span id="sim-t_sev"></span>: <span id="sim-sevVal">50%</span></label>
+          <input type="range" id="sim-sev" min="0" max="100" value="50">
+          <label class="sim-chk"><input type="checkbox" id="sim-cmp"> <span id="sim-t_cmp"></span></label>
+          <div class="sim-info"><b id="sim-infoTitle"></b><span id="sim-infoText"></span></div>
+          <div class="sim-info"><b id="sim-t_symTitle"></b><span id="sim-t_symText"></span></div>
+        </aside>
+      </div>
+      <div class="upload-disclaimer">
+        <div class="disclaimer-title">⚠ Education only — not a test</div>
+        <span id="sim-t_warn"></span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -4178,6 +4299,8 @@ function showPage(name) {
   if (target) target.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'instant' });
   if (name === 'reports') loadReports();
+  if (window.simLeave && name !== 'sim') simLeave();
+  if (name === 'sim' && window.simEnter) simEnter();
 }
 
 function setToggle(btn) {
@@ -5611,5 +5734,227 @@ document.addEventListener('click', function(e) {
 });
 </script>
 
+<script>
+/* Vision Simulator: browser-only canvas filters (educational) */
+(function(){
+"use strict";
+
+/* ---------- text (Hindi / English) ---------- */
+var T = {
+  hi:{
+    brand:"चक्षु रक्षक AI", title:"दृष्टि सिमुलेटर",
+    sub:"देखिए कि आँख की बीमारियों में दुनिया कैसी दिखती है। कैमरा चालू करें या कोई फ़ोटो चुनें।",
+    cam:"कैमरा चालू करें", stop:"कैमरा बंद करें", upload:"फ़ोटो चुनें", snap:"तस्वीर सेव करें",
+    cond:"बीमारी चुनें", cattype:"मोतियाबिंद का प्रकार", sev:"गंभीरता", cmp:"असली और सिमुलेशन साथ-साथ दिखाएँ",
+    orig:"असली", sim:"सिमुलेशन", ph:"कैमरा चालू करें या फ़ोटो चुनें",
+    symTitle:"इन लक्षणों पर आँखों की जाँच कराएँ",
+    symText:"धुंधला दिखना, किनारे से कम दिखना, सीधी रेखाएँ टेढ़ी दिखना, आँखों के आगे काले धब्बे, रंग फीके लगना। मधुमेह वाले लोग साल में एक बार जाँच ज़रूर कराएँ।",
+    warn:"<b>केवल शिक्षा के लिए।</b> यह सिमुलेटर बीमारी की जाँच या निदान नहीं करता। असली अनुभव हर मरीज़ में अलग होता है। आँखों की समस्या हो तो नेत्र विशेषज्ञ से मिलें। आपका कैमरा सिर्फ़ इसी ब्राउज़र में चलता है, कोई वीडियो या फ़ोटो कहीं भेजी या सेव नहीं होती।",
+    foot:"चक्षु रक्षक AI · जागरूकता के लिए",
+    camErr:"कैमरा नहीं खुला। अनुमति दें, या ऊपर से फ़ोटो चुनें। (कैमरा सिर्फ़ https या localhost पर चलता है।)",
+    camOn:"कैमरा चालू है।",
+    conds:{
+      normal:["सामान्य दृष्टि","सामान्य दृष्टि","कोई फ़िल्टर नहीं लगा है। इसे तुलना के लिए आधार मानें।"],
+      glaucoma:["काला मोतिया (ग्लूकोमा)","काला मोतिया","किनारे का दृश्य धीरे-धीरे अंधेरा होता जाता है और सिर्फ़ बीच का छोटा हिस्सा दिखता है (सुरंग जैसी दृष्टि)। गंभीरता बढ़ाने पर यह हिस्सा और संकरा होता है।"],
+      cataract:["मोतियाबिंद","मोतियाबिंद","लेंस धुंधला हो जाता है। चीज़ें धुंधली, फीकी और कुछ पीली दिखती हैं और रोशनी चुभती है।"],
+      dr:["डायबिटिक रेटिनोपैथी","डायबिटिक रेटिनोपैथी","नज़र के सामने काले-लाल धब्बे दिखते हैं (रक्तस्राव और सूजन)। गंभीरता बढ़ने पर धब्बे ज़्यादा और बड़े होते हैं।"],
+      amd:["धब्बे की क्षति (AMD)","AMD","देखने के ठीक बीच में काला या धुंधला धब्बा बन जाता है जो बढ़ता है। पढ़ना और चेहरे पहचानना मुश्किल हो जाता है।"]
+    },
+    cat:{yellow:"पीला पड़ना (न्यूक्लियर)", blur:"धुंध और धुंधलापन (कॉर्टिकल)"}
+  },
+  en:{
+    brand:"Chakshu Rakshak AI", title:"Vision Simulator",
+    sub:"See how the world looks with common eye conditions. Start your camera or choose a photo.",
+    cam:"Start camera", stop:"Stop camera", upload:"Choose photo", snap:"Save picture",
+    cond:"Condition", cattype:"Cataract type", sev:"Severity", cmp:"Show original and simulation side by side",
+    orig:"Original", sim:"Simulation", ph:"Start the camera or choose a photo",
+    symTitle:"See an eye doctor if you notice",
+    symText:"Blurred vision, loss of side vision, straight lines looking bent, dark spots in your view, or colours looking faded. People with diabetes should get an eye check every year.",
+    warn:"<b>For education only.</b> This simulator does not screen for or diagnose any disease. The real experience differs from person to person. If you have eye problems, see an eye specialist. Your camera runs only in this browser; no video or photo is sent or stored anywhere.",
+    foot:"Chakshu Rakshak AI · for awareness",
+    camErr:"Could not open the camera. Allow permission, or choose a photo instead. (Camera works only on https or localhost.)",
+    camOn:"Camera is on.",
+    conds:{
+      normal:["Normal vision","Normal vision","No filter applied. Use as a baseline for comparison."],
+      glaucoma:["Glaucoma","Glaucoma","Side vision fades to dark, leaving only a small central area (tunnel vision). Higher severity narrows it further."],
+      cataract:["Cataract","Cataract","The lens clouds over. Things look blurred, faded and slightly yellow, and bright light causes glare."],
+      dr:["Diabetic retinopathy","Diabetic retinopathy","Dark red-black spots drift across the view (bleeding and swelling). Higher severity means more and larger spots."],
+      amd:["Macular degeneration (AMD)","AMD","A dark or blurred patch forms right in the centre of vision and grows. Reading and recognising faces become hard."]
+    },
+    cat:{yellow:"Yellowing (nuclear)", blur:"Haze and blur (cortical)"}
+  }
+};
+var ORDER=["normal","glaucoma","cataract","dr","amd"];
+var lang="en", cond="normal", catType="yellow", sev=0.5, compare=false;
+
+/* ---------- elements ---------- */
+function $(id){var e=document.getElementById("sim-"+id); return e||{style:{},classList:{toggle:function(){}},setAttribute:function(){}};}
+var out=$("out"), octx=out.getContext("2d");
+var orig=$("orig"), origCtx=orig.getContext("2d");
+var tmp=document.createElement("canvas"), tctx=tmp.getContext("2d");
+var video=document.createElement("video"); video.playsInline=true; video.muted=true;
+var stream=null, imgSrc=null, raf=0;
+
+/* ---------- UI text + controls ---------- */
+function buildPills(){
+  var box=$("condPills"); box.innerHTML="";
+  ORDER.forEach(function(k){
+    var id="simc_"+k;
+    var inp=document.createElement("input"); inp.type="radio"; inp.name="simcond"; inp.id=id; inp.value=k; inp.checked=(k===cond);
+    inp.addEventListener("change",function(){cond=k; refreshText();});
+    var lb=document.createElement("label"); lb.htmlFor=id; lb.textContent=T[lang].conds[k][0];
+    box.appendChild(inp); box.appendChild(lb);
+  });
+  var cb=$("catPills"); cb.innerHTML="";
+  ["yellow","blur"].forEach(function(k){
+    var id="simk_"+k;
+    var inp=document.createElement("input"); inp.type="radio"; inp.name="simcat"; inp.id=id; inp.value=k; inp.checked=(k===catType);
+    inp.addEventListener("change",function(){catType=k;});
+    var lb=document.createElement("label"); lb.htmlFor=id; lb.textContent=T[lang].cat[k];
+    cb.appendChild(inp); cb.appendChild(lb);
+  });
+}
+function refreshText(){
+  var t=T[lang];  
+  $("t_brand").textContent=t.brand; $("t_title").textContent=t.title; $("t_sub").textContent=t.sub;
+  $("camBtn").textContent=t.cam; $("stopBtn").textContent=t.stop; $("t_upload").textContent=t.upload; $("snapBtn").textContent=t.snap;
+  $("t_cond").textContent=t.cond; $("t_cattype").textContent=t.cattype; $("t_sev").textContent=t.sev; $("t_cmp").textContent=t.cmp;
+  $("t_orig").textContent=t.orig; $("t_sim").textContent=t.sim; $("placeholder").textContent=t.ph;
+  $("t_symTitle").textContent=t.symTitle; $("t_symText").textContent=t.symText;
+  $("t_warn").innerHTML=t.warn; $("t_foot").textContent=t.foot;
+  $("infoTitle").textContent=t.conds[cond][0]; $("infoText").textContent=t.conds[cond][2];
+  $("catWrap").style.display=(cond==="cataract")?"block":"none";
+  buildPills();
+  $("lhi").setAttribute("aria-pressed",lang==="hi"); $("len").setAttribute("aria-pressed",lang==="en");
+}
+$("lhi").onclick=function(){lang="hi";refreshText();};
+$("len").onclick=function(){lang="en";refreshText();};
+$("sev").addEventListener("input",function(e){sev=e.target.value/100; $("sevVal").textContent=e.target.value+"%";});
+$("cmp").addEventListener("change",function(e){compare=e.target.checked; $("views").classList.toggle("compare",compare);});
+
+function say(m){$("msg").textContent=m||"";}
+
+/* ---------- source handling ---------- */
+function haveSource(){ return (stream && video.videoWidth>0) || imgSrc; }
+function srcSize(){
+  if(stream && video.videoWidth>0) return [video.videoWidth, video.videoHeight];
+  if(imgSrc) return [imgSrc.naturalWidth, imgSrc.naturalHeight];
+  return [0,0];
+}
+function srcEl(){ return (stream && video.videoWidth>0) ? video : imgSrc; }
+
+$("camBtn").onclick=function(){
+  say("");
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ say(T[lang].camErr); return; }
+  navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false}).then(function(s){
+    stopCamera(); imgSrc=null; stream=s; video.srcObject=s; video.play();
+    $("stopBtn").disabled=false; say(T[lang].camOn); start();
+  }).catch(function(){ say(T[lang].camErr); });
+};
+function stopCamera(){
+  if(stream){ stream.getTracks().forEach(function(t){t.stop();}); stream=null; video.srcObject=null; }
+  $("stopBtn").disabled=true;
+}
+$("stopBtn").onclick=function(){ stopCamera(); say(""); if(!imgSrc){ stop(); $("placeholder").style.display="flex"; $("snapBtn").disabled=true; } };
+$("file").addEventListener("change",function(e){
+  var f=e.target.files&&e.target.files[0]; if(!f) return;
+  var url=URL.createObjectURL(f), im=new Image();
+  im.onload=function(){ stopCamera(); imgSrc=im; say(""); start(); };
+  im.onerror=function(){ say(T[lang].camErr); };
+  im.src=url; e.target.value="";
+});
+$("snapBtn").onclick=function(){
+  var a=document.createElement("a"); a.download="chakshu-rakshak-"+cond+".png"; a.href=out.toDataURL("image/png"); a.click();
+};
+
+/* ---------- drawing ---------- */
+function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; var t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+var rand=rng(20260121), spots=[];
+for(var i=0;i<44;i++){ spots.push({x:0.08+rand()*0.84, y:0.08+rand()*0.84, r:0.012+rand()*0.045, k:rand()}); }
+
+function blurInto(ctx, w, h, factor){
+  var tw=Math.max(8,Math.round(w/factor)), th=Math.max(8,Math.round(h/factor));
+  tmp.width=tw; tmp.height=th;
+  tctx.imageSmoothingEnabled=true; tctx.drawImage(ctx.canvas,0,0,w,h,0,0,tw,th);
+  return tmp;
+}
+
+function applyEffect(ctx,w,h,c,s){
+  if(c==="normal"||s<=0) return;
+  var cx=w/2, cy=h/2, m=Math.min(w,h), g;
+
+  if(c==="glaucoma"){
+    var inner=m*(0.62-0.50*s);           /* clear radius shrinks with severity */
+    var outer=inner+m*0.30;
+    g=ctx.createRadialGradient(cx,cy,Math.max(1,inner),cx,cy,outer);
+    g.addColorStop(0,"rgba(0,0,0,0)"); g.addColorStop(1,"rgba(0,0,0,"+(0.80+0.19*s)+")");
+    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+    ctx.fillStyle="rgba(0,0,0,"+(0.80+0.19*s)+")";
+    /* corners beyond the gradient radius */
+    ctx.save(); ctx.globalCompositeOperation="source-over";
+    var far=Math.hypot(cx,cy);
+    if(outer<far){ ctx.beginPath(); ctx.rect(0,0,w,h); ctx.arc(cx,cy,outer,0,Math.PI*2,true); ctx.fill("evenodd"); }
+    ctx.restore();
+  }
+
+  if(c==="cataract"){
+    if(catType==="yellow"){
+      ctx.globalCompositeOperation="multiply";
+      ctx.fillStyle="rgb(255,"+Math.round(255-60*s)+","+Math.round(255-190*s)+")";
+      ctx.fillRect(0,0,w,h);
+      ctx.globalCompositeOperation="source-over";
+      ctx.fillStyle="rgba(235,215,170,"+(0.18*s)+")"; ctx.fillRect(0,0,w,h);
+    } else {
+      var b=blurInto(ctx,w,h,2+14*s);
+      ctx.imageSmoothingEnabled=true; ctx.globalAlpha=0.55+0.45*s; ctx.drawImage(b,0,0,w,h); ctx.globalAlpha=1;
+      g=ctx.createRadialGradient(cx,cy,0,cx,cy,m*0.8);
+      g.addColorStop(0,"rgba(255,255,255,"+(0.15+0.55*s)+")"); g.addColorStop(1,"rgba(255,255,255,"+(0.05+0.15*s)+")");
+      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+    }
+  }
+
+  if(c==="dr"){
+    var n=Math.round(6+36*s), a=0.30+0.55*s;
+    for(var i=0;i<n&&i<spots.length;i++){
+      var p=spots[i], r=p.r*m*(0.8+0.8*s), x=p.x*w, y=p.y*h;
+      var gg=ctx.createRadialGradient(x,y,0,x,y,r);
+      if(p.k<0.8){ gg.addColorStop(0,"rgba(25,0,0,"+a+")"); gg.addColorStop(0.65,"rgba(60,5,5,"+(a*0.6)+")"); gg.addColorStop(1,"rgba(60,5,5,0)"); }
+      else { gg.addColorStop(0,"rgba(215,190,90,"+(a*0.7)+")"); gg.addColorStop(1,"rgba(215,190,90,0)"); }
+      ctx.fillStyle=gg; ctx.beginPath(); ctx.ellipse(x,y,r,r*(0.7+0.5*p.k),p.k*3,0,Math.PI*2); ctx.fill();
+    }
+    ctx.fillStyle="rgba(120,40,30,"+(0.10*s)+")"; ctx.fillRect(0,0,w,h);
+  }
+
+  if(c==="amd"){
+    var R=m*(0.07+0.34*s), x0=cx-w*0.03*s, y0=cy;
+    var bb=blurInto(ctx,w,h,10);
+    ctx.save(); ctx.beginPath(); ctx.arc(x0,y0,R*1.35,0,Math.PI*2); ctx.clip();
+    ctx.imageSmoothingEnabled=true; ctx.drawImage(bb,0,0,w,h); ctx.restore();
+    g=ctx.createRadialGradient(x0,y0,0,x0,y0,R*1.35);
+    g.addColorStop(0,"rgba(18,18,22,"+(0.50+0.48*s)+")"); g.addColorStop(0.7,"rgba(18,18,22,"+(0.35+0.4*s)+")"); g.addColorStop(1,"rgba(18,18,22,0)");
+    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+  }
+}
+
+function frame(){
+  raf=requestAnimationFrame(frame);
+  if(!haveSource()) return;
+  var sz=srcSize(), sw=sz[0], sh=sz[1]; if(!sw||!sh) return;
+  var k=Math.min(1,720/sw), w=Math.round(sw*k), h=Math.round(sh*k);
+  if(out.width!==w||out.height!==h){ out.width=w; out.height=h; orig.width=w; orig.height=h; }
+  var el=srcEl();
+  octx.globalCompositeOperation="source-over"; octx.globalAlpha=1;
+  octx.drawImage(el,0,0,w,h);
+  if(compare) origCtx.drawImage(el,0,0,w,h);
+  applyEffect(octx,w,h,cond,sev);
+}
+function start(){ $("placeholder").style.display="none"; $("snapBtn").disabled=false; if(!raf) frame(); }
+function stop(){ cancelAnimationFrame(raf); raf=0; }
+
+window.simEnter=function(){if(haveSource())start();};
+window.simLeave=function(){stopCamera();stop();};
+refreshText();
+})();
+</script>
 </body>
 </html>
