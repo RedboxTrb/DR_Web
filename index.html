@@ -1212,43 +1212,72 @@ footer{padding:52px 60px 28px;}
 .ex-strip-item.on span{color:var(--teal-d);}
 #ex-msg{margin-top:14px;}
 @media(max-width:640px){.exres-page{padding:22px 16px 56px;}.exres-title{font-size:21px;}}
-/* ── Vision Simulator (educational; browser-only, no model) ── */
-:root{--sim:#E8780A;--sim-d:#C45F00;--sim-bg:rgba(232,120,10,.1);}
-.ch-sim{--ac:var(--sim);--ac-d:var(--sim-d);--ac-bg:var(--sim-bg);}
-.sim-grid{display:grid;grid-template-columns:1.7fr 1fr;gap:18px;margin-bottom:20px;}
-@media(max-width:900px){.sim-grid{grid-template-columns:1fr;}}
-.sim-card{background:var(--white);border:1px solid var(--g200);border-top:3px solid var(--sim);border-radius:14px;padding:16px;}
-.sim-views{display:grid;gap:10px;grid-template-columns:1fr;}
+/* ── Vision Simulator (educational; browser-only, no model). Uses the site's teal theme. ── */
+:root{--sim:var(--teal);--sim-d:var(--teal-d);--sim-bg:rgba(34,183,163,.1);--sim-bd:rgba(34,183,163,.28);}
+.sim-grid{display:grid;gap:14px;margin-bottom:16px;align-items:start;grid-template-columns:1.6fr 1fr;grid-template-rows:auto 1fr;grid-template-areas:"views ctrl" "btns ctrl";}
+.sim-views-wrap{grid-area:views;}
+.sim-btns{grid-area:btns;}
+.sim-ctrl{grid-area:ctrl;}
+@media(max-width:900px){
+  .sim-grid{grid-template-columns:minmax(0,1fr);grid-template-rows:auto;grid-template-areas:"views" "btns" "ctrl";gap:12px;}
+  .sim-views-wrap{position:sticky;top:56px;z-index:20;background:var(--white);padding:6px 0 8px;}
+}
+.sim-card{background:var(--white);border:1px solid var(--g200);border-top:3px solid var(--teal);border-radius:14px;padding:16px;}
+.sim-views{display:grid;gap:8px;grid-template-columns:1fr;}
 .sim-views.compare{grid-template-columns:1fr 1fr;}
-.sim-view{position:relative;background:var(--navy);border-radius:10px;overflow:hidden;min-height:220px;display:flex;align-items:center;justify-content:center;}
-.sim-view canvas{width:100%;height:auto;display:block;}
-.sim-tag{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;padding:2px 8px;border-radius:6px;}
+.sim-view{position:relative;background:var(--navy);border-radius:12px;overflow:hidden;min-height:180px;display:flex;align-items:center;justify-content:center;}
+.sim-view canvas{width:100%;height:auto;max-height:46vh;object-fit:contain;display:block;}
+@media(max-width:900px){.sim-view{min-height:150px;}.sim-view canvas{max-height:34vh;}}
+.sim-tag{position:absolute;left:8px;top:8px;background:rgba(12,16,36,.7);color:#fff;font-size:11px;font-weight:600;padding:3px 9px;border-radius:6px;}
 #sim-origWrap{display:none;}
 .sim-views.compare #sim-origWrap{display:flex;}
-#sim-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--g300);padding:20px;font-size:14px;}
-.sim-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
-.sim-btn{font-family:inherit;font-size:13px;font-weight:600;border:1px solid var(--g200);background:var(--white);color:var(--navy);padding:10px 14px;min-height:44px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;}
-.sim-btn:hover{border-color:var(--sim);}
-.sim-btn.primary{background:var(--sim);border-color:var(--sim);color:#fff;}
-.sim-btn.primary:hover{background:var(--sim-d);}
+#sim-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--g300);padding:20px;font-size:14px;line-height:1.6;}
+.sim-row{display:flex;gap:8px;flex-wrap:wrap;}
+.sim-btn{font-family:inherit;font-size:14px;font-weight:600;border:1px solid var(--g200);background:var(--white);color:var(--navy);padding:10px 16px;min-height:46px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-align:center;}
+.sim-btn:hover{border-color:var(--teal);}
+.sim-btn.primary{background:var(--teal);border-color:var(--teal);color:#fff;}
+.sim-btn.primary:hover{background:var(--teal-d);}
 .sim-btn:disabled{opacity:.5;cursor:default;}
-.sim-btn:focus-visible,.sim-pills input:focus-visible+label{outline:2px solid var(--sim-d);outline-offset:2px;}
+.sim-btn:focus-visible,.sim-pills input:focus-visible+label{outline:2px solid var(--teal-d);outline-offset:2px;}
+@media(max-width:600px){.sim-row .sim-btn{flex:1 1 calc(50% - 8px);padding:10px 8px;font-size:13px;}.sim-row .sim-btn.primary{flex-basis:100%;}}
 #sim-msg{color:var(--red);font-size:13px;margin-top:8px;min-height:1.2em;}
-.sim-lbl{display:block;font-weight:600;font-size:13px;margin:14px 0 6px;color:var(--navy);}
+.sim-lbl{display:block;font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--g500);margin:16px 0 8px;}
 .sim-lbl:first-child{margin-top:0;}
-.sim-pills{display:flex;flex-wrap:wrap;gap:6px;}
+.sim-pills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}
+.sim-gh{grid-column:1/-1;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--g400);margin:8px 0 0;}
+.sim-gh:first-child{margin-top:0;}
 .sim-pills input{position:absolute;opacity:0;pointer-events:none;}
-.sim-pills label{border:1px solid var(--g200);border-radius:999px;padding:7px 13px;cursor:pointer;font-size:13px;background:var(--white);color:var(--navy);}
-.sim-pills input:checked+label{background:var(--sim);border-color:var(--sim);color:#fff;}
-#sim-sev{width:100%;accent-color:var(--sim);}
-.sim-chk{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;}
-.sim-info{background:var(--sim-bg);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:13px;line-height:1.6;}
-.sim-info b{display:block;margin-bottom:2px;}
-.sim-lang{display:inline-flex;margin-bottom:12px;}
-.sim-lang button{font-family:inherit;font-size:13px;border:1px solid var(--g200);background:var(--white);color:var(--navy);padding:6px 12px;cursor:pointer;}
-.sim-lang button:first-child{border-radius:8px 0 0 8px;}
-.sim-lang button:last-child{border-radius:0 8px 8px 0;border-left:0;}
-.sim-lang button[aria-pressed="true"]{background:var(--sim);border-color:var(--sim);color:#fff;}
+.sim-pills label{border:1px solid var(--g200);border-radius:10px;padding:9px 8px;min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;font-size:13px;font-weight:500;line-height:1.25;background:var(--white);color:var(--navy);}
+.sim-pills input:checked+label{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600;}
+.sim-sevrow{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:600;color:var(--navy);margin:16px 0 6px;}
+.sim-sevrow span:last-child{color:var(--teal-d);}
+#sim-sev{width:100%;height:32px;accent-color:var(--teal);}
+.sim-chk{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:13px;min-height:36px;}
+.sim-chk input{width:18px;height:18px;accent-color:var(--teal);}
+.sim-fine{font-size:12px;color:var(--g500);line-height:1.6;margin-top:10px;}
+/* detail card */
+.sim-detail{margin-bottom:16px;}
+.sim-dhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.sim-dtag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal-d);background:var(--sim-bg);border-radius:999px;padding:3px 10px;}
+.sim-detail h2{font-size:22px;color:var(--navy);margin:0;}
+.sim-dcols{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:22px;margin-top:10px;}
+@media(max-width:900px){.sim-dcols{grid-template-columns:minmax(0,1fr);gap:16px;}}
+.sim-detail h3{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal-d);margin:16px 0 6px;}
+.sim-detail h3:first-child{margin-top:0;}
+.sim-detail p{font-size:14px;line-height:1.7;color:var(--g600);margin:0;}
+.sim-detail ul{margin:0;padding-left:18px;font-size:14px;line-height:1.65;color:var(--g600);}
+.sim-detail li{margin-bottom:5px;}
+.sim-note{margin-top:14px;border-radius:10px;padding:11px 13px;font-size:13px;line-height:1.65;background:var(--sim-bg);border:1px solid var(--sim-bd);color:var(--navy);}
+.sim-note.urgent{background:rgba(243,88,88,.09);border-color:rgba(243,88,88,.4);}
+.sim-mod{margin-top:12px;font-size:13px;color:var(--g500);}
+.sim-mod button{font-family:inherit;font-size:13px;font-weight:700;color:#fff;background:var(--teal);border:1px solid var(--teal);border-radius:10px;padding:11px 16px;min-height:44px;cursor:pointer;}
+.sim-mod button:hover{background:var(--teal-d);}
+.sim-fundus-wrap{text-align:center;}
+#sim-fundus{width:100%;max-width:360px;height:auto;border-radius:50%;background:#0b0f1f;display:block;margin:0 auto;}
+.sim-legend{display:flex;flex-direction:column;gap:6px;margin:12px auto 0;max-width:360px;text-align:left;font-size:12.5px;color:var(--g600);}
+.sim-legend div{display:flex;align-items:center;gap:8px;line-height:1.35;}
+.sim-legend i{flex:none;width:12px;height:12px;border-radius:50%;border:1px solid rgba(12,16,36,.25);}
+.sim-cap{font-size:11.5px;color:var(--g400);margin-top:10px;line-height:1.5;}
 </style>
 </head>
 <body>
@@ -1267,6 +1296,7 @@ footer{padding:52px 60px 28px;}
       <a href="#features" onclick="if(document.getElementById('page-home').classList.contains('active')){event.preventDefault();document.getElementById('features').scrollIntoView({behavior:'smooth'});}">About</a>
       <a onclick="showPage('choose')">Demo</a>
       <a onclick="showPage('clinics')">Find a Clinic</a>
+      <a onclick="showPage('sim')">Simulator</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-home" style="display:flex;gap:16px;align-items:center;">
@@ -1428,6 +1458,7 @@ footer{padding:52px 60px 28px;}
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
       <a style="color:var(--teal);font-weight:600;">Demo</a>
+      <a onclick="showPage('sim')">Simulator</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-upload" style="display:flex;gap:12px;align-items:center;">
@@ -1527,6 +1558,7 @@ footer{padding:52px 60px 28px;}
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
       <a onclick="showPage('choose')">Demo</a>
+      <a onclick="showPage('sim')">Simulator</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-validation" style="display:flex;gap:12px;align-items:center;">
@@ -1587,6 +1619,7 @@ footer{padding:52px 60px 28px;}
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
       <a style="color:var(--teal);font-weight:600;" onclick="showPage('choose')">Demo</a>
+      <a onclick="showPage('sim')">Simulator</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-choose" style="display:flex;gap:12px;align-items:center;">
@@ -1645,7 +1678,7 @@ footer{padding:52px 60px 28px;}
         <button type="button" class="ch-card ch-sim" onclick="showPage('sim')">
           <span class="ch-badge">LEARN</span>
           <span class="ch-title">Vision Simulator</span>
-          <span class="ch-desc">Not an analysis &mdash; an educational demo. Point your camera at a room, or load a photo, and see roughly how glaucoma, cataract, diabetic retinopathy or macular degeneration can change what a person sees. Runs in your browser; nothing is uploaded.</span>
+          <span class="ch-desc">Not an analysis &mdash; a teaching demo. Use your camera or a photo to see how glaucoma, diabetic retinopathy, macular disease, vein occlusion, retinal detachment, cataract and more change vision, and what the doctor sees inside the eye. Runs in your browser; nothing is uploaded.</span>
           <span class="ch-go">Open the simulator &rarr;</span>
         </button>
       </div>
@@ -1683,6 +1716,7 @@ footer{padding:52px 60px 28px;}
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
       <a style="color:var(--teal);font-weight:600;" onclick="showPage('choose')">Demo</a>
+      <a onclick="showPage('sim')">Simulator</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-dme" style="display:flex;gap:12px;align-items:center;">
@@ -1783,6 +1817,7 @@ footer{padding:52px 60px 28px;}
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
       <a style="color:var(--teal);font-weight:600;" onclick="showPage('choose')">Demo</a>
+      <a onclick="showPage('sim')">Simulator</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-beta" style="display:flex;gap:12px;align-items:center;">
@@ -1885,6 +1920,7 @@ footer{padding:52px 60px 28px;}
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Analysis</a>
       <a onclick="showPage('upload')">New Analysis</a>
       <a onclick="showPage('clinics')">Find a Clinic</a>
+      <a onclick="showPage('sim')">Simulator</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <div id="nav-guest-analysis" style="display:flex;gap:10px;align-items:center;">
@@ -1995,6 +2031,7 @@ footer{padding:52px 60px 28px;}
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Analysis</a>
       <a onclick="showPage('dme')">New Analysis</a>
       <a onclick="showPage('clinics')">Find a Clinic</a>
+      <a onclick="showPage('sim')">Simulator</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <div id="nav-guest-dmeres" style="display:flex;gap:10px;align-items:center;">
@@ -2041,6 +2078,7 @@ footer{padding:52px 60px 28px;}
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Analysis</a>
       <a onclick="showPage('beta')">New Analysis</a>
       <a onclick="showPage('clinics')">Find a Clinic</a>
+      <a onclick="showPage('sim')">Simulator</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <div id="nav-guest-betares" style="display:flex;gap:10px;align-items:center;">
@@ -2089,6 +2127,7 @@ footer{padding:52px 60px 28px;}
       <a onclick="showPage('home')">Home</a>
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Find a Clinic</a>
       <a onclick="showPage('choose')">Demo</a>
+      <a onclick="showPage('sim')">Simulator</a>
     </div>
     <div class="nav-right">
       <button class="nav-btn-ghost" onclick="showPage('home')">&larr; Back to home</button>
@@ -2177,6 +2216,7 @@ footer{padding:52px 60px 28px;}
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
       <a style="color:var(--teal);font-weight:600;" onclick="showPage('choose')">Demo</a>
+      <a onclick="showPage('sim')">Simulator</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-explore" style="display:flex;gap:12px;align-items:center;">
@@ -2243,6 +2283,7 @@ footer{padding:52px 60px 28px;}
       <a onclick="showPage('home')">Home</a>
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Explorer</a>
       <a onclick="showPage('clinics')">Find a Clinic</a>
+      <a onclick="showPage('sim')">Simulator</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <button class="nav-btn-ghost" onclick="exNewAnalysis()">New analysis</button>
@@ -2259,7 +2300,7 @@ footer{padding:52px 60px 28px;}
 </div>
 
 <!-- ═══════════════════════════════════
-     VISION SIMULATOR: educational only. Pure browser canvas filters; no model, no upload,
+     VISION SIMULATOR: educational only. Pure browser canvas drawing; no model, no upload,
      nothing is sent or saved. Camera/photo never leaves the page.
 ══════════════════════════════════ -->
 <div class="page" id="page-sim">
@@ -2271,7 +2312,8 @@ footer{padding:52px 60px 28px;}
     <div class="nav-links">
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
-      <a style="color:var(--teal);font-weight:600;" onclick="showPage('choose')">Demo</a>
+      <a onclick="showPage('choose')">Demo</a>
+      <a style="color:var(--teal);font-weight:600;" onclick="showPage('sim')">Simulator</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-sim" style="display:flex;gap:12px;align-items:center;">
@@ -2292,45 +2334,66 @@ footer{padding:52px 60px 28px;}
   </nav>
   <div class="upload-hero">
     <h1>Vision <span>Simulator</span></h1>
-    <p id="sim-t_sub"></p>
+    <p>See how common eye diseases change what a person sees &mdash; and what the doctor sees inside the eye. A teaching demo, not a test.</p>
   </div>
   <div class="upload-body">
     <div class="upload-container">
-      <div class="sim-lang" role="group" aria-label="Language">
-        <button type="button" id="sim-lhi" aria-pressed="false">हिंदी</button><button type="button" id="sim-len" aria-pressed="true">English</button>
-      </div>
       <div class="sim-grid">
-        <section class="sim-card">
+        <div class="sim-views-wrap">
           <div class="sim-views" id="sim-views">
-            <div class="sim-view" id="sim-origWrap"><span class="sim-tag" id="sim-t_orig"></span><canvas id="sim-orig" width="640" height="480"></canvas></div>
-            <div class="sim-view" id="sim-mainWrap"><span class="sim-tag" id="sim-t_sim"></span><canvas id="sim-out" width="640" height="480"></canvas><div id="sim-placeholder"></div></div>
+            <div class="sim-view" id="sim-origWrap"><span class="sim-tag">Normal</span><canvas id="sim-orig" width="640" height="480"></canvas></div>
+            <div class="sim-view" id="sim-mainWrap"><span class="sim-tag" id="sim-t_sim">Simulation</span><canvas id="sim-out" width="640" height="480"></canvas><div id="sim-placeholder">Start your camera or choose a photo.<br>Then pick a condition below.</div></div>
           </div>
+        </div>
+        <div class="sim-btns">
           <div class="sim-row">
-            <button type="button" class="sim-btn primary" id="sim-camBtn"></button>
-            <button type="button" class="sim-btn" id="sim-stopBtn" disabled></button>
-            <label class="sim-btn" for="sim-file" id="sim-t_upload"></label>
+            <button type="button" class="sim-btn primary" id="sim-camBtn">Start camera</button>
+            <button type="button" class="sim-btn" id="sim-stopBtn" disabled>Stop camera</button>
+            <label class="sim-btn" for="sim-file">Choose photo</label>
             <input type="file" id="sim-file" accept="image/*" hidden>
-            <button type="button" class="sim-btn" id="sim-snapBtn" disabled></button>
+            <button type="button" class="sim-btn" id="sim-snapBtn" disabled>Save picture</button>
           </div>
           <div id="sim-msg" role="status"></div>
-        </section>
-        <aside class="sim-card">
-          <span class="sim-lbl" id="sim-t_cond"></span>
+        </div>
+        <aside class="sim-card sim-ctrl">
+          <span class="sim-lbl">Condition</span>
           <div class="sim-pills" id="sim-condPills"></div>
           <div id="sim-catWrap" style="display:none">
-            <span class="sim-lbl" id="sim-t_cattype"></span>
+            <span class="sim-lbl">Cataract type</span>
             <div class="sim-pills" id="sim-catPills"></div>
           </div>
-          <label class="sim-lbl" for="sim-sev"><span id="sim-t_sev"></span>: <span id="sim-sevVal">50%</span></label>
+          <div class="sim-sevrow"><label for="sim-sev">Severity</label><span id="sim-sevVal">50% &middot; Moderate</span></div>
           <input type="range" id="sim-sev" min="0" max="100" value="50">
-          <label class="sim-chk"><input type="checkbox" id="sim-cmp"> <span id="sim-t_cmp"></span></label>
-          <div class="sim-info"><b id="sim-infoTitle"></b><span id="sim-infoText"></span></div>
-          <div class="sim-info"><b id="sim-t_symTitle"></b><span id="sim-t_symText"></span></div>
+          <label class="sim-chk"><input type="checkbox" id="sim-cmp"> <span>Show normal vision next to it</span></label>
+          <p class="sim-fine">Severity is illustrative. Real vision loss differs from person to person and eye to eye.</p>
         </aside>
       </div>
+
+      <section class="sim-card sim-detail" id="sim-detail" aria-live="polite">
+        <div class="sim-dhead"><span class="sim-dtag" id="sim-d_tag"></span><h2 id="sim-d_name"></h2></div>
+        <div class="sim-dcols">
+          <div>
+            <h3>What the person sees</h3>
+            <p id="sim-d_see"></p>
+            <h3>What happens in the eye</h3>
+            <p id="sim-d_path"></p>
+            <h3>What the doctor looks for</h3>
+            <ul id="sim-d_signs"></ul>
+            <div class="sim-note" id="sim-d_note"></div>
+            <div class="sim-mod" id="sim-d_mod"></div>
+          </div>
+          <div class="sim-fundus-wrap">
+            <h3 style="text-align:left">Inside the eye (fundus view)</h3>
+            <canvas id="sim-fundus" width="360" height="360" role="img" aria-label="Schematic of the back of the eye for the selected condition"></canvas>
+            <div class="sim-legend" id="sim-legend"></div>
+            <p class="sim-cap">A schematic drawn for teaching, not a real photograph. It changes with the severity slider.</p>
+          </div>
+        </div>
+      </section>
+
       <div class="upload-disclaimer">
-        <div class="disclaimer-title">⚠ Education only — not a test</div>
-        <span id="sim-t_warn"></span>
+        <div class="disclaimer-title">&#9888; Education only &mdash; not a test</div>
+        This simulator does not screen for or diagnose any disease, and it cannot tell you whether you have one. If you notice any of these symptoms, see an eye specialist. Your camera runs only in this browser &mdash; no video or photo is sent or stored anywhere.
       </div>
     </div>
   </div>
@@ -2491,6 +2554,7 @@ footer{padding:52px 60px 28px;}
       <a onclick="showPage('home')">Home</a>
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">My Reports</a>
       <a onclick="showPage('upload')">New Analysis</a>
+      <a onclick="showPage('sim')">Simulator</a>
     </div>
     <div style="display:flex;align-items:center;gap:12px;">
       <span id="reports-nav-name" style="font-size:13px;font-weight:600;color:var(--navy);"></span>
@@ -2539,6 +2603,7 @@ footer{padding:52px 60px 28px;}
     <div class="nav-links">
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('reports')" style="color:var(--teal);">← My Reports</a>
+      <a onclick="showPage('sim')">Simulator</a>
     </div>
     <div style="display:flex;gap:10px;">
       <button class="ar-btn-ghost" onclick="exportSavedReport()">Export PDF</button>
@@ -5694,6 +5759,7 @@ function toggleMobileMenu() {
       <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('home')">Home</a>
       <a class="nav-mobile-link" onclick="closeMobileMenu();document.getElementById('features')&&document.getElementById('features').scrollIntoView({behavior:'smooth'});showPage('home')">About</a>
       <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('choose')">Try Demo</a>
+      <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('sim')">Vision Simulator</a>
       <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('clinics')">Find a Clinic</a>
       <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('validation')">Validation</a>
       <hr class="nav-mobile-divider">
@@ -5735,173 +5801,244 @@ document.addEventListener('click', function(e) {
 </script>
 
 <script>
-/* Vision Simulator: browser-only canvas filters (educational) */
+/* Vision Simulator: browser-only canvas drawing (educational) */
 (function(){
 "use strict";
+function $(id){ return document.getElementById("sim-"+id); }
 
-/* ---------- text (Hindi / English) ---------- */
-var T = {
-  hi:{
-    brand:"चक्षु रक्षक AI", title:"दृष्टि सिमुलेटर",
-    sub:"देखिए कि आँख की बीमारियों में दुनिया कैसी दिखती है। कैमरा चालू करें या कोई फ़ोटो चुनें।",
-    cam:"कैमरा चालू करें", stop:"कैमरा बंद करें", upload:"फ़ोटो चुनें", snap:"तस्वीर सेव करें",
-    cond:"बीमारी चुनें", cattype:"मोतियाबिंद का प्रकार", sev:"गंभीरता", cmp:"असली और सिमुलेशन साथ-साथ दिखाएँ",
-    orig:"असली", sim:"सिमुलेशन", ph:"कैमरा चालू करें या फ़ोटो चुनें",
-    symTitle:"इन लक्षणों पर आँखों की जाँच कराएँ",
-    symText:"धुंधला दिखना, किनारे से कम दिखना, सीधी रेखाएँ टेढ़ी दिखना, आँखों के आगे काले धब्बे, रंग फीके लगना। मधुमेह वाले लोग साल में एक बार जाँच ज़रूर कराएँ।",
-    warn:"<b>केवल शिक्षा के लिए।</b> यह सिमुलेटर बीमारी की जाँच या निदान नहीं करता। असली अनुभव हर मरीज़ में अलग होता है। आँखों की समस्या हो तो नेत्र विशेषज्ञ से मिलें। आपका कैमरा सिर्फ़ इसी ब्राउज़र में चलता है, कोई वीडियो या फ़ोटो कहीं भेजी या सेव नहीं होती।",
-    foot:"चक्षु रक्षक AI · जागरूकता के लिए",
-    camErr:"कैमरा नहीं खुला। अनुमति दें, या ऊपर से फ़ोटो चुनें। (कैमरा सिर्फ़ https या localhost पर चलता है।)",
-    camOn:"कैमरा चालू है।",
-    conds:{
-      normal:["सामान्य दृष्टि","सामान्य दृष्टि","कोई फ़िल्टर नहीं लगा है। इसे तुलना के लिए आधार मानें।"],
-      glaucoma:["काला मोतिया (ग्लूकोमा)","काला मोतिया","किनारे का दृश्य धीरे-धीरे अंधेरा होता जाता है और सिर्फ़ बीच का छोटा हिस्सा दिखता है (सुरंग जैसी दृष्टि)। गंभीरता बढ़ाने पर यह हिस्सा और संकरा होता है।"],
-      cataract:["मोतियाबिंद","मोतियाबिंद","लेंस धुंधला हो जाता है। चीज़ें धुंधली, फीकी और कुछ पीली दिखती हैं और रोशनी चुभती है।"],
-      dr:["डायबिटिक रेटिनोपैथी","डायबिटिक रेटिनोपैथी","नज़र के सामने काले-लाल धब्बे दिखते हैं (रक्तस्राव और सूजन)। गंभीरता बढ़ने पर धब्बे ज़्यादा और बड़े होते हैं।"],
-      amd:["धब्बे की क्षति (AMD)","AMD","देखने के ठीक बीच में काला या धुंधला धब्बा बन जाता है जो बढ़ता है। पढ़ना और चेहरे पहचानना मुश्किल हो जाता है।"]
-    },
-    cat:{yellow:"पीला पड़ना (न्यूक्लियर)", blur:"धुंध और धुंधलापन (कॉर्टिकल)"}
+/* ---------- condition data ---------- */
+var GROUPS=[
+  {h:"Reference", ids:["normal"]},
+  {h:"Retina and optic nerve", ids:["glaucoma","dr","dme","amd","rvo","rd","rp"]},
+  {h:"Lens and vitreous", ids:["cataract","floaters"]}
+];
+var C={
+  normal:{
+    name:"Normal vision", tag:"Reference",
+    see:"Clear, sharp vision with natural colours and a full field of view.",
+    path:"Light is focused by a clear cornea and lens onto the retina. The macula gives sharp central vision and the optic nerve carries the signal to the brain.",
+    signs:["Optic disc: pink rim with a small central cup (cup-to-disc ratio about 0.3–0.4).","Macula: a slightly darker area with a bright pinpoint reflex at the fovea.","Vessels: arteries thinner than veins, smooth branching, no kinks.","Background: even orange-red, with no spots, patches or deposits."],
+    note:{t:"Use this as the baseline. Regular eye checks matter most after 40, and every year for people with diabetes or a family history of glaucoma.",urgent:false},
+    mod:null,
+    legend:function(){ return [["#fbe3a8","Optic disc (cup about 0.35 of the disc)"],["#b44a30","Macula and fovea"],["#7a1410","Veins"],["#c63a2a","Arteries"]]; }
   },
-  en:{
-    brand:"Chakshu Rakshak AI", title:"Vision Simulator",
-    sub:"See how the world looks with common eye conditions. Start your camera or choose a photo.",
-    cam:"Start camera", stop:"Stop camera", upload:"Choose photo", snap:"Save picture",
-    cond:"Condition", cattype:"Cataract type", sev:"Severity", cmp:"Show original and simulation side by side",
-    orig:"Original", sim:"Simulation", ph:"Start the camera or choose a photo",
-    symTitle:"See an eye doctor if you notice",
-    symText:"Blurred vision, loss of side vision, straight lines looking bent, dark spots in your view, or colours looking faded. People with diabetes should get an eye check every year.",
-    warn:"<b>For education only.</b> This simulator does not screen for or diagnose any disease. The real experience differs from person to person. If you have eye problems, see an eye specialist. Your camera runs only in this browser; no video or photo is sent or stored anywhere.",
-    foot:"Chakshu Rakshak AI · for awareness",
-    camErr:"Could not open the camera. Allow permission, or choose a photo instead. (Camera works only on https or localhost.)",
-    camOn:"Camera is on.",
-    conds:{
-      normal:["Normal vision","Normal vision","No filter applied. Use as a baseline for comparison."],
-      glaucoma:["Glaucoma","Glaucoma","Side vision fades to dark, leaving only a small central area (tunnel vision). Higher severity narrows it further."],
-      cataract:["Cataract","Cataract","The lens clouds over. Things look blurred, faded and slightly yellow, and bright light causes glare."],
-      dr:["Diabetic retinopathy","Diabetic retinopathy","Dark red-black spots drift across the view (bleeding and swelling). Higher severity means more and larger spots."],
-      amd:["Macular degeneration (AMD)","AMD","A dark or blurred patch forms right in the centre of vision and grows. Reading and recognising faces become hard."]
-    },
-    cat:{yellow:"Yellowing (nuclear)", blur:"Haze and blur (cortical)"}
+  glaucoma:{
+    name:"Glaucoma", tag:"Optic nerve",
+    see:"Side (peripheral) vision fades first, usually without pain. Central vision stays sharp until late, so people often notice only when much is lost — the “silent thief of sight”. It ends in tunnel vision.",
+    path:"Retinal ganglion cells and their nerve fibres die, often (not always) with raised eye pressure. The optic nerve head slowly hollows out, and the lost field cannot be recovered.",
+    signs:["Optic disc cupping: the pale central cup enlarges. A vertical cup-to-disc ratio (V-CDR) above about 0.65, or a clear difference between the two eyes, is suspicious.","Neuro-retinal rim thinning, graded on the DDLS scale (stages 1–10). The inferior and superior rim is usually lost first.","Retinal nerve fibre layer (RNFL) thinning, measured on OCT.","Splinter-shaped disc haemorrhage at the rim, and vessels that bend sharply over the cup edge.","Visual field: arcuate scotoma and nasal step, then tunnel vision."],
+    note:{t:"Lost vision cannot be restored. Drops, laser or surgery only slow the damage, so finding it early is everything. Get checked if a close relative has glaucoma.",urgent:false},
+    mod:{t:"Glaucoma analysis is planned for this site — it is not available yet."},
+    legend:function(s){ var cdr=(0.35+0.55*s); return [["#fff3d2","Optic cup — cup-to-disc ratio about "+cdr.toFixed(2)+(cdr>=0.65?" (suspicious)":"")],["#e9a650","Neuro-retinal rim (thins as the cup grows)"],["#b01010","Disc haemorrhage (advanced)"]]; }
+  },
+  dr:{
+    name:"Diabetic retinopathy (DR)", tag:"Retina",
+    see:"Early stages usually cause no symptoms. Later: dark floating spots or strings, blurred patches, dim or empty areas, and sudden loss if a vessel bleeds into the eye.",
+    path:"Long-standing high blood sugar damages the tiny retinal vessels. They leak, close off, or grow fragile new vessels that bleed. It is a leading cause of preventable blindness in working-age adults.",
+    signs:["Microaneurysms: tiny red dots, the first visible sign.","Dot-and-blot and flame-shaped haemorrhages.","Hard exudates: yellow fatty deposits left by leaking vessels.","Cotton-wool spots: pale, fluffy patches where nerve fibres lack blood.","Venous beading and abnormal vessel branches (IRMA) in severe disease.","Neovascularisation — fragile new vessels at the disc or elsewhere — and vitreous haemorrhage in proliferative DR.","Grades: 0 no DR, 1 mild, 2 moderate, 3 severe, 4 proliferative."],
+    note:{t:"People with diabetes should have a dilated eye exam at least once a year, even with perfect vision. Laser and injections work best when started early.",urgent:false},
+    mod:{t:"Analyse a fundus photograph for DR →",page:"upload"},
+    legend:function(s){ var l=[["#b01010","Microaneurysms (red dots)"],["#8a0f0f","Dot-and-blot haemorrhages"],["#f3dd7a","Hard exudates (yellow)"]]; if(s>0.35)l.push(["#ffffff","Cotton-wool spots (white, fluffy)"]); if(s>0.75)l.push(["#c01818","New fragile vessels near the disc"]); return l; }
+  },
+  dme:{
+    name:"Diabetic macular oedema (DME)", tag:"Macula",
+    see:"Blurred or wavy central vision. Straight lines look bent, reading gets hard and faces are hard to recognise, while side vision stays normal.",
+    path:"Fluid and fats leak from damaged vessels and swell the macula — the centre of the retina. It is the commonest reason people with diabetes lose reading vision.",
+    signs:["Retinal thickening at or near the fovea — best seen on OCT.","Hard exudates in a ring (circinate) or clusters around the macula.","Microaneurysms and haemorrhages close to the fovea.","Clinically significant when the swelling or exudates involve or threaten the centre of the fovea."],
+    note:{t:"DME can occur at any stage of diabetic retinopathy. Injections and laser can stop it getting worse, but only if it is found in time.",urgent:false},
+    mod:{t:"Grade diabetic macular oedema from a fundus photograph →",page:"dme"},
+    legend:function(){ return [["#f3dd7a","Hard exudates in a ring around the macula"],["#b01010","Microaneurysms"],["#ffe9c0","Swollen (thickened) macula"],["#b44a30","Fovea"]]; }
+  },
+  amd:{
+    name:"Age-related macular degeneration (AMD)", tag:"Macula",
+    see:"A blurred or dark patch right in the centre of vision that slowly grows. Straight lines look wavy, colours fade, and reading and faces become hard. Side vision stays normal.",
+    path:"Ageing damages the macula and the pigment cells beneath it. The dry form thins slowly. The wet form grows leaky new vessels under the retina (choroidal neovascularisation) and can cause sudden loss.",
+    signs:["Drusen: yellow deposits beneath the retina — small and hard, or large and soft.","Pigment changes: clumping or loss of the retinal pigment epithelium.","Geographic atrophy: a sharply edged pale area in advanced dry AMD.","Wet AMD: fluid and bleeding under the retina and a grey-green membrane.","Main risks: age, smoking and family history."],
+    note:{t:"A sudden new distortion or central blur needs an eye check within days — wet AMD is treatable with injections if caught early.",urgent:true},
+    mod:{t:"AMD is covered by the multi-disease screening (beta) →",page:"beta"},
+    legend:function(s){ var l=[["#f0dfa0","Drusen (yellow deposits)"]]; if(s>0.5)l.push(["#f5d2aa","Geographic atrophy (pale patch)"]); if(s>0.75)l.push(["#7a0c0c","Bleeding from a wet-AMD membrane"]); return l; }
+  },
+  rvo:{
+    name:"Retinal vein occlusion (RVO)", tag:"Retina",
+    see:"Sudden blurring or a dark area in part of the vision, usually in one eye, often painless. A smaller branch blockage can be missed.",
+    path:"A retinal vein is blocked by a clot. Blood and fluid back up and leak into the retina. A branch occlusion (BRVO) affects one sector; a central occlusion (CRVO) affects the whole retina.",
+    signs:["Flame-shaped haemorrhages spread along the area drained by the blocked vein.","Dilated, tortuous veins.","Cotton-wool spots.","Macular oedema — the main cause of vision loss.","Linked to high blood pressure, diabetes, high cholesterol and glaucoma."],
+    note:{t:"Get an eye check promptly after sudden blurring in one eye. Treatment (injections, laser) is time-sensitive, and blood pressure and sugar must be controlled.",urgent:true},
+    mod:{t:"RVO is covered by the multi-disease screening (beta) →",page:"beta"},
+    legend:function(){ return [["#8a0f0f","Flame haemorrhages in the blocked sector"],["#5a0d0d","Dilated, tortuous vein"],["#ffffff","Cotton-wool spots"]]; }
+  },
+  rd:{
+    name:"Retinal detachment (RD)", tag:"Retina",
+    see:"A dark shadow or curtain moving in from the side or from below, sudden flashes of light, a shower of new floaters, and blurred vision.",
+    path:"The retina peels away from the wall of the eye, usually after a tear lets fluid seep underneath. A detached retina stops working and, if untreated, dies.",
+    signs:["A retinal tear, often horseshoe-shaped, in the peripheral retina.","Grey, billowing, raised retina with folds; vessels look darker over it.","Pigment cells floating in the vitreous (“tobacco dust”).","Risks: high short-sightedness, previous eye surgery or injury, family history and age."],
+    note:{t:"EMERGENCY. Go to an eye hospital the same day if you see a curtain, new flashes or a sudden shower of floaters. Early surgery can save vision.",urgent:true},
+    mod:null,
+    legend:function(){ return [["#d7cdc6","Detached (raised, grey) retina"],["#c01818","Retinal tear (horseshoe)"],["#3a0c08","Vessels look darker over the detached area"]]; }
+  },
+  rp:{
+    name:"Retinitis pigmentosa (RP)", tag:"Retina",
+    see:"Poor vision at night and in dim light first, then the side vision slowly closes in (tunnel vision), with glare. Central vision may last until late.",
+    path:"An inherited disease of the photoreceptors. The rods, which give night and side vision, die first, then the cones. It usually begins in childhood or the teens.",
+    signs:["Bone-spicule pigment: dark, spidery deposits in the mid-periphery.","Attenuated (thin) retinal arteries.","Waxy pallor of the optic disc.","Ring-shaped field loss that grows into tunnel vision; the electroretinogram (ERG) is reduced or flat.","Inherited — family members may be affected."],
+    note:{t:"There is no routine cure yet, and gene therapy exists for only a few genetic forms. Low-vision aids, regular follow-up and genetic counselling help.",urgent:false},
+    mod:null,
+    legend:function(){ return [["#1a1010","Bone-spicule pigment at the edge of the retina"],["#e2dab8","Waxy pale optic disc"],["#c63a2a","Thin (attenuated) vessels"]]; }
+  },
+  cataract:{
+    name:"Cataract", tag:"Lens (not the retina)",
+    see:"Blurred, hazy, washed-out vision. Colours turn yellow-brown, lights glare and halo, and night driving gets hard.",
+    path:"Proteins in the eye’s lens clump and the lens turns cloudy — mostly with age, also with diabetes, steroids, injury or smoking. The retina behind it may be perfectly healthy.",
+    signs:["Nuclear sclerosis: the centre of the lens yellows and hardens.","Cortical: white spokes growing in from the edge of the lens.","Posterior subcapsular: a plaque at the back of the lens that causes glare and trouble reading.","On a fundus photograph a dense cataract makes the image hazy and dull, which can make retinal analysis unreliable."],
+    note:{t:"Cataract is treatable: the cloudy lens is replaced with a clear artificial one in a short operation, and vision usually improves a lot.",urgent:false},
+    mod:{t:"Cataract analysis is planned for this site — it is not available yet."},
+    legend:function(){ return [["#ffffff","Haze: the lens blocks the view of the retina"]]; }
+  },
+  floaters:{
+    name:"Floaters and flashes", tag:"Vitreous gel",
+    see:"Drifting specks, threads or cobwebs that move when the eyes move and slide away when you try to look at them. Most visible against a bright wall or sky.",
+    path:"The vitreous — the clear gel inside the eye — shrinks and clumps with age or after surgery, casting shadows on the retina. They sit in front of the retina and are not a retinal disease themselves.",
+    signs:["Usually harmless: posterior vitreous detachment is common after about 50 and in short-sighted people.","A sudden shower of new floaters, flashes of light, or a dark curtain can mean a retinal tear or detachment.","The doctor checks the peripheral retina with a dilated exam."],
+    note:{t:"If floaters appear suddenly, increase, or come with flashes or a shadow in your vision, see an eye specialist the same day.",urgent:true},
+    mod:null,
+    legend:function(){ return [["#3a3a3a","Vitreous floaters (shadows cast on the retina)"]]; }
   }
 };
-var ORDER=["normal","glaucoma","cataract","dr","amd"];
-var lang="en", cond="normal", catType="yellow", sev=0.5, compare=false;
 
-/* ---------- elements ---------- */
-function $(id){var e=document.getElementById("sim-"+id); return e||{style:{},classList:{toggle:function(){}},setAttribute:function(){}};}
+/* ---------- state + elements ---------- */
+var cond="normal", catType="yellow", sev=0.5, compare=false;
 var out=$("out"), octx=out.getContext("2d");
 var orig=$("orig"), origCtx=orig.getContext("2d");
 var tmp=document.createElement("canvas"), tctx=tmp.getContext("2d");
+var tmp2=document.createElement("canvas"), t2ctx=tmp2.getContext("2d");
 var video=document.createElement("video"); video.playsInline=true; video.muted=true;
 var stream=null, imgSrc=null, raf=0;
 
-/* ---------- UI text + controls ---------- */
+function sevLabel(s){ return s<0.34?"Mild":(s<0.67?"Moderate":"Severe"); }
+function say(m){ $("msg").textContent=m||""; }
+
+/* ---------- controls ---------- */
 function buildPills(){
   var box=$("condPills"); box.innerHTML="";
-  ORDER.forEach(function(k){
-    var id="simc_"+k;
-    var inp=document.createElement("input"); inp.type="radio"; inp.name="simcond"; inp.id=id; inp.value=k; inp.checked=(k===cond);
-    inp.addEventListener("change",function(){cond=k; refreshText();});
-    var lb=document.createElement("label"); lb.htmlFor=id; lb.textContent=T[lang].conds[k][0];
-    box.appendChild(inp); box.appendChild(lb);
+  GROUPS.forEach(function(g){
+    var h=document.createElement("div"); h.className="sim-gh"; h.textContent=g.h; box.appendChild(h);
+    g.ids.forEach(function(k){
+      var id="simc_"+k;
+      var inp=document.createElement("input"); inp.type="radio"; inp.name="simcond"; inp.id=id; inp.value=k; inp.checked=(k===cond);
+      inp.addEventListener("change",function(){ cond=k; refresh(); });
+      var lb=document.createElement("label"); lb.htmlFor=id; lb.textContent=C[k].name.replace(/ \(.*\)$/,"");
+      box.appendChild(inp); box.appendChild(lb);
+    });
   });
   var cb=$("catPills"); cb.innerHTML="";
-  ["yellow","blur"].forEach(function(k){
-    var id="simk_"+k;
-    var inp=document.createElement("input"); inp.type="radio"; inp.name="simcat"; inp.id=id; inp.value=k; inp.checked=(k===catType);
-    inp.addEventListener("change",function(){catType=k;});
-    var lb=document.createElement("label"); lb.htmlFor=id; lb.textContent=T[lang].cat[k];
+  [["yellow","Yellowing (nuclear)"],["blur","Haze and blur (cortical)"]].forEach(function(p){
+    var id="simk_"+p[0];
+    var inp=document.createElement("input"); inp.type="radio"; inp.name="simcat"; inp.id=id; inp.value=p[0]; inp.checked=(p[0]===catType);
+    inp.addEventListener("change",function(){ catType=p[0]; });
+    var lb=document.createElement("label"); lb.htmlFor=id; lb.textContent=p[1];
     cb.appendChild(inp); cb.appendChild(lb);
   });
 }
-function refreshText(){
-  var t=T[lang];  
-  $("t_brand").textContent=t.brand; $("t_title").textContent=t.title; $("t_sub").textContent=t.sub;
-  $("camBtn").textContent=t.cam; $("stopBtn").textContent=t.stop; $("t_upload").textContent=t.upload; $("snapBtn").textContent=t.snap;
-  $("t_cond").textContent=t.cond; $("t_cattype").textContent=t.cattype; $("t_sev").textContent=t.sev; $("t_cmp").textContent=t.cmp;
-  $("t_orig").textContent=t.orig; $("t_sim").textContent=t.sim; $("placeholder").textContent=t.ph;
-  $("t_symTitle").textContent=t.symTitle; $("t_symText").textContent=t.symText;
-  $("t_warn").innerHTML=t.warn; $("t_foot").textContent=t.foot;
-  $("infoTitle").textContent=t.conds[cond][0]; $("infoText").textContent=t.conds[cond][2];
+function refresh(){
+  var d=C[cond];
+  $("t_sim").textContent=(cond==="normal")?"Normal vision":"Simulation";
+  $("d_tag").textContent=d.tag; $("d_name").textContent=d.name;
+  $("d_see").textContent=d.see; $("d_path").textContent=d.path;
+  var ul=$("d_signs"); ul.innerHTML="";
+  d.signs.forEach(function(t){ var li=document.createElement("li"); li.textContent=t; ul.appendChild(li); });
+  var n=$("d_note"); n.textContent=d.note.t; n.className="sim-note"+(d.note.urgent?" urgent":"");
+  var m=$("d_mod"); m.innerHTML="";
+  if(d.mod && d.mod.page){
+    var b=document.createElement("button"); b.type="button"; b.textContent=d.mod.t;
+    b.addEventListener("click",function(){ if(typeof showPage==="function") showPage(d.mod.page); });
+    m.appendChild(b);
+  } else if(d.mod){ m.textContent=d.mod.t; }
   $("catWrap").style.display=(cond==="cataract")?"block":"none";
-  buildPills();
-  $("lhi").setAttribute("aria-pressed",lang==="hi"); $("len").setAttribute("aria-pressed",lang==="en");
+  $("sevVal").textContent=Math.round(sev*100)+"% · "+sevLabel(sev);
+  /* keep radios in step with the state */
+  var r=document.getElementById("simc_"+cond); if(r) r.checked=true;
+  drawFundus(cond,sev);
+  var lg=$("legend"); lg.innerHTML="";
+  d.legend(sev).forEach(function(e){
+    var row=document.createElement("div"), sw=document.createElement("i"), tx=document.createElement("span");
+    sw.style.background=e[0]; tx.textContent=e[1]; row.appendChild(sw); row.appendChild(tx); lg.appendChild(row);
+  });
+  if(!raf && haveSource()) start();
 }
-$("lhi").onclick=function(){lang="hi";refreshText();};
-$("len").onclick=function(){lang="en";refreshText();};
-$("sev").addEventListener("input",function(e){sev=e.target.value/100; $("sevVal").textContent=e.target.value+"%";});
-$("cmp").addEventListener("change",function(e){compare=e.target.checked; $("views").classList.toggle("compare",compare);});
+$("sev").addEventListener("input",function(e){ sev=e.target.value/100; refresh(); });
+$("cmp").addEventListener("change",function(e){ compare=e.target.checked; $("views").classList.toggle("compare",compare); });
 
-function say(m){$("msg").textContent=m||"";}
-
-/* ---------- source handling ---------- */
+/* ---------- source: camera or photo ---------- */
 function haveSource(){ return (stream && video.videoWidth>0) || imgSrc; }
+function srcEl(){ return (stream && video.videoWidth>0) ? video : imgSrc; }
 function srcSize(){
   if(stream && video.videoWidth>0) return [video.videoWidth, video.videoHeight];
   if(imgSrc) return [imgSrc.naturalWidth, imgSrc.naturalHeight];
   return [0,0];
 }
-function srcEl(){ return (stream && video.videoWidth>0) ? video : imgSrc; }
-
 $("camBtn").onclick=function(){
   say("");
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ say(T[lang].camErr); return; }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ say("The camera is not available here. It works on https pages. You can choose a photo instead."); return; }
   navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false}).then(function(s){
     stopCamera(); imgSrc=null; stream=s; video.srcObject=s; video.play();
-    $("stopBtn").disabled=false; say(T[lang].camOn); start();
-  }).catch(function(){ say(T[lang].camErr); });
+    $("stopBtn").disabled=false; start();
+  }).catch(function(){ say("Could not open the camera. Allow camera permission, or choose a photo instead."); });
 };
 function stopCamera(){
-  if(stream){ stream.getTracks().forEach(function(t){t.stop();}); stream=null; video.srcObject=null; }
+  if(stream){ stream.getTracks().forEach(function(t){ t.stop(); }); stream=null; video.srcObject=null; }
   $("stopBtn").disabled=true;
 }
 $("stopBtn").onclick=function(){ stopCamera(); say(""); if(!imgSrc){ stop(); $("placeholder").style.display="flex"; $("snapBtn").disabled=true; } };
 $("file").addEventListener("change",function(e){
-  var f=e.target.files&&e.target.files[0]; if(!f) return;
+  var f=e.target.files && e.target.files[0]; if(!f) return;
   var url=URL.createObjectURL(f), im=new Image();
   im.onload=function(){ stopCamera(); imgSrc=im; say(""); start(); };
-  im.onerror=function(){ say(T[lang].camErr); };
+  im.onerror=function(){ say("That file could not be opened as an image."); };
   im.src=url; e.target.value="";
 });
 $("snapBtn").onclick=function(){
-  var a=document.createElement("a"); a.download="chakshu-rakshak-"+cond+".png"; a.href=out.toDataURL("image/png"); a.click();
+  var a=document.createElement("a"); a.download="vision-simulator-"+cond+".png"; a.href=out.toDataURL("image/png"); a.click();
 };
 
-/* ---------- drawing ---------- */
+/* ---------- vision effects ---------- */
 function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; var t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
-var rand=rng(20260121), spots=[];
-for(var i=0;i<44;i++){ spots.push({x:0.08+rand()*0.84, y:0.08+rand()*0.84, r:0.012+rand()*0.045, k:rand()}); }
+var R0=rng(20260121);
+var spots=[], flames=[], floaters=[];
+var i;
+for(i=0;i<44;i++) spots.push({x:0.08+R0()*0.84, y:0.08+R0()*0.84, r:0.012+R0()*0.045, k:R0()});
+for(i=0;i<28;i++) flames.push({t:R0(), rad:R0(), k:R0()});
+for(i=0;i<18;i++) floaters.push({x:0.08+R0()*0.84, y:0.08+R0()*0.84, p:R0()*6.28, t:Math.floor(R0()*3), l:30+R0()*70, z:R0()});
 
-function blurInto(ctx, w, h, factor){
+function blurInto(ctx,w,h,factor){
   var tw=Math.max(8,Math.round(w/factor)), th=Math.max(8,Math.round(h/factor));
-  tmp.width=tw; tmp.height=th;
-  tctx.imageSmoothingEnabled=true; tctx.drawImage(ctx.canvas,0,0,w,h,0,0,tw,th);
+  tmp.width=tw; tmp.height=th; tctx.imageSmoothingEnabled=true; tctx.drawImage(ctx.canvas,0,0,w,h,0,0,tw,th);
   return tmp;
 }
+function tunnel(ctx,w,h,inner,outer,a){
+  var cx=w/2, cy=h/2, g=ctx.createRadialGradient(cx,cy,Math.max(1,inner),cx,cy,outer);
+  g.addColorStop(0,"rgba(0,0,0,0)"); g.addColorStop(1,"rgba(0,0,0,"+a+")");
+  ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+}
 
-function applyEffect(ctx,w,h,c,s){
+function applyEffect(ctx,w,h,c,s,now){
   if(c==="normal"||s<=0) return;
-  var cx=w/2, cy=h/2, m=Math.min(w,h), g;
+  var cx=w/2, cy=h/2, m=Math.min(w,h), g, k, p, x, y, r;
 
   if(c==="glaucoma"){
-    var inner=m*(0.62-0.50*s);           /* clear radius shrinks with severity */
-    var outer=inner+m*0.30;
-    g=ctx.createRadialGradient(cx,cy,Math.max(1,inner),cx,cy,outer);
-    g.addColorStop(0,"rgba(0,0,0,0)"); g.addColorStop(1,"rgba(0,0,0,"+(0.80+0.19*s)+")");
-    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-    ctx.fillStyle="rgba(0,0,0,"+(0.80+0.19*s)+")";
-    /* corners beyond the gradient radius */
-    ctx.save(); ctx.globalCompositeOperation="source-over";
-    var far=Math.hypot(cx,cy);
-    if(outer<far){ ctx.beginPath(); ctx.rect(0,0,w,h); ctx.arc(cx,cy,outer,0,Math.PI*2,true); ctx.fill("evenodd"); }
-    ctx.restore();
+    var inner=m*(0.62-0.50*s);
+    tunnel(ctx,w,h,inner,inner+m*0.30,0.80+0.19*s);
+  }
+
+  if(c==="rp"){
+    ctx.fillStyle="rgba(10,16,40,"+(0.12+0.38*s)+")"; ctx.fillRect(0,0,w,h);
+    var ri=m*(0.36-0.27*s);
+    tunnel(ctx,w,h,ri,ri+m*0.09,0.97);
   }
 
   if(c==="cataract"){
     if(catType==="yellow"){
       ctx.globalCompositeOperation="multiply";
-      ctx.fillStyle="rgb(255,"+Math.round(255-60*s)+","+Math.round(255-190*s)+")";
-      ctx.fillRect(0,0,w,h);
+      ctx.fillStyle="rgb(255,"+Math.round(255-60*s)+","+Math.round(255-190*s)+")"; ctx.fillRect(0,0,w,h);
       ctx.globalCompositeOperation="source-over";
       ctx.fillStyle="rgba(235,215,170,"+(0.18*s)+")"; ctx.fillRect(0,0,w,h);
     } else {
@@ -5915,28 +6052,94 @@ function applyEffect(ctx,w,h,c,s){
 
   if(c==="dr"){
     var n=Math.round(6+36*s), a=0.30+0.55*s;
-    for(var i=0;i<n&&i<spots.length;i++){
-      var p=spots[i], r=p.r*m*(0.8+0.8*s), x=p.x*w, y=p.y*h;
-      var gg=ctx.createRadialGradient(x,y,0,x,y,r);
-      if(p.k<0.8){ gg.addColorStop(0,"rgba(25,0,0,"+a+")"); gg.addColorStop(0.65,"rgba(60,5,5,"+(a*0.6)+")"); gg.addColorStop(1,"rgba(60,5,5,0)"); }
-      else { gg.addColorStop(0,"rgba(215,190,90,"+(a*0.7)+")"); gg.addColorStop(1,"rgba(215,190,90,0)"); }
-      ctx.fillStyle=gg; ctx.beginPath(); ctx.ellipse(x,y,r,r*(0.7+0.5*p.k),p.k*3,0,Math.PI*2); ctx.fill();
+    for(k=0;k<n&&k<spots.length;k++){
+      p=spots[k]; r=p.r*m*(0.8+0.8*s); x=p.x*w; y=p.y*h;
+      g=ctx.createRadialGradient(x,y,0,x,y,r);
+      if(p.k<0.8){ g.addColorStop(0,"rgba(25,0,0,"+a+")"); g.addColorStop(0.65,"rgba(60,5,5,"+(a*0.6)+")"); g.addColorStop(1,"rgba(60,5,5,0)"); }
+      else { g.addColorStop(0,"rgba(215,190,90,"+(a*0.7)+")"); g.addColorStop(1,"rgba(215,190,90,0)"); }
+      ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(x,y,r,r*(0.7+0.5*p.k),p.k*3,0,Math.PI*2); ctx.fill();
     }
     ctx.fillStyle="rgba(120,40,30,"+(0.10*s)+")"; ctx.fillRect(0,0,w,h);
   }
 
+  if(c==="dme"){
+    var R=m*(0.20+0.28*s), amp=m*(0.006+0.020*s);
+    if(tmp2.width!==w||tmp2.height!==h){ tmp2.width=w; tmp2.height=h; }
+    t2ctx.drawImage(ctx.canvas,0,0);
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.clip();
+    for(y=cy-R;y<cy+R;y+=3){ ctx.drawImage(tmp2,0,y,w,3,amp*Math.sin(y/(m*0.045)),y,w,3); }
+    ctx.restore();
+    var bd=blurInto(ctx,w,h,4+8*s);
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,R*0.8,0,Math.PI*2); ctx.clip();
+    ctx.globalAlpha=0.55+0.4*s; ctx.imageSmoothingEnabled=true; ctx.drawImage(bd,0,0,w,h); ctx.restore(); ctx.globalAlpha=1;
+    g=ctx.createRadialGradient(cx,cy,0,cx,cy,R);
+    g.addColorStop(0,"rgba(240,236,225,"+(0.18+0.30*s)+")"); g.addColorStop(1,"rgba(240,236,225,0)");
+    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+  }
+
   if(c==="amd"){
-    var R=m*(0.07+0.34*s), x0=cx-w*0.03*s, y0=cy;
+    var Ra=m*(0.07+0.34*s), x0=cx-w*0.03*s;
     var bb=blurInto(ctx,w,h,10);
-    ctx.save(); ctx.beginPath(); ctx.arc(x0,y0,R*1.35,0,Math.PI*2); ctx.clip();
+    ctx.save(); ctx.beginPath(); ctx.arc(x0,cy,Ra*1.35,0,Math.PI*2); ctx.clip();
     ctx.imageSmoothingEnabled=true; ctx.drawImage(bb,0,0,w,h); ctx.restore();
-    g=ctx.createRadialGradient(x0,y0,0,x0,y0,R*1.35);
+    g=ctx.createRadialGradient(x0,cy,0,x0,cy,Ra*1.35);
     g.addColorStop(0,"rgba(18,18,22,"+(0.50+0.48*s)+")"); g.addColorStop(0.7,"rgba(18,18,22,"+(0.35+0.4*s)+")"); g.addColorStop(1,"rgba(18,18,22,0)");
     ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
   }
+
+  if(c==="rvo"){
+    var a0=-Math.PI*0.62, span=Math.PI*(0.30+0.55*s), Rb=Math.hypot(w,h);
+    var bl=blurInto(ctx,w,h,6+8*s);
+    ctx.save(); ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,Rb,a0,a0+span); ctx.closePath(); ctx.clip();
+    ctx.imageSmoothingEnabled=true; ctx.globalAlpha=0.9; ctx.drawImage(bl,0,0,w,h); ctx.globalAlpha=1;
+    ctx.fillStyle="rgba(28,0,0,"+(0.28+0.50*s)+")"; ctx.fillRect(0,0,w,h);
+    var nf=Math.round(8+20*s);
+    for(k=0;k<nf&&k<flames.length;k++){
+      p=flames[k]; var ang=a0+p.t*span, rr=(0.12+0.78*p.rad)*m*0.62;
+      x=cx+Math.cos(ang)*rr; y=cy+Math.sin(ang)*rr;
+      ctx.fillStyle="rgba(135,8,8,"+(0.45+0.3*p.k)+")";
+      ctx.beginPath(); ctx.ellipse(x,y,m*(0.03+0.03*p.k),m*0.011,ang,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  if(c==="rd"){
+    var R2=w*(0.30+0.85*s), px=w+m*0.15, py=h*0.62;
+    g=ctx.createRadialGradient(px,py,0,px,py,R2);
+    g.addColorStop(0,"rgba(0,0,0,0.95)"); g.addColorStop(0.82,"rgba(0,0,0,0.92)"); g.addColorStop(1,"rgba(0,0,0,0)");
+    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+    var ph=now%2600;
+    if(ph<150){
+      var ex=px-R2*0.9;
+      g=ctx.createRadialGradient(ex,py,0,ex,py,m*0.30);
+      g.addColorStop(0,"rgba(255,255,255,"+(0.55*(1-ph/150))+")"); g.addColorStop(1,"rgba(255,255,255,0)");
+      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+    }
+  }
+
+  if(c==="floaters"){
+    var nfl=Math.round(3+15*s), sc=m/480;
+    ctx.save(); ctx.lineCap="round"; ctx.shadowColor="rgba(30,30,30,0.55)"; ctx.shadowBlur=4;
+    for(k=0;k<nfl&&k<floaters.length;k++){
+      p=floaters[k];
+      x=(p.x+0.035*Math.sin(now/2600+p.p))*w; y=(p.y+0.03*Math.cos(now/3100+p.p*1.7))*h;
+      var col="rgba(30,30,30,"+(0.34+0.26*s)+")"; ctx.strokeStyle=col; ctx.fillStyle=col;
+      var L=p.l*sc;
+      if(p.t===0){
+        ctx.lineWidth=(1.5+p.z*2.5)*sc+0.5; ctx.beginPath(); ctx.moveTo(x,y);
+        ctx.bezierCurveTo(x+L*0.3,y-L*0.4,x+L*0.6,y+L*0.4,x+L,y); ctx.stroke();
+      } else if(p.t===1){
+        for(var j=0;j<4;j++){ ctx.beginPath(); ctx.arc(x+j*7*sc,y+Math.sin(j*1.7)*5*sc,(1.5+p.z*3)*sc,0,Math.PI*2); ctx.fill(); }
+      } else {
+        ctx.beginPath(); ctx.ellipse(x,y,L*0.28,L*0.13,p.p,0,Math.PI*2); ctx.globalAlpha=0.5; ctx.fill(); ctx.globalAlpha=1;
+      }
+    }
+    ctx.restore();
+  }
 }
 
-function frame(){
+/* ---------- main loop ---------- */
+function frame(now){
   raf=requestAnimationFrame(frame);
   if(!haveSource()) return;
   var sz=srcSize(), sw=sz[0], sh=sz[1]; if(!sw||!sh) return;
@@ -5946,15 +6149,117 @@ function frame(){
   octx.globalCompositeOperation="source-over"; octx.globalAlpha=1;
   octx.drawImage(el,0,0,w,h);
   if(compare) origCtx.drawImage(el,0,0,w,h);
-  applyEffect(octx,w,h,cond,sev);
+  applyEffect(octx,w,h,cond,sev,now||0);
 }
-function start(){ $("placeholder").style.display="none"; $("snapBtn").disabled=false; if(!raf) frame(); }
+function start(){ $("placeholder").style.display="none"; $("snapBtn").disabled=false; if(!raf) raf=requestAnimationFrame(frame); }
 function stop(){ cancelAnimationFrame(raf); raf=0; }
 
-window.simEnter=function(){if(haveSource())start();};
-window.simLeave=function(){stopCamera();stop();};
-refreshText();
+/* ---------- fundus schematic ---------- */
+var ARC=[[262,172,235,140,190,100,130,70],[262,172,235,205,190,250,130,290],[262,172,285,140,300,110,310,80],[262,172,285,205,300,240,310,270]];
+var BR=[[215,128,190,150,170,160,155,175],[212,222,190,205,170,198,155,190]];
+function bez(x,a,dy){ x.beginPath(); x.moveTo(a[0],a[1]+dy); x.bezierCurveTo(a[2],a[3]+dy,a[4],a[5]+dy,a[6],a[7]+dy); x.stroke(); }
+function bezPt(a,t){ var u=1-t; return [u*u*u*a[0]+3*u*u*t*a[2]+3*u*t*t*a[4]+t*t*t*a[6], u*u*u*a[1]+3*u*u*t*a[3]+3*u*t*t*a[5]+t*t*t*a[7]]; }
+function blot(x,px,py,rx,ry,rot,col){ x.fillStyle=col; x.beginPath(); x.ellipse(px,py,rx,ry,rot,0,Math.PI*2); x.fill(); }
+function fuzz(x,px,py,r,rgb,a){ var g=x.createRadialGradient(px,py,0,px,py,r); g.addColorStop(0,"rgba("+rgb+","+a+")"); g.addColorStop(1,"rgba("+rgb+",0)"); x.fillStyle=g; x.beginPath(); x.arc(px,py,r,0,Math.PI*2); x.fill(); }
+
+function drawFundus(c,s){
+  var cv=$("fundus"), x=cv.getContext("2d"), W=cv.width, H=cv.height;
+  var CX=180, CY=180, RAD=168, D={x:262,y:172}, M={x:150,y:182};
+  var rn=rng(11), q;
+  function pickNear(cx0,cy0,rmax){ var a=rn()*6.283, d=Math.sqrt(rn())*rmax; return [cx0+Math.cos(a)*d, cy0+Math.sin(a)*d]; }
+  x.clearRect(0,0,W,H); x.fillStyle="#0b0f1f"; x.fillRect(0,0,W,H);
+  x.save(); x.beginPath(); x.arc(CX,CY,RAD,0,Math.PI*2); x.clip();
+  var bg=x.createRadialGradient(CX-10,CY,10,CX,CY,RAD);
+  bg.addColorStop(0,"#ee9158"); bg.addColorStop(0.6,"#d4683c"); bg.addColorStop(1,"#8e3220");
+  x.fillStyle=bg; x.fillRect(0,0,W,H);
+  fuzz(x,M.x,M.y,30,"110,30,12",0.55);
+
+  /* vessels */
+  var thin=(c==="rp")?(1-0.55*s):1;
+  x.lineCap="round";
+  x.strokeStyle="#7a1410"; x.lineWidth=4*thin; ARC.forEach(function(a){ bez(x,a,2.5); });
+  x.strokeStyle="#c63a2a"; x.lineWidth=2.6*thin; ARC.forEach(function(a){ bez(x,a,-1); });
+  x.strokeStyle="#a52a1f"; x.lineWidth=1.8*thin; BR.forEach(function(a){ bez(x,a,0); });
+  if(c==="rvo"){
+    x.strokeStyle="#4a0b0b"; x.lineWidth=5+3*s; x.beginPath(); var a1=ARC[0];
+    for(var t=0;t<=1.001;t+=0.04){ q=bezPt(a1,t); var off=Math.sin(t*22)*(2+4*s); if(t===0)x.moveTo(q[0],q[1]+3+off); else x.lineTo(q[0],q[1]+3+off); }
+    x.stroke();
+  }
+
+  /* optic disc */
+  var cup=0.35, pale=(c==="rp");
+  if(c==="glaucoma") cup=0.35+0.55*s;
+  var dg=x.createRadialGradient(D.x,D.y,2,D.x,D.y,24);
+  if(pale){ dg.addColorStop(0,"#f6f0d6"); dg.addColorStop(1,"#d3c99c"); } else { dg.addColorStop(0,"#fbe3a8"); dg.addColorStop(1,"#e9a650"); }
+  if(c==="rvo") fuzz(x,D.x,D.y,34,"250,190,130",0.5);
+  x.fillStyle=dg; x.beginPath(); x.ellipse(D.x,D.y,19,23,0,0,Math.PI*2); x.fill();
+  x.strokeStyle="rgba(150,75,20,0.75)"; x.lineWidth=1.6; x.stroke();
+  x.fillStyle="#fffbea"; x.beginPath(); x.ellipse(D.x-1,D.y,19*cup,23*cup,0,0,Math.PI*2); x.fill();
+  x.strokeStyle="rgba(205,150,70,0.8)"; x.lineWidth=1; x.stroke();
+  fuzz(x,M.x,M.y,5,"150,50,25",0.9);
+
+  /* condition overlays */
+  var k, p, n;
+  if(c==="glaucoma" && s>0.5){ x.strokeStyle="#b01010"; x.lineWidth=2; x.beginPath(); x.moveTo(D.x-4,D.y+19); x.lineTo(D.x+3,D.y+26); x.stroke(); }
+  if(c==="dr"){
+    n=Math.round(3+16*s); for(k=0;k<n;k++){ p=pickNear(M.x+20,M.y,95); blot(x,p[0],p[1],2.2,2.2,0,"#b01010"); }
+    n=Math.round(1+9*s); for(k=0;k<n;k++){ p=pickNear(M.x+25,M.y,90); blot(x,p[0],p[1],5+rn()*5,3.5+rn()*3,rn()*3,"rgba(138,15,15,0.9)"); }
+    n=Math.round(2+12*s); for(k=0;k<n;k++){ p=pickNear(M.x+10,M.y+5,75); blot(x,p[0],p[1],2+rn()*2,2+rn()*2,0,"#f3dd7a"); }
+    if(s>0.35){ n=Math.round(1+4*s); for(k=0;k<n;k++){ p=pickNear(M.x+50,M.y,100); fuzz(x,p[0],p[1],9+rn()*5,"255,255,255",0.85); } }
+    if(s>0.75){ x.strokeStyle="#c01818"; x.lineWidth=1.2; for(k=0;k<3;k++){ x.beginPath(); x.moveTo(D.x-18,D.y-10+k*9); x.bezierCurveTo(D.x-36,D.y-26+k*12,D.x-30,D.y+4+k*6,D.x-50,D.y-12+k*14); x.stroke(); } }
+  }
+  if(c==="dme"){
+    fuzz(x,M.x,M.y,48,"255,236,190",0.14+0.34*s);
+    n=Math.round(6+26*s); for(k=0;k<n;k++){ var an=rn()*6.283, rr=32+rn()*16-s*6; blot(x,M.x+Math.cos(an)*rr,M.y+Math.sin(an)*rr,1.8+rn()*2.2,1.8+rn()*2.2,0,"#f3dd7a"); }
+    n=Math.round(3+6*s); for(k=0;k<n;k++){ p=pickNear(M.x,M.y,45); blot(x,p[0],p[1],2.2,2.2,0,"#b01010"); }
+  }
+  if(c==="amd"){
+    n=Math.round(8+34*s); for(k=0;k<n;k++){ p=pickNear(M.x,M.y,38); x.globalAlpha=0.9; blot(x,p[0],p[1],2+rn()*2.6,2+rn()*2.6,0,"#f0dfa0"); x.globalAlpha=1; }
+    if(s>0.5){ var gr=10+24*(s-0.5); x.fillStyle="rgba(245,210,170,0.88)"; x.beginPath(); x.ellipse(M.x,M.y,gr,gr*0.85,0.3,0,Math.PI*2); x.fill(); x.strokeStyle="rgba(190,110,80,0.5)"; x.lineWidth=1; x.beginPath(); x.moveTo(M.x-gr*0.7,M.y-2); x.lineTo(M.x+gr*0.6,M.y+4); x.stroke(); }
+    if(s>0.75){ fuzz(x,M.x+16,M.y-14,16,"150,160,120",0.55); blot(x,M.x+18,M.y-12,9,6,0.5,"rgba(122,12,12,0.9)"); }
+  }
+  if(c==="rvo"){
+    var a2=ARC[0]; n=Math.round(6+22*s);
+    for(k=0;k<n;k++){ q=bezPt(a2,rn()); var tg=bezPt(a2,Math.min(1,0.5)); var side=(rn()-0.5)*2*(14+22*s); blot(x,q[0]+side*0.3,q[1]+side,6+rn()*5,1.8+rn()*1.2,-0.7+rn()*0.4,"rgba(138,15,15,0.85)"); }
+    n=Math.round(1+3*s); for(k=0;k<n;k++){ q=bezPt(a2,0.3+rn()*0.4); fuzz(x,q[0]-6,q[1]-8,8,"255,255,255",0.8); }
+  }
+  if(c==="rd"){
+    var rr2=70+170*s, bx=60, by=300;
+    x.save(); x.beginPath(); x.arc(bx,by,rr2,0,Math.PI*2); x.clip();
+    x.fillStyle="rgba(215,205,198,0.66)"; x.fillRect(0,0,W,H);
+    x.strokeStyle="rgba(255,255,255,0.35)"; x.lineWidth=2; for(k=0;k<4;k++){ x.beginPath(); x.moveTo(bx-rr2,by-30*k+10); x.bezierCurveTo(bx-rr2/2,by-40*k-14,bx+rr2/3,by-26*k+18,bx+rr2,by-34*k); x.stroke(); }
+    x.strokeStyle="rgba(58,12,8,0.7)"; x.lineWidth=2.4; ARC.forEach(function(a){ bez(x,a,0); });
+    x.restore();
+    x.strokeStyle="rgba(255,255,255,0.55)"; x.lineWidth=2; x.beginPath(); x.arc(bx,by,rr2,0,Math.PI*2); x.stroke();
+    var ta=-0.9; x.strokeStyle="#c01818"; x.lineWidth=3; x.beginPath(); x.arc(bx+Math.cos(ta)*rr2,by+Math.sin(ta)*rr2,9,ta+2.2,ta+5.2); x.stroke();
+  }
+  if(c==="rp"){
+    n=Math.round(25+110*s);
+    for(k=0;k<n;k++){ var ang=rn()*6.283, rad=100+rn()*60; var px=CX+Math.cos(ang)*rad, py=CY+Math.sin(ang)*rad, L=5+rn()*6; x.strokeStyle="rgba(20,12,12,0.85)"; x.lineWidth=1.4; x.beginPath(); x.moveTo(px,py); x.lineTo(px+Math.cos(ang+0.9)*L,py+Math.sin(ang+0.9)*L); x.moveTo(px,py); x.lineTo(px+Math.cos(ang-0.8)*L*0.8,py+Math.sin(ang-0.8)*L*0.8); x.moveTo(px,py); x.lineTo(px+Math.cos(ang)*L*0.6,py+Math.sin(ang)*L*0.6); x.stroke(); }
+    x.fillStyle="rgba(0,0,0,"+(0.16*s)+")"; x.fillRect(0,0,W,H);
+  }
+  if(c==="cataract"){
+    tmp.width=90; tmp.height=90; tctx.imageSmoothingEnabled=true; tctx.drawImage(cv,0,0,W,H,0,0,90,90);
+    x.globalAlpha=0.55+0.4*s; x.imageSmoothingEnabled=true; x.drawImage(tmp,0,0,90,90,0,0,W,H); x.globalAlpha=1;
+    x.fillStyle="rgba(255,255,255,"+(0.12+0.45*s)+")"; x.fillRect(0,0,W,H);
+  }
+  if(c==="floaters"){
+    x.strokeStyle="rgba(40,40,40,0.5)"; x.lineWidth=2; x.lineCap="round";
+    n=Math.round(3+8*s);
+    for(k=0;k<n;k++){ var fx=60+rn()*240, fy=60+rn()*240; x.beginPath(); x.moveTo(fx,fy); x.bezierCurveTo(fx+14,fy-18,fx+30,fy+16,fx+46,fy); x.stroke(); }
+  }
+  x.restore();
+  x.strokeStyle="rgba(0,0,0,0.55)"; x.lineWidth=3; x.beginPath(); x.arc(CX,CY,RAD,0,Math.PI*2); x.stroke();
+}
+
+/* ---------- page hooks ---------- */
+window.simEnter=function(){ if(haveSource()) start(); };
+window.simLeave=function(){ stopCamera(); stop(); };
+
+buildPills();
+refresh();
 })();
+
 </script>
 </body>
 </html>
