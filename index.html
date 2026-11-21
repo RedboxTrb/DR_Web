@@ -1214,54 +1214,54 @@ footer{padding:52px 60px 28px;}
 @media(max-width:640px){.exres-page{padding:22px 16px 56px;}.exres-title{font-size:21px;}}
 /* ── Vision Simulator (educational; browser-only, no model). Uses the site's teal theme. ── */
 :root{--sim:var(--teal);--sim-d:var(--teal-d);--sim-bg:rgba(34,183,163,.1);--sim-bd:rgba(34,183,163,.28);}
-.sim-grid{display:grid;gap:14px;margin-bottom:16px;align-items:start;grid-template-columns:1.6fr 1fr;grid-template-rows:auto 1fr;grid-template-areas:"views ctrl" "btns ctrl";}
-.sim-views-wrap{grid-area:views;}
-.sim-btns{grid-area:btns;}
-.sim-ctrl{grid-area:ctrl;}
-@media(max-width:900px){
-  .sim-grid{grid-template-columns:minmax(0,1fr);grid-template-rows:auto;grid-template-areas:"views" "btns" "ctrl";gap:12px;}
-  .sim-views-wrap{position:sticky;top:56px;z-index:20;background:var(--white);padding:6px 0 8px;}
-}
+.sim-top{margin-bottom:14px;}
 .sim-card{background:var(--white);border:1px solid var(--g200);border-top:3px solid var(--teal);border-radius:14px;padding:16px;}
-.sim-views{display:grid;gap:8px;grid-template-columns:1fr;}
+.sim-views{display:grid;gap:10px;grid-template-columns:1fr;}
 .sim-views.compare{grid-template-columns:1fr 1fr;}
-.sim-view{position:relative;background:var(--navy);border-radius:12px;overflow:hidden;min-height:180px;display:flex;align-items:center;justify-content:center;}
-.sim-view canvas{width:100%;height:auto;max-height:46vh;object-fit:contain;display:block;}
-@media(max-width:900px){.sim-view{min-height:150px;}.sim-view canvas{max-height:34vh;}}
+.sim-view{position:relative;background:var(--navy);border-radius:12px;overflow:hidden;min-height:200px;display:flex;align-items:center;justify-content:center;}
+.sim-view canvas{width:100%;height:auto;max-height:58vh;object-fit:contain;display:block;}
 .sim-tag{position:absolute;left:8px;top:8px;background:rgba(12,16,36,.7);color:#fff;font-size:11px;font-weight:600;padding:3px 9px;border-radius:6px;}
 #sim-origWrap{display:none;}
 .sim-views.compare #sim-origWrap{display:flex;}
 #sim-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--g300);padding:20px;font-size:14px;line-height:1.6;}
-.sim-row{display:flex;gap:8px;flex-wrap:wrap;}
+/* condition picker: sits right under the two views, chips laid out across the page */
+.sim-picker{margin-top:12px;}
+.sim-lbl{display:block;font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--g500);margin:0 0 8px;}
+.sim-picker .sim-lbl+.sim-pills-sub{margin-top:0;}
+#sim-catWrap{margin-top:12px;}
+.sim-pills{display:flex;flex-wrap:wrap;gap:8px;position:relative;}
+.sim-gh{flex:0 0 100%;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--g400);margin:8px 0 0;}
+.sim-gh:first-child{margin-top:0;}
+.sim-pills input{position:absolute;opacity:0;pointer-events:none;}
+.sim-pills label{flex:none;border:1px solid var(--g200);border-radius:999px;padding:9px 15px;min-height:42px;display:flex;align-items:center;text-align:center;cursor:pointer;font-size:13px;font-weight:500;line-height:1.2;background:var(--white);color:var(--navy);white-space:nowrap;}
+.sim-pills input:checked+label{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600;}
+.sim-btn:focus-visible,.sim-pills input:focus-visible+label,.sim-seg input:focus-visible+label{outline:2px solid var(--teal-d);outline-offset:2px;}
+.sim-sevbar{display:grid;grid-template-columns:1fr auto;gap:2px 28px;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--g200);}
+.sim-sevrow{grid-column:1;display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:600;color:var(--navy);margin:0;}
+.sim-sevrow span:last-child{color:var(--teal-d);}
+#sim-sev{grid-column:1;width:100%;height:32px;accent-color:var(--teal);margin:0;}
+.sim-chk{grid-column:2;grid-row:1 / span 2;display:flex;align-items:center;gap:10px;font-size:13px;min-height:36px;}
+.sim-chk input{width:18px;height:18px;accent-color:var(--teal);}
+/* camera controls */
+.sim-btns{margin-bottom:16px;}
+.sim-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
 .sim-btn{font-family:inherit;font-size:14px;font-weight:600;border:1px solid var(--g200);background:var(--white);color:var(--navy);padding:10px 16px;min-height:46px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-align:center;}
 .sim-btn:hover{border-color:var(--teal);}
 .sim-btn.primary{background:var(--teal);border-color:var(--teal);color:#fff;}
 .sim-btn.primary:hover{background:var(--teal-d);}
 .sim-btn:disabled{opacity:.5;cursor:default;}
-.sim-btn:focus-visible,.sim-pills input:focus-visible+label{outline:2px solid var(--teal-d);outline-offset:2px;}
-@media(max-width:600px){.sim-row .sim-btn{flex:1 1 calc(50% - 8px);padding:10px 8px;font-size:13px;}.sim-row .sim-btn.primary{flex-basis:100%;}}
+.sim-seg{display:inline-flex;border:1px solid var(--g200);border-radius:12px;overflow:hidden;background:var(--white);}
+.sim-seg input{position:absolute;opacity:0;pointer-events:none;}
+.sim-seg label{padding:10px 16px;min-height:46px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;font-weight:600;color:var(--navy);}
+.sim-seg input:checked+label{background:var(--teal);color:#fff;}
 #sim-msg{color:var(--red);font-size:13px;margin-top:8px;min-height:1.2em;}
-.sim-lbl{display:block;font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--g500);margin:16px 0 8px;}
-.sim-lbl:first-child{margin-top:0;}
-.sim-pills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}
-.sim-gh{grid-column:1/-1;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--g400);margin:8px 0 0;}
-.sim-gh:first-child{margin-top:0;}
-.sim-pills input{position:absolute;opacity:0;pointer-events:none;}
-.sim-pills label{border:1px solid var(--g200);border-radius:10px;padding:9px 8px;min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;font-size:13px;font-weight:500;line-height:1.25;background:var(--white);color:var(--navy);}
-.sim-pills input:checked+label{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600;}
-.sim-sevrow{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:600;color:var(--navy);margin:16px 0 6px;}
-.sim-sevrow span:last-child{color:var(--teal-d);}
-#sim-sev{width:100%;height:32px;accent-color:var(--teal);}
-.sim-chk{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:13px;min-height:36px;}
-.sim-chk input{width:18px;height:18px;accent-color:var(--teal);}
-.sim-fine{font-size:12px;color:var(--g500);line-height:1.6;margin-top:10px;}
+.sim-fine{font-size:12px;color:var(--g500);line-height:1.6;margin:6px 0 0;}
 /* detail card */
 .sim-detail{margin-bottom:16px;}
 .sim-dhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
 .sim-dtag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal-d);background:var(--sim-bg);border-radius:999px;padding:3px 10px;}
 .sim-detail h2{font-size:22px;color:var(--navy);margin:0;}
 .sim-dcols{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:22px;margin-top:10px;}
-@media(max-width:900px){.sim-dcols{grid-template-columns:minmax(0,1fr);gap:16px;}}
 .sim-detail h3{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal-d);margin:16px 0 6px;}
 .sim-detail h3:first-child{margin-top:0;}
 .sim-detail p{font-size:14px;line-height:1.7;color:var(--g600);margin:0;}
@@ -1278,6 +1278,30 @@ footer{padding:52px 60px 28px;}
 .sim-legend div{display:flex;align-items:center;gap:8px;line-height:1.35;}
 .sim-legend i{flex:none;width:12px;height:12px;border-radius:50%;border:1px solid rgba(12,16,36,.25);}
 .sim-cap{font-size:11.5px;color:var(--g400);margin-top:10px;line-height:1.5;}
+/* phones and small tablets: views + condition strip + severity stay pinned at the top */
+@media(max-width:900px){
+  .sim-top{position:sticky;top:56px;z-index:20;background:var(--white);padding:6px 0 4px;margin-bottom:10px;}
+  .sim-views{gap:6px;}
+  .sim-view{min-height:120px;border-radius:10px;}
+  .sim-view canvas{max-height:30vh;}
+  .sim-picker{margin-top:6px;padding:6px 0 0;border:0;border-radius:0;}
+  .sim-picker>.sim-lbl{display:none;}
+  .sim-pills{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:6px;padding-bottom:4px;}
+  .sim-pills::-webkit-scrollbar{display:none;}
+  .sim-gh{display:none;}
+  .sim-pills label{padding:8px 14px;min-height:40px;}
+  #sim-catWrap{margin-top:6px;}
+  #sim-catWrap .sim-lbl{display:none;}
+  .sim-pills-sub{flex-wrap:wrap;overflow:visible;}
+  .sim-sevbar{grid-template-columns:1fr;gap:0;margin-top:4px;padding-top:6px;}
+  .sim-chk{grid-column:1;grid-row:auto;min-height:30px;margin-top:0;}
+  #sim-sev{height:28px;}
+  .sim-dcols{grid-template-columns:minmax(0,1fr);gap:16px;}
+  .sim-seg{flex:1 1 100%;}
+  .sim-seg label{flex:1;}
+  .sim-row .sim-btn{flex:1 1 calc(50% - 8px);padding:10px 8px;font-size:13px;}
+  .sim-row .sim-btn.primary{flex-basis:100%;}
+}
 </style>
 </head>
 <body>
@@ -2338,35 +2362,41 @@ footer{padding:52px 60px 28px;}
   </div>
   <div class="upload-body">
     <div class="upload-container">
-      <div class="sim-grid">
-        <div class="sim-views-wrap">
-          <div class="sim-views compare" id="sim-views">
-            <div class="sim-view" id="sim-origWrap"><span class="sim-tag">Normal</span><canvas id="sim-orig" width="640" height="480"></canvas></div>
-            <div class="sim-view" id="sim-mainWrap"><span class="sim-tag" id="sim-t_sim">Simulation</span><canvas id="sim-out" width="640" height="480"></canvas><div id="sim-placeholder">Start your camera or choose a photo.<br>Then pick a condition below.</div></div>
-          </div>
+
+      <div class="sim-top">
+        <div class="sim-views compare" id="sim-views">
+          <div class="sim-view" id="sim-origWrap"><span class="sim-tag">Normal</span><canvas id="sim-orig" width="640" height="480"></canvas></div>
+          <div class="sim-view" id="sim-mainWrap"><span class="sim-tag" id="sim-t_sim">Simulation</span><canvas id="sim-out" width="640" height="480"></canvas><div id="sim-placeholder">Start your camera or choose a photo.<br>Then pick a condition below.</div></div>
         </div>
-        <div class="sim-btns">
-          <div class="sim-row">
-            <button type="button" class="sim-btn primary" id="sim-camBtn">Start camera</button>
-            <button type="button" class="sim-btn" id="sim-stopBtn" disabled>Stop camera</button>
-            <label class="sim-btn" for="sim-file">Choose photo</label>
-            <input type="file" id="sim-file" accept="image/*" hidden>
-            <button type="button" class="sim-btn" id="sim-snapBtn" disabled>Save picture</button>
-          </div>
-          <div id="sim-msg" role="status"></div>
-        </div>
-        <aside class="sim-card sim-ctrl">
+        <div class="sim-picker sim-card">
           <span class="sim-lbl">Condition</span>
           <div class="sim-pills" id="sim-condPills"></div>
           <div id="sim-catWrap" style="display:none">
             <span class="sim-lbl">Cataract type</span>
-            <div class="sim-pills" id="sim-catPills"></div>
+            <div class="sim-pills sim-pills-sub" id="sim-catPills"></div>
           </div>
-          <div class="sim-sevrow"><label for="sim-sev">Severity</label><span id="sim-sevVal">50% &middot; Moderate</span></div>
-          <input type="range" id="sim-sev" min="0" max="100" value="50">
-          <label class="sim-chk"><input type="checkbox" id="sim-cmp" checked> <span>Show normal vision next to it</span></label>
-          <p class="sim-fine">Severity is illustrative. Real vision loss differs from person to person and eye to eye.</p>
-        </aside>
+          <div class="sim-sevbar">
+            <div class="sim-sevrow"><label for="sim-sev">Severity</label><span id="sim-sevVal">50% &middot; Moderate</span></div>
+            <input type="range" id="sim-sev" min="0" max="100" value="50">
+            <label class="sim-chk"><input type="checkbox" id="sim-cmp" checked> <span>Show normal vision next to it</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="sim-btns">
+        <div class="sim-row">
+          <div class="sim-seg" role="radiogroup" aria-label="Which camera">
+            <input type="radio" name="simcamera" id="sim-cam_env" value="environment" checked><label for="sim-cam_env">Back camera</label>
+            <input type="radio" name="simcamera" id="sim-cam_user" value="user"><label for="sim-cam_user">Front camera</label>
+          </div>
+          <button type="button" class="sim-btn primary" id="sim-camBtn">Start camera</button>
+          <button type="button" class="sim-btn" id="sim-stopBtn" disabled>Stop camera</button>
+          <label class="sim-btn" for="sim-file">Choose photo</label>
+          <input type="file" id="sim-file" accept="image/*" hidden>
+          <button type="button" class="sim-btn" id="sim-snapBtn" disabled>Save picture</button>
+        </div>
+        <div id="sim-msg" role="status"></div>
+        <p class="sim-fine">Severity is illustrative. Real vision loss differs from person to person and eye to eye.</p>
       </div>
 
       <section class="sim-card sim-detail" id="sim-detail" aria-live="polite">
@@ -6072,6 +6102,9 @@ function refresh(){
   $("sevVal").textContent=Math.round(sev*100)+"% · "+sevLabel(sev);
   /* keep radios in step with the state */
   var r=document.getElementById("simc_"+cond); if(r) r.checked=true;
+  /* on phones the condition chips scroll sideways: keep the chosen one in view */
+  var box=$("condPills"), chip=r && r.nextSibling;
+  if(chip && box.scrollWidth>box.clientWidth+4){ box.scrollTo({left:Math.max(0,chip.offsetLeft-(box.clientWidth-chip.offsetWidth)/2),behavior:"smooth"}); }
   drawFundus(cond,sev);
   var lg=$("legend"); lg.innerHTML="";
   d.legend(sev).forEach(function(e){
@@ -6091,14 +6124,28 @@ function srcSize(){
   if(imgSrc) return [imgSrc.naturalWidth, imgSrc.naturalHeight];
   return [0,0];
 }
-$("camBtn").onclick=function(){
+var facing="environment", mirror=false;
+function openStream(want){
+  return navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:want}},audio:false})
+    .catch(function(){ return navigator.mediaDevices.getUserMedia({video:true,audio:false}); });
+}
+function startCamera(){
   say("");
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ say("The camera is not available here. It works on https pages. You can choose a photo instead."); return; }
-  navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false}).then(function(s){
-    stopCamera(); imgSrc=null; stream=s; video.srcObject=s; video.play();
+  var want=facing;
+  stopCamera();   /* many phones cannot open the front camera while the back one is still running */
+  openStream(want).then(function(s){
+    imgSrc=null; stream=s; video.srcObject=s; video.play();
+    var st=(s.getVideoTracks()[0]&&s.getVideoTracks()[0].getSettings&&s.getVideoTracks()[0].getSettings())||{};
+    var used=st.facingMode||want;          /* what the browser really gave us */
+    mirror=(used==="user");                /* selfie view is mirrored, like a mirror */
     $("stopBtn").disabled=false; start();
-  }).catch(function(){ say("Could not open the camera. Allow camera permission, or choose a photo instead."); });
-};
+  }).catch(function(){ say("Could not open the "+(want==="user"?"front":"back")+" camera. Allow camera permission, try the other camera, or choose a photo instead."); });
+}
+$("camBtn").onclick=startCamera;
+[["cam_env","environment"],["cam_user","user"]].forEach(function(p){
+  $(p[0]).addEventListener("change",function(){ facing=p[1]; if(stream) startCamera(); });
+});
 function stopCamera(){
   if(stream){ stream.getTracks().forEach(function(t){ t.stop(); }); stream=null; video.srcObject=null; }
   $("stopBtn").disabled=true;
@@ -6338,9 +6385,10 @@ function frame(now){
   var k=Math.min(1,720/sw), w=Math.round(sw*k), h=Math.round(sh*k);
   if(out.width!==w||out.height!==h){ out.width=w; out.height=h; orig.width=w; orig.height=h; }
   var el=srcEl();
+  var flip=(stream && mirror);
   octx.globalCompositeOperation="source-over"; octx.globalAlpha=1;
-  octx.drawImage(el,0,0,w,h);
-  if(compare) origCtx.drawImage(el,0,0,w,h);
+  octx.save(); if(flip){ octx.translate(w,0); octx.scale(-1,1); } octx.drawImage(el,0,0,w,h); octx.restore();
+  if(compare){ origCtx.save(); if(flip){ origCtx.translate(w,0); origCtx.scale(-1,1); } origCtx.drawImage(el,0,0,w,h); origCtx.restore(); }
   applyEffect(octx,w,h,cond,sev,now||0);
 }
 function start(){ $("placeholder").style.display="none"; $("snapBtn").disabled=false; if(!raf) raf=requestAnimationFrame(frame); }
