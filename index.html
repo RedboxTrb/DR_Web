@@ -1519,6 +1519,24 @@ footer{padding:52px 60px 28px;}
 .v5 .hx-card .stage{padding:16px}
 .v5 .hx-card .cvw{width:min(100%,340px)}
 .v5 .hx-card .hx-sec{margin:36px 0 12px;padding-top:22px;border-top:1px solid #E3EAF0;font:800 24px Inter,sans-serif;color:#0E1A2B;scroll-margin-top:16px}
+.v5 .hx-card .hx-abtabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0 6px}
+@media(max-width:700px){.v5 .hx-card .hx-abtabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+}.v5 .hx-card .hx-abt{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;padding:14px 16px;border-radius:16px;border:1px solid #D7E3E1;background:#fff;color:#0E1A2B;cursor:pointer;font-family:Inter,sans-serif;transition:transform .15s,border-color .15s,background .15s}
+.v5 .hx-card .hx-abt b{font:700 15px Inter,sans-serif}
+.v5 .hx-card .hx-abt span{font:500 12px Inter,sans-serif;color:#5C6B7A}
+.v5 .hx-card .hx-abt:hover{transform:translateY(-2px);border-color:#22B7A3}
+.v5 .hx-card .hx-abt[aria-selected="true"]{background:#0E1A2B;border-color:#0E1A2B;color:#fff}
+.v5 .hx-card .hx-abt[aria-selected="true"] span{color:#9FB3C8}
+.v5 .hx-card .ab-pane[hidden]{display:none}
+.v5 .hx-card .ab-pane .hx-sec{margin-top:22px}
+.v5 .hx-card .ab-mails{display:flex;flex-direction:column;gap:8px;margin:6px 0 18px}
+.v5 .hx-card .ab-mails a{font:600 16px Inter,sans-serif;color:#0E7C70;text-decoration:none;word-break:break-all}
+.v5 .hx-card .ab-lab{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;border:1px solid #D7E3E1;background:#F2FBF9;text-decoration:none;color:#0E1A2B;max-width:420px}
+.v5 .hx-card .ab-lab img{width:56px;height:56px;border-radius:12px;object-fit:contain;background:#fff}
+.v5 .hx-card .ab-lab span{display:flex;flex-direction:column}
+.v5 .hx-card .ab-lab small{font:500 12px Inter,sans-serif;color:#5C6B7A}
+.v5 .hx-card .ab-lab b{font:700 17px Inter,sans-serif}
+.v5 .hx-card .ab-lab em{font:500 13px Inter,sans-serif;color:#0E7C70;font-style:normal}
 .v5 .hx-card .hx-jump{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .v5 .hx-card .hx-jump a{padding:8px 14px;border-radius:999px;border:1px solid #CFEDE8;background:#F2FBF9;color:#0E4F47;font:600 13px Inter,sans-serif;text-decoration:none}
 .v5 .hx-card .hx-foot .btn:not(.btn-p){background:#fff;border:1px solid #CFD8E3;color:#0E1A2B;padding:12px 20px;border-radius:12px;font:600 15px Inter,sans-serif;cursor:pointer}
@@ -1576,6 +1594,7 @@ footer{padding:52px 60px 28px;}
 .v5 section{scroll-margin-top:84px}
 .v5.v5in{padding-bottom:0;background:transparent}.val-extra{max-width:1180px;margin:64px auto 0}@media(min-width:901px){.val-extra{max-width:90vw}}.v5 .rsrch2{grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:940px){.v5 .rsrch2{grid-template-columns:1fr}}
 html.hx-lock{overflow:hidden}
+.nav-links{gap:clamp(12px,1.9vw,32px)}.nav-links a{white-space:nowrap}.nav-btn-ghost,.nav-btn{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -1596,7 +1615,6 @@ html.hx-lock{overflow:hidden}
       <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
       <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
       <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-home" style="display:flex;gap:16px;align-items:center;">
@@ -1784,32 +1802,50 @@ html.hx-lock{overflow:hidden}
     <button type="button" class="hx-x" data-close aria-label="Close">×</button>
     <span class="eyebrow">About</span>
     <h2 id="sh-about-t">About ChakshuRakshakAI.</h2>
-    <p class="lead">A research platform from MAITRI Lab, MNIT Jaipur. How it works, why a retinal photograph matters, and the questions people ask.</p>
-    <div class="hx-jump" role="navigation" aria-label="In this section"><a href="#ab-how">How it works</a><a href="#ab-why">Why it matters</a><a href="#ab-faq">Questions</a></div>
-
-    <h3 class="hx-sec" id="ab-how">How it works</h3>
-    <div class="steps">
-      <div class="hstep"><h3>Upload</h3><p>One or several fundus photographs — JPG, PNG or TIFF, up to 20 MB each.</p></div>
-      <div class="hstep"><h3>Choose an analysis</h3><p>DR, DME, the multi-disease beta, or the Image Explorer. Each runs its own model.</p></div>
-      <div class="hstep"><h3>Check the evidence</h3><p>Vessel, lesion and exudate overlays are drawn on your own image.</p></div>
-      <div class="hstep"><h3>Download the report</h3><p>Add patient details and download a printable PDF to share with an eye doctor.</p></div>
+    <p class="lead">A research platform from MAITRI Lab, MNIT Jaipur. Pick a topic.</p>
+    <div class="hx-abtabs" role="tablist" aria-label="About topics">
+      <button type="button" role="tab" class="hx-abt" data-ab="how" aria-selected="true"><b>How it works</b><span>Four steps</span></button>
+      <button type="button" role="tab" class="hx-abt" data-ab="why" aria-selected="false"><b>Why it matters</b><span>The retina and diabetes</span></button>
+      <button type="button" role="tab" class="hx-abt" data-ab="faq" aria-selected="false"><b>Questions</b><span>Common answers</span></button>
+      <button type="button" role="tab" class="hx-abt" data-ab="contact" aria-selected="false"><b>Contact us</b><span>Email and the lab</span></button>
     </div>
 
-    <h3 class="hx-sec" id="ab-why">Why it matters</h3>
-    <p class="lead">The back of the eye is one of the few places where small blood vessels can be seen directly.</p>
-    <div class="why">
-      <div class="wcard"><div class="n" style="background:#e1f6f2">🩸</div><h3>Diabetes can harm the retina quietly</h3><p>Damage to the tiny vessels often starts without pain or any change in how you see.</p></div>
-      <div class="wcard"><div class="n" style="background:#fff0d2">👁️</div><h3>Early signs show in a photograph</h3><p>Microaneurysms, haemorrhages and exudates can be seen on a fundus photograph before sight is affected.</p></div>
-      <div class="wcard"><div class="n" style="background:#e6ecfb">🤝</div><h3>A second pair of eyes, not a replacement</h3><p>This is a research tool. It helps a reader look more carefully; it does not replace an eye doctor.</p></div>
+    <div class="ab-pane on" id="ab-how">
+      <h3 class="hx-sec">How it works</h3>
+      <div class="steps">
+        <div class="hstep"><h3>Upload</h3><p>One or several fundus photographs — JPG, PNG or TIFF, up to 20 MB each.</p></div>
+        <div class="hstep"><h3>Choose an analysis</h3><p>DR, DME, the multi-disease beta, or the Image Explorer. Each runs its own model.</p></div>
+        <div class="hstep"><h3>Check the evidence</h3><p>Vessel, lesion and exudate overlays are drawn on your own image.</p></div>
+        <div class="hstep"><h3>Download the report</h3><p>Add patient details and download a printable PDF to share with an eye doctor.</p></div>
+      </div>
+      <div class="hx-foot"><a class="btn btn-p" href="/demo" data-gate="1">Analyze retina →</a></div>
     </div>
 
-    <h3 class="hx-sec" id="ab-faq">Questions</h3>
-    <details><summary>Is this a medical device?</summary><p>No. ChakshuRakshakAI is a research platform for research and education. Its results do not replace an examination by a qualified eye doctor.</p></details>
-    <details><summary>Do I need an account?</summary><p>No. You can run any analysis as a guest. Sign in only if you want your reports saved.</p></details>
-    <details><summary>What kind of image do I need?</summary><p>A fundus photograph — a picture of the back of the eye — as a JPG, PNG or TIFF file of up to 20 MB.</p></details>
-    <details><summary>What if I only want to learn?</summary><p>Open the Vision Simulator. It does not analyse anything; it shows how eye diseases change vision and what a doctor looks for.</p></details>
+    <div class="ab-pane" id="ab-why" hidden>
+      <h3 class="hx-sec">Why it matters</h3>
+      <p class="lead">The back of the eye is one of the few places where small blood vessels can be seen directly.</p>
+      <div class="why">
+        <div class="wcard"><div class="n" style="background:#e1f6f2">🩸</div><h3>Diabetes can harm the retina quietly</h3><p>Damage to the tiny vessels often starts without pain or any change in how you see.</p></div>
+        <div class="wcard"><div class="n" style="background:#fff0d2">👁️</div><h3>Early signs show in a photograph</h3><p>Microaneurysms, haemorrhages and exudates can be seen on a fundus photograph before sight is affected.</p></div>
+        <div class="wcard"><div class="n" style="background:#e6ecfb">🤝</div><h3>A second pair of eyes, not a replacement</h3><p>This is a research tool. It helps a reader look more carefully; it does not replace an eye doctor.</p></div>
+      </div>
+    </div>
 
-    <div class="hx-foot"><a class="btn btn-p" href="/demo" data-gate="1">Analyze retina →</a><button type="button" class="btn" data-contact="1">Contact us</button></div>
+    <div class="ab-pane" id="ab-faq" hidden>
+      <h3 class="hx-sec">Questions</h3>
+      <details><summary>Is this a medical device?</summary><p>No. ChakshuRakshakAI is a research platform for research and education. Its results do not replace an examination by a qualified eye doctor.</p></details>
+      <details><summary>Do I need an account?</summary><p>No. You can run any analysis as a guest. Sign in only if you want your reports saved.</p></details>
+      <details><summary>What kind of image do I need?</summary><p>A fundus photograph — a picture of the back of the eye — as a JPG, PNG or TIFF file of up to 20 MB.</p></details>
+      <details><summary>What if I only want to learn?</summary><p>Open the Vision Simulator. It does not analyse anything; it shows how eye diseases change vision and what a doctor looks for.</p></details>
+    </div>
+
+    <div class="ab-pane" id="ab-contact" hidden>
+      <h3 class="hx-sec">Contact us</h3>
+      <p class="lead">Questions, feedback or research collaboration — write to us.</p>
+      <div class="ab-mails"><a href="mailto:info@chakshurakshakai.com">info@chakshurakshakai.com</a><a href="mailto:priyanka.maths@mnit.ac.in">priyanka.maths@mnit.ac.in</a></div>
+      <a class="ab-lab" href="https://maitri-lab.com" target="_blank" rel="noopener"><img src="/assets/maitri-lab.webp" alt="MAITRI Lab logo" width="64" height="64" loading="lazy"><span><small>Developed by</small><b>MAITRI Lab</b><em>maitri-lab.com ↗</em></span></a>
+      <p class="fine5">Research use only · Not a medical device.</p>
+    </div>
   </div>
 </div>
 </div>
@@ -1863,7 +1899,6 @@ html.hx-lock{overflow:hidden}
       <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
       <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
       <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-upload" style="display:flex;gap:12px;align-items:center;">
@@ -1966,7 +2001,6 @@ html.hx-lock{overflow:hidden}
       <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
       <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
       <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-validation" style="display:flex;gap:12px;align-items:center;">
@@ -2057,7 +2091,6 @@ html.hx-lock{overflow:hidden}
       <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
       <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
       <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-choose" style="display:flex;gap:12px;align-items:center;">
@@ -2157,7 +2190,6 @@ html.hx-lock{overflow:hidden}
       <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
       <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
       <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-dme" style="display:flex;gap:12px;align-items:center;">
@@ -2261,7 +2293,6 @@ html.hx-lock{overflow:hidden}
       <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
       <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
       <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-beta" style="display:flex;gap:12px;align-items:center;">
@@ -2366,7 +2397,6 @@ html.hx-lock{overflow:hidden}
       <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
       <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
       <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <div id="nav-guest-analysis" style="display:flex;gap:10px;align-items:center;">
@@ -2479,7 +2509,6 @@ html.hx-lock{overflow:hidden}
       <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
       <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
       <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <div id="nav-guest-dmeres" style="display:flex;gap:10px;align-items:center;">
@@ -2528,7 +2557,6 @@ html.hx-lock{overflow:hidden}
       <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
       <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
       <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <div id="nav-guest-betares" style="display:flex;gap:10px;align-items:center;">
@@ -2580,7 +2608,6 @@ html.hx-lock{overflow:hidden}
       <a href="#" style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
       <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
       <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <button class="nav-btn-ghost" onclick="showPage('home')">&larr; Back to home</button>
@@ -2672,7 +2699,6 @@ html.hx-lock{overflow:hidden}
       <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
       <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
       <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-explore" style="display:flex;gap:12px;align-items:center;">
@@ -2742,7 +2768,6 @@ html.hx-lock{overflow:hidden}
       <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
       <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
       <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <button class="nav-btn-ghost" onclick="exNewAnalysis()">New analysis</button>
@@ -2775,7 +2800,6 @@ html.hx-lock{overflow:hidden}
       <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
       <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
       <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-sim" style="display:flex;gap:12px;align-items:center;">
@@ -3027,7 +3051,6 @@ html.hx-lock{overflow:hidden}
       <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
       <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
       <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div style="display:flex;align-items:center;gap:12px;">
       <span id="reports-nav-name" style="font-size:13px;font-weight:600;color:var(--navy);"></span>
@@ -3080,7 +3103,6 @@ html.hx-lock{overflow:hidden}
       <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
       <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
       <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div style="display:flex;gap:10px;">
       <button class="ar-btn-ghost" onclick="exportSavedReport()">Export PDF</button>
@@ -6275,7 +6297,7 @@ function toggleMobileMenu() {
     menu.id = 'mobile-nav-menu';
     menu.className = 'nav-mobile-menu';
     menu.innerHTML = `
-      <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('home')">Home</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('analyze')">Analyze Retina</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('sim')">Vision Simulator</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('clinic')">Find Retinal Clinic</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('validation')">Validation</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('about')">About</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxContact()">Contact Us</a>
+      <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('home')">Home</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('analyze')">Analyze Retina</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('sim')">Vision Simulator</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('clinic')">Find Retinal Clinic</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('validation')">Validation</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('about')">About</a>
       <hr class="nav-mobile-divider">
       <a class="nav-mobile-link" id="mm-login" onclick="closeMobileMenu();showPage('auth')" style="color:var(--teal)">Log in / Sign up</a>
       <a class="nav-mobile-link" id="mm-reports" style="display:none;" onclick="closeMobileMenu();showPage('reports')">My Reports</a>
@@ -7234,6 +7256,13 @@ refresh();
     var b=e.target.closest('[data-sheet]');
     if(b){ e.preventDefault(); openSheet(b.getAttribute('data-sheet')); return; }
     if(e.target.closest('[data-close]')){ closeUi(); return; }
+    var ab=e.target.closest('[data-ab]');
+    if(ab){
+      var k=ab.getAttribute('data-ab');
+      root.querySelectorAll('.hx-abt').forEach(function(t){ t.setAttribute('aria-selected',t===ab?'true':'false'); });
+      root.querySelectorAll('.ab-pane').forEach(function(p){ var on=p.id==='ab-'+k; p.hidden=!on; p.classList.toggle('on',on); });
+      return;
+    }
     if(e.target.closest('[data-contact]')){ e.preventDefault(); window.hxContact(); return; }
     var a=e.target.closest('a'); if(!a) return;
     if(a.hasAttribute('data-gate')){ e.preventDefault(); closeNow(); showAuthGate(); return; }
