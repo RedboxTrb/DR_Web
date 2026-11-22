@@ -1518,6 +1518,10 @@ footer{padding:52px 60px 28px;}
 .v5 .hx-card .panel.on{grid-template-columns:minmax(0,1fr);padding:24px}
 .v5 .hx-card .stage{padding:16px}
 .v5 .hx-card .cvw{width:min(100%,340px)}
+.v5 .hx-card .hx-sec{margin:36px 0 12px;padding-top:22px;border-top:1px solid #E3EAF0;font:800 24px Inter,sans-serif;color:#0E1A2B;scroll-margin-top:16px}
+.v5 .hx-card .hx-jump{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.v5 .hx-card .hx-jump a{padding:8px 14px;border-radius:999px;border:1px solid #CFEDE8;background:#F2FBF9;color:#0E4F47;font:600 13px Inter,sans-serif;text-decoration:none}
+.v5 .hx-card .hx-foot .btn:not(.btn-p){background:#fff;border:1px solid #CFD8E3;color:#0E1A2B;padding:12px 20px;border-radius:12px;font:600 15px Inter,sans-serif;cursor:pointer}
 .v5 .hx-card .fd-info{margin-top:14px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.07);text-align:left;min-height:84px}
 .v5 .hx-card .fd-info b{display:block;font:700 14px Inter,sans-serif;color:#fff;margin-bottom:4px}
 .v5 .hx-card .fd-info p{margin:0;font-size:13px;line-height:1.5;color:#C9D3F2}
@@ -1586,10 +1590,13 @@ html.hx-lock{overflow:hidden}
       <span class="nav-logo-text">ChakshuRakshakAI</span>
     </a>
     <div class="nav-links">
-      <a href="#home" onclick="showPage('home')">Home</a>
-      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
-      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find a Clinic</a>
+      <a href="#" onclick="event.preventDefault();showPage('home')">Home</a>
+      <a href="#" onclick="event.preventDefault();hxGo('analyze')">Analyze Retina</a>
       <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-home" style="display:flex;gap:16px;align-items:center;">
@@ -1666,13 +1673,6 @@ html.hx-lock{overflow:hidden}
   </button>
 </section>
 
-<div class="hx-pills" role="group" aria-label="More">
-  <button type="button" data-sheet="about">How it works</button>
-  <button type="button" data-sheet="why">Why it matters</button>
-  <button type="button" data-sheet="faq">Questions</button>
-  <a href="/image-explorer">Image Explorer</a>
-  <a href="https://maitri-lab.com/chakshurakshakai/" target="_blank" rel="noopener">About MAITRI Lab &#8599;</a>
-</div>
 
 <!-- ───────── detail sheets: each opens on top of the home page ───────── -->
 
@@ -1777,47 +1777,39 @@ html.hx-lock{overflow:hidden}
   </div>
 </div>
 
+
 <div class="hx-sheet" id="sheet-about" role="dialog" aria-modal="true" aria-labelledby="sh-about-t" hidden>
   <div class="hx-back" data-close></div>
   <div class="hx-card hx-narrow">
     <button type="button" class="hx-x" data-close aria-label="Close">×</button>
-    <span class="eyebrow">How it works</span>
-    <h2 id="sh-about-t">From photograph to report in four steps.</h2>
+    <span class="eyebrow">About</span>
+    <h2 id="sh-about-t">About ChakshuRakshakAI.</h2>
+    <p class="lead">A research platform from MAITRI Lab, MNIT Jaipur. How it works, why a retinal photograph matters, and the questions people ask.</p>
+    <div class="hx-jump" role="navigation" aria-label="In this section"><a href="#ab-how">How it works</a><a href="#ab-why">Why it matters</a><a href="#ab-faq">Questions</a></div>
+
+    <h3 class="hx-sec" id="ab-how">How it works</h3>
     <div class="steps">
       <div class="hstep"><h3>Upload</h3><p>One or several fundus photographs — JPG, PNG or TIFF, up to 20 MB each.</p></div>
       <div class="hstep"><h3>Choose an analysis</h3><p>DR, DME, the multi-disease beta, or the Image Explorer. Each runs its own model.</p></div>
       <div class="hstep"><h3>Check the evidence</h3><p>Vessel, lesion and exudate overlays are drawn on your own image.</p></div>
       <div class="hstep"><h3>Download the report</h3><p>Add patient details and download a printable PDF to share with an eye doctor.</p></div>
     </div>
-    <div class="hx-foot"><a class="btn btn-p" href="/demo">Analyze retina →</a></div>
-  </div>
-</div>
 
-<div class="hx-sheet" id="sheet-why" role="dialog" aria-modal="true" aria-labelledby="sh-why-t" hidden>
-  <div class="hx-back" data-close></div>
-  <div class="hx-card hx-narrow">
-    <button type="button" class="hx-x" data-close aria-label="Close">×</button>
-    <span class="eyebrow">Why it matters</span>
-    <h2 id="sh-why-t">Why a retinal photograph matters.</h2>
+    <h3 class="hx-sec" id="ab-why">Why it matters</h3>
     <p class="lead">The back of the eye is one of the few places where small blood vessels can be seen directly.</p>
     <div class="why">
       <div class="wcard"><div class="n" style="background:#e1f6f2">🩸</div><h3>Diabetes can harm the retina quietly</h3><p>Damage to the tiny vessels often starts without pain or any change in how you see.</p></div>
       <div class="wcard"><div class="n" style="background:#fff0d2">👁️</div><h3>Early signs show in a photograph</h3><p>Microaneurysms, haemorrhages and exudates can be seen on a fundus photograph before sight is affected.</p></div>
       <div class="wcard"><div class="n" style="background:#e6ecfb">🤝</div><h3>A second pair of eyes, not a replacement</h3><p>This is a research tool. It helps a reader look more carefully; it does not replace an eye doctor.</p></div>
     </div>
-  </div>
-</div>
 
-<div class="hx-sheet" id="sheet-faq" role="dialog" aria-modal="true" aria-labelledby="sh-faq-t" hidden>
-  <div class="hx-back" data-close></div>
-  <div class="hx-card hx-narrow">
-    <button type="button" class="hx-x" data-close aria-label="Close">×</button>
-    <span class="eyebrow">Questions</span>
-    <h2 id="sh-faq-t">Questions people ask.</h2>
+    <h3 class="hx-sec" id="ab-faq">Questions</h3>
     <details><summary>Is this a medical device?</summary><p>No. ChakshuRakshakAI is a research platform for research and education. Its results do not replace an examination by a qualified eye doctor.</p></details>
     <details><summary>Do I need an account?</summary><p>No. You can run any analysis as a guest. Sign in only if you want your reports saved.</p></details>
     <details><summary>What kind of image do I need?</summary><p>A fundus photograph — a picture of the back of the eye — as a JPG, PNG or TIFF file of up to 20 MB.</p></details>
     <details><summary>What if I only want to learn?</summary><p>Open the Vision Simulator. It does not analyse anything; it shows how eye diseases change vision and what a doctor looks for.</p></details>
+
+    <div class="hx-foot"><a class="btn btn-p" href="/demo" data-gate="1">Analyze retina →</a><button type="button" class="btn" data-contact="1">Contact us</button></div>
   </div>
 </div>
 </div>
@@ -1865,9 +1857,13 @@ html.hx-lock{overflow:hidden}
       <span class="nav-logo-text">ChakshuRakshakAI</span>
     </a>
     <div class="nav-links">
-      <a onclick="showPage('home')">Home</a>
-      <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
+      <a href="#" onclick="event.preventDefault();showPage('home')">Home</a>
+      <a href="#" onclick="event.preventDefault();hxGo('analyze')">Analyze Retina</a>
       <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-upload" style="display:flex;gap:12px;align-items:center;">
@@ -1964,9 +1960,13 @@ html.hx-lock{overflow:hidden}
       <span class="nav-logo-text">ChakshuRakshakAI</span>
     </a>
     <div class="nav-links">
-      <a onclick="showPage('home')">Home</a>
-      <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
+      <a href="#" onclick="event.preventDefault();showPage('home')">Home</a>
+      <a href="#" onclick="event.preventDefault();hxGo('analyze')">Analyze Retina</a>
       <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-validation" style="display:flex;gap:12px;align-items:center;">
@@ -2051,9 +2051,13 @@ html.hx-lock{overflow:hidden}
       <span class="nav-logo-text">ChakshuRakshakAI</span>
     </a>
     <div class="nav-links">
-      <a onclick="showPage('home')">Home</a>
-      <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
+      <a href="#" onclick="event.preventDefault();showPage('home')">Home</a>
+      <a href="#" onclick="event.preventDefault();hxGo('analyze')">Analyze Retina</a>
       <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-choose" style="display:flex;gap:12px;align-items:center;">
@@ -2147,9 +2151,13 @@ html.hx-lock{overflow:hidden}
       <span class="nav-logo-text">ChakshuRakshakAI</span>
     </a>
     <div class="nav-links">
-      <a onclick="showPage('home')">Home</a>
-      <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
+      <a href="#" onclick="event.preventDefault();showPage('home')">Home</a>
+      <a href="#" onclick="event.preventDefault();hxGo('analyze')">Analyze Retina</a>
       <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-dme" style="display:flex;gap:12px;align-items:center;">
@@ -2247,9 +2255,13 @@ html.hx-lock{overflow:hidden}
       <span class="nav-logo-text">ChakshuRakshakAI</span>
     </a>
     <div class="nav-links">
-      <a onclick="showPage('home')">Home</a>
-      <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
+      <a href="#" onclick="event.preventDefault();showPage('home')">Home</a>
+      <a href="#" onclick="event.preventDefault();hxGo('analyze')">Analyze Retina</a>
       <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-beta" style="display:flex;gap:12px;align-items:center;">
@@ -2348,11 +2360,13 @@ html.hx-lock{overflow:hidden}
       <span class="nav-logo-text">ChakshuRakshakAI</span>
     </a>
     <div class="nav-links">
-      <a onclick="showPage('home')">Home</a>
-      <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Analysis</a>
-      <a onclick="showPage('upload')">New Analysis</a>
-      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find a Clinic</a>
+      <a href="#" onclick="event.preventDefault();showPage('home')">Home</a>
+      <a href="#" style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;" onclick="event.preventDefault();hxGo('analyze')">Analyze Retina</a>
       <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <div id="nav-guest-analysis" style="display:flex;gap:10px;align-items:center;">
@@ -2459,11 +2473,13 @@ html.hx-lock{overflow:hidden}
       <span class="nav-logo-text">ChakshuRakshakAI</span>
     </a>
     <div class="nav-links">
-      <a onclick="showPage('home')">Home</a>
-      <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Analysis</a>
-      <a onclick="showPage('dme')">New Analysis</a>
-      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find a Clinic</a>
+      <a href="#" onclick="event.preventDefault();showPage('home')">Home</a>
+      <a href="#" style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;" onclick="event.preventDefault();hxGo('analyze')">Analyze Retina</a>
       <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <div id="nav-guest-dmeres" style="display:flex;gap:10px;align-items:center;">
@@ -2506,11 +2522,13 @@ html.hx-lock{overflow:hidden}
       <span class="nav-logo-text">ChakshuRakshakAI</span>
     </a>
     <div class="nav-links">
-      <a onclick="showPage('home')">Home</a>
-      <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Analysis</a>
-      <a onclick="showPage('beta')">New Analysis</a>
-      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find a Clinic</a>
+      <a href="#" onclick="event.preventDefault();showPage('home')">Home</a>
+      <a href="#" style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;" onclick="event.preventDefault();hxGo('analyze')">Analyze Retina</a>
       <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <div id="nav-guest-betares" style="display:flex;gap:10px;align-items:center;">
@@ -2556,9 +2574,13 @@ html.hx-lock{overflow:hidden}
       <span class="nav-logo-text">ChakshuRakshakAI</span>
     </a>
     <div class="nav-links">
-      <a onclick="showPage('home')">Home</a>
-      <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Find a Clinic</a>
+      <a href="#" onclick="event.preventDefault();showPage('home')">Home</a>
+      <a href="#" onclick="event.preventDefault();hxGo('analyze')">Analyze Retina</a>
       <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
+      <a href="#" style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <button class="nav-btn-ghost" onclick="showPage('home')">&larr; Back to home</button>
@@ -2644,9 +2666,13 @@ html.hx-lock{overflow:hidden}
       <span class="nav-logo-text">ChakshuRakshakAI</span>
     </a>
     <div class="nav-links">
-      <a onclick="showPage('home')">Home</a>
-      <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
+      <a href="#" onclick="event.preventDefault();showPage('home')">Home</a>
+      <a href="#" onclick="event.preventDefault();hxGo('analyze')">Analyze Retina</a>
       <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-explore" style="display:flex;gap:12px;align-items:center;">
@@ -2710,10 +2736,13 @@ html.hx-lock{overflow:hidden}
       <span class="nav-logo-text">ChakshuRakshakAI</span>
     </a>
     <div class="nav-links">
-      <a onclick="showPage('home')">Home</a>
-      <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Explorer</a>
-      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find a Clinic</a>
+      <a href="#" onclick="event.preventDefault();showPage('home')">Home</a>
+      <a href="#" style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;" onclick="event.preventDefault();hxGo('analyze')">Analyze Retina</a>
       <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <button class="nav-btn-ghost" onclick="exNewAnalysis()">New analysis</button>
@@ -2740,9 +2769,13 @@ html.hx-lock{overflow:hidden}
       <span class="nav-logo-text">ChakshuRakshakAI</span>
     </a>
     <div class="nav-links">
-      <a onclick="showPage('home')">Home</a>
-      <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
-      <a style="color:var(--teal);font-weight:600;" onclick="showPage('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();showPage('home')">Home</a>
+      <a href="#" onclick="event.preventDefault();hxGo('analyze')">Analyze Retina</a>
+      <a href="#" style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-sim" style="display:flex;gap:12px;align-items:center;">
@@ -2988,10 +3021,13 @@ html.hx-lock{overflow:hidden}
       <span class="nav-logo-text">ChakshuRakshakAI</span>
     </a>
     <div class="nav-links">
-      <a onclick="showPage('home')">Home</a>
-      <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">My Reports</a>
-      <a onclick="showPage('upload')">New Analysis</a>
+      <a href="#" onclick="event.preventDefault();showPage('home')">Home</a>
+      <a href="#" onclick="event.preventDefault();hxGo('analyze')">Analyze Retina</a>
       <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div style="display:flex;align-items:center;gap:12px;">
       <span id="reports-nav-name" style="font-size:13px;font-weight:600;color:var(--navy);"></span>
@@ -3038,9 +3074,13 @@ html.hx-lock{overflow:hidden}
       <span class="nav-logo-text">ChakshuRakshakAI</span>
     </a>
     <div class="nav-links">
-      <a onclick="showPage('home')">Home</a>
-      <a onclick="showPage('reports')" style="color:var(--teal);">← My Reports</a>
+      <a href="#" onclick="event.preventDefault();showPage('home')">Home</a>
+      <a href="#" onclick="event.preventDefault();hxGo('analyze')">Analyze Retina</a>
       <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find Retinal Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('validation')">Validation</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxContact()">Contact Us</a>
     </div>
     <div style="display:flex;gap:10px;">
       <button class="ar-btn-ghost" onclick="exportSavedReport()">Export PDF</button>
@@ -6235,12 +6275,7 @@ function toggleMobileMenu() {
     menu.id = 'mobile-nav-menu';
     menu.className = 'nav-mobile-menu';
     menu.innerHTML = `
-      <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('home')">Home</a>
-      <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('about')">About</a>
-      <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('choose')">Try Demo</a>
-      <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('sim')">Vision Simulator</a>
-      <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('clinic')">Find a Clinic</a>
-      <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('validation')">Validation</a>
+      <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('home')">Home</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('analyze')">Analyze Retina</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('sim')">Vision Simulator</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('clinic')">Find Retinal Clinic</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('validation')">Validation</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('about')">About</a> <a class="nav-mobile-link" onclick="closeMobileMenu();hxContact()">Contact Us</a>
       <hr class="nav-mobile-divider">
       <a class="nav-mobile-link" id="mm-login" onclick="closeMobileMenu();showPage('auth')" style="color:var(--teal)">Log in / Sign up</a>
       <a class="nav-mobile-link" id="mm-reports" style="display:none;" onclick="closeMobileMenu();showPage('reports')">My Reports</a>
@@ -7163,7 +7198,7 @@ refresh();
     clearTimeout(timer);
     s.hidden=false; cur=s; lock(true);
     var c=s.querySelector('.hx-card'); if(c) c.scrollTop=0;
-    requestAnimationFrame(function(){ requestAnimationFrame(function(){ s.classList.add('show'); }); });
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ if(cur===s) s.classList.add('show'); }); });
     try{ history.pushState({page:'home',sheet:id},'',location.pathname); }catch(e){}
     var x=s.querySelector('.hx-x'); if(x) setTimeout(function(){ try{ x.focus({preventScroll:true}); }catch(e){} },60);
   }
@@ -7178,6 +7213,11 @@ refresh();
   }
   function closeNow(){ if(cur) hide(cur,true); }
   window.hxOpenSheet=openSheet;
+  window.hxContact=function(){
+    function go(){ closeNow(); var f=document.querySelector('#page-home footer'); if(f) f.scrollIntoView({behavior:'smooth'}); }
+    var pg=document.getElementById('page-home');
+    if(pg && pg.classList.contains('active')){ go(); } else { showPage('home'); setTimeout(go,150); }
+  };
   window.hxGo=function(id){
     var pg=document.getElementById('page-home');
     if(pg && pg.classList.contains('active')){ openSheet(id); }
@@ -7194,6 +7234,7 @@ refresh();
     var b=e.target.closest('[data-sheet]');
     if(b){ e.preventDefault(); openSheet(b.getAttribute('data-sheet')); return; }
     if(e.target.closest('[data-close]')){ closeUi(); return; }
+    if(e.target.closest('[data-contact]')){ e.preventDefault(); window.hxContact(); return; }
     var a=e.target.closest('a'); if(!a) return;
     if(a.hasAttribute('data-gate')){ e.preventDefault(); closeNow(); showAuthGate(); return; }
     var h=a.getAttribute('href')||'';
