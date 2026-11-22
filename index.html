@@ -1518,6 +1518,12 @@ footer{padding:52px 60px 28px;}
 .v5 .hx-card .panel.on{grid-template-columns:minmax(0,1fr);padding:24px}
 .v5 .hx-card .stage{padding:16px}
 .v5 .hx-card .cvw{width:min(100%,340px)}
+.v5 .hx-card .fd-info{margin-top:14px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.07);text-align:left;min-height:84px}
+.v5 .hx-card .fd-info b{display:block;font:700 14px Inter,sans-serif;color:#fff;margin-bottom:4px}
+.v5 .hx-card .fd-info p{margin:0;font-size:13px;line-height:1.5;color:#C9D3F2}
+.v5 .hx-card .fd-what{margin-top:14px;padding:16px 18px;border-radius:18px;background:#F2FBF9;border:1px solid #CFEDE8}
+.v5 .hx-card .fd-what h4{margin:0 0 6px;font:700 15px Inter,sans-serif;color:#0E4F47}
+.v5 .hx-card .fd-what p{margin:0;font-size:14px;line-height:1.6;color:#2B4A46}
 .v5 .hx-card .steps{margin-top:26px}
 .v5 .hx-card .why{margin-top:24px}
 .v5 .hx-card details{margin-top:12px}
@@ -1581,10 +1587,9 @@ html.hx-lock{overflow:hidden}
     </a>
     <div class="nav-links">
       <a href="#home" onclick="showPage('home')">Home</a>
-      <a href="#features" onclick="if(document.getElementById('page-home').classList.contains('active')){event.preventDefault();document.getElementById('features').scrollIntoView({behavior:'smooth'});}">About</a>
-      <a onclick="showPage('choose')">Demo</a>
-      <a onclick="showPage('clinics')">Find a Clinic</a>
-      <a onclick="showPage('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('about')">About</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find a Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-home" style="display:flex;gap:16px;align-items:center;">
@@ -1693,16 +1698,13 @@ html.hx-lock{overflow:hidden}
       </div>
       <div class="stagew">
         <div class="stage">
-          <div class="st-top"><b>Layers on one fundus photograph</b><span>Schematic · tap to toggle</span></div>
+          <div class="st-top"><b id="fd-title">Lesions on a fundus photograph</b><span>Schematic · tap to mark</span></div>
           <div class="cvw"><canvas id="eye" width="720" height="720"></canvas><div class="scan"></div></div>
-          <div class="layers" id="layers">
-            <button class="lay" data-l="vessels" aria-pressed="true"><i style="background:#3df2c0"></i>Vessels</button>
-            <button class="lay" data-l="lesions" aria-pressed="true"><i style="background:#ff6b5e"></i>Lesions</button>
-            <button class="lay" data-l="disc" aria-pressed="true"><i style="background:#ffd35a"></i>Optic disc</button>
-            <button class="lay" data-l="macula" aria-pressed="false"><i style="background:#8e7dff"></i>Macula</button>
-          </div>
+          <div class="layers" id="layers"></div>
+          <div class="fd-info" aria-live="polite"><b id="fd-it">Tap a lesion type</b><p id="fd-id"></p></div>
           <p class="cap">A schematic drawn to show the idea — not a real photograph or a real result.</p>
         </div>
+        <div class="fd-what"><h4 id="fd-wh"></h4><p id="fd-wp"></p></div>
       </div>
     </div>
     <div class="hx-foot"><a class="btn btn-p" href="/demo">Choose an analysis →</a><span class="hx-note">Free research access. No account required.</span></div>
@@ -1865,8 +1867,7 @@ html.hx-lock{overflow:hidden}
     <div class="nav-links">
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
-      <a style="color:var(--teal);font-weight:600;">Demo</a>
-      <a onclick="showPage('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-upload" style="display:flex;gap:12px;align-items:center;">
@@ -1965,8 +1966,7 @@ html.hx-lock{overflow:hidden}
     <div class="nav-links">
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
-      <a onclick="showPage('choose')">Demo</a>
-      <a onclick="showPage('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-validation" style="display:flex;gap:12px;align-items:center;">
@@ -2053,8 +2053,7 @@ html.hx-lock{overflow:hidden}
     <div class="nav-links">
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
-      <a style="color:var(--teal);font-weight:600;" onclick="showPage('choose')">Demo</a>
-      <a onclick="showPage('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-choose" style="display:flex;gap:12px;align-items:center;">
@@ -2150,8 +2149,7 @@ html.hx-lock{overflow:hidden}
     <div class="nav-links">
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
-      <a style="color:var(--teal);font-weight:600;" onclick="showPage('choose')">Demo</a>
-      <a onclick="showPage('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-dme" style="display:flex;gap:12px;align-items:center;">
@@ -2251,8 +2249,7 @@ html.hx-lock{overflow:hidden}
     <div class="nav-links">
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
-      <a style="color:var(--teal);font-weight:600;" onclick="showPage('choose')">Demo</a>
-      <a onclick="showPage('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-beta" style="display:flex;gap:12px;align-items:center;">
@@ -2354,8 +2351,8 @@ html.hx-lock{overflow:hidden}
       <a onclick="showPage('home')">Home</a>
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Analysis</a>
       <a onclick="showPage('upload')">New Analysis</a>
-      <a onclick="showPage('clinics')">Find a Clinic</a>
-      <a onclick="showPage('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find a Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <div id="nav-guest-analysis" style="display:flex;gap:10px;align-items:center;">
@@ -2465,8 +2462,8 @@ html.hx-lock{overflow:hidden}
       <a onclick="showPage('home')">Home</a>
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Analysis</a>
       <a onclick="showPage('dme')">New Analysis</a>
-      <a onclick="showPage('clinics')">Find a Clinic</a>
-      <a onclick="showPage('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find a Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <div id="nav-guest-dmeres" style="display:flex;gap:10px;align-items:center;">
@@ -2512,8 +2509,8 @@ html.hx-lock{overflow:hidden}
       <a onclick="showPage('home')">Home</a>
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Analysis</a>
       <a onclick="showPage('beta')">New Analysis</a>
-      <a onclick="showPage('clinics')">Find a Clinic</a>
-      <a onclick="showPage('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find a Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <div id="nav-guest-betares" style="display:flex;gap:10px;align-items:center;">
@@ -2561,8 +2558,7 @@ html.hx-lock{overflow:hidden}
     <div class="nav-links">
       <a onclick="showPage('home')">Home</a>
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Find a Clinic</a>
-      <a onclick="showPage('choose')">Demo</a>
-      <a onclick="showPage('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
     </div>
     <div class="nav-right">
       <button class="nav-btn-ghost" onclick="showPage('home')">&larr; Back to home</button>
@@ -2650,8 +2646,7 @@ html.hx-lock{overflow:hidden}
     <div class="nav-links">
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
-      <a style="color:var(--teal);font-weight:600;" onclick="showPage('choose')">Demo</a>
-      <a onclick="showPage('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
     </div>
     <div class="nav-right">
       <div id="nav-guest-explore" style="display:flex;gap:12px;align-items:center;">
@@ -2717,8 +2712,8 @@ html.hx-lock{overflow:hidden}
     <div class="nav-links">
       <a onclick="showPage('home')">Home</a>
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">Explorer</a>
-      <a onclick="showPage('clinics')">Find a Clinic</a>
-      <a onclick="showPage('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('clinic')">Find a Clinic</a>
+      <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
       <button class="nav-btn-ghost" onclick="exNewAnalysis()">New analysis</button>
@@ -2747,7 +2742,6 @@ html.hx-lock{overflow:hidden}
     <div class="nav-links">
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),120);" href="#">About</a>
-      <a onclick="showPage('choose')">Demo</a>
       <a style="color:var(--teal);font-weight:600;" onclick="showPage('sim')">Vision Simulator</a>
     </div>
     <div class="nav-right">
@@ -2997,7 +2991,7 @@ html.hx-lock{overflow:hidden}
       <a onclick="showPage('home')">Home</a>
       <a style="color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);padding-bottom:2px;">My Reports</a>
       <a onclick="showPage('upload')">New Analysis</a>
-      <a onclick="showPage('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
     </div>
     <div style="display:flex;align-items:center;gap:12px;">
       <span id="reports-nav-name" style="font-size:13px;font-weight:600;color:var(--navy);"></span>
@@ -3046,7 +3040,7 @@ html.hx-lock{overflow:hidden}
     <div class="nav-links">
       <a onclick="showPage('home')">Home</a>
       <a onclick="showPage('reports')" style="color:var(--teal);">← My Reports</a>
-      <a onclick="showPage('sim')">Vision Simulator</a>
+      <a href="#" onclick="event.preventDefault();hxGo('sim')">Vision Simulator</a>
     </div>
     <div style="display:flex;gap:10px;">
       <button class="ar-btn-ghost" onclick="exportSavedReport()">Export PDF</button>
@@ -6242,10 +6236,10 @@ function toggleMobileMenu() {
     menu.className = 'nav-mobile-menu';
     menu.innerHTML = `
       <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('home')">Home</a>
-      <a class="nav-mobile-link" onclick="closeMobileMenu();document.getElementById('features')&&document.getElementById('features').scrollIntoView({behavior:'smooth'});showPage('home')">About</a>
+      <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('about')">About</a>
       <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('choose')">Try Demo</a>
-      <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('sim')">Vision Simulator</a>
-      <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('clinics')">Find a Clinic</a>
+      <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('sim')">Vision Simulator</a>
+      <a class="nav-mobile-link" onclick="closeMobileMenu();hxGo('clinic')">Find a Clinic</a>
       <a class="nav-mobile-link" onclick="closeMobileMenu();showPage('validation')">Validation</a>
       <hr class="nav-mobile-divider">
       <a class="nav-mobile-link" id="mm-login" onclick="closeMobileMenu();showPage('auth')" style="color:var(--teal)">Log in / Sign up</a>
@@ -6972,53 +6966,163 @@ refresh();
 </script>
 <script>
 /* Home page: layers, analysis tabs and simulator preview */
-
 (function(){
-  /* ---- hero: schematic fundus with toggleable layers (illustration only) ---- */
-  var cv=document.getElementById('eye'), x=cv.getContext('2d'), S=cv.width, sc=S/360, st={vessels:true,lesions:true,disc:true,macula:false};
+  /* ============ fundus picture: lesions you can pick, per analysis ============ */
+  var cv=document.getElementById('eye'); if(!cv) return;
+  var x=cv.getContext('2d'), S=cv.width, sc=S/360;
+  function $(id){ return document.getElementById(id); }
   function R(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
   var ARC=[[262,172,235,140,190,100,130,70],[262,172,235,205,190,250,130,290],[262,172,285,140,300,110,310,80],[262,172,285,205,300,240,310,270],[215,128,190,150,170,160,155,175],[212,222,190,205,170,198,155,190]];
   var D={x:262,y:172}, M={x:150,y:182};
   function bez(a,dy){x.beginPath();x.moveTo(a[0]*sc,(a[1]+dy)*sc);x.bezierCurveTo(a[2]*sc,(a[3]+dy)*sc,a[4]*sc,(a[5]+dy)*sc,a[6]*sc,(a[7]+dy)*sc);x.stroke();}
+  function bezPt(a,t){var u=1-t;return [u*u*u*a[0]+3*u*u*t*a[2]+3*u*t*t*a[4]+t*t*t*a[6], u*u*u*a[1]+3*u*u*t*a[3]+3*u*t*t*a[5]+t*t*t*a[7]];}
   function fuzz(px,py,r,rgb,a){var g=x.createRadialGradient(px*sc,py*sc,0,px*sc,py*sc,r*sc);g.addColorStop(0,'rgba('+rgb+','+a+')');g.addColorStop(1,'rgba('+rgb+',0)');x.fillStyle=g;x.beginPath();x.arc(px*sc,py*sc,r*sc,0,7);x.fill();}
   function blot(px,py,rx,ry,rot,col){x.fillStyle=col;x.beginPath();x.ellipse(px*sc,py*sc,rx*sc,ry*sc,rot,0,7);x.fill();}
-  function draw(){
-    var r=R(21);x.clearRect(0,0,S,S);
+  function near(r,cx,cy,rad){var a=r()*6.283,d=Math.sqrt(r())*rad;return [cx+Math.cos(a)*d,cy+Math.sin(a)*d];}
+  function ring(cx,cy,rad,dash){x.strokeStyle='rgba(255,255,255,.95)';x.lineWidth=2.4*sc;x.setLineDash(dash?[6*sc,5*sc]:[]);x.beginPath();x.arc(cx*sc,cy*sc,rad*sc,0,7);x.stroke();x.setLineDash([]);}
+
+  var SETS={
+    dr:{
+      title:'Diabetic retinopathy on a fundus photograph',
+      intro:['What is diabetic retinopathy?','Long-standing high blood sugar damages the tiny blood vessels of the retina. Early on there are usually no symptoms; later the vessels leak, close off, or grow fragile new vessels that can bleed. It is graded on a five-step scale: 0 No DR, 1 Mild, 2 Moderate, 3 Severe and 4 Proliferative. A yearly dilated eye exam catches it early.'],
+      layers:[
+        {id:'ma',label:'Microaneurysms',color:'#ff5a5a',ring:[M.x+20,M.y,100],
+         desc:'Tiny balloon-like swellings of the smallest vessels, and the first visible sign of diabetic retinopathy. They look like pin-point red dots.',
+         draw:function(){var r=R(31),k,p;for(k=0;k<16;k++){p=near(r,M.x+20,M.y,95);blot(p[0],p[1],2.4,2.4,0,'#ff3b3b');}}},
+        {id:'hem',label:'Haemorrhages',color:'#c0392b',ring:[M.x+30,M.y-10,100],
+         desc:'Blood that has leaked from weakened vessels. Small round "dot-and-blot" haemorrhages sit deeper in the retina; flame-shaped ones lie in the nerve-fibre layer. More and larger ones point to more severe disease.',
+         draw:function(){var r=R(32),k,p,q;for(k=0;k<7;k++){p=near(r,M.x+25,M.y,88);blot(p[0],p[1],6+r()*4,4+r()*2,r()*3,'rgba(120,8,8,.92)');}[0.35,0.5,0.66].forEach(function(t){q=bezPt(ARC[0],t);blot(q[0]-6,q[1]-10,9,2.4,-0.7,'rgba(150,12,12,.92)');});}},
+        {id:'ex',label:'Hard exudates',color:'#fff06a',ring:[M.x+10,M.y+5,80],
+         desc:'Yellow, waxy deposits of fat and protein left behind when fluid leaks from vessels. They often form clusters or rings, and near the macula they threaten central vision.',
+         draw:function(){var r=R(33),k,p;for(k=0;k<13;k++){p=near(r,M.x+10,M.y+5,72);blot(p[0],p[1],2.4+r()*1.8,2.4+r()*1.8,0,'#fff06a');}}},
+        {id:'cws',label:'Cotton-wool spots',color:'#ffffff',ring:[M.x+50,M.y,100],
+         desc:'Pale, fluffy patches where a small area of nerve fibres is starved of blood. They suggest the retina is becoming short of oxygen (ischaemia).',
+         draw:function(){var r=R(34),k,p;for(k=0;k<3;k++){p=near(r,M.x+50,M.y,90);fuzz(p[0],p[1],10,'255,255,255',.92);}}},
+        {id:'irma',label:'Venous beading and IRMA',color:'#e0568a',ring:[190,255,56],
+         desc:'Veins that look like a string of sausages, and tiny abnormal vessels inside the retina (IRMA). They are warning signs of severe non-proliferative disease and a high risk of progressing.',
+         draw:function(){var t,q,i=0;for(t=0.28;t<0.97;t+=0.085){q=bezPt(ARC[1],t);x.fillStyle='#5a0a14';x.beginPath();x.arc(q[0]*sc,(q[1]+3)*sc,(i%2?3.9:2.8)*sc,0,7);x.fill();i++;}x.strokeStyle='#e0568a';x.lineWidth=1.4*sc;[[200,230,214,246,206,262],[170,262,184,250,176,236],[228,258,238,246,232,234]].forEach(function(c){x.beginPath();x.moveTo(c[0]*sc,c[1]*sc);x.bezierCurveTo((c[0]+8)*sc,(c[1]-14)*sc,c[2]*sc,c[3]*sc,c[4]*sc,c[5]*sc);x.stroke();});}},
+        {id:'nv',label:'Neovascularisation',color:'#ff3b6b',ring:[D.x-34,D.y,46],
+         desc:'Fragile new vessels that grow on the optic disc (NVD) or elsewhere on the retina (NVE) when it is starved of oxygen. They bleed easily and can cause scarring and retinal detachment — the hallmark of proliferative diabetic retinopathy.',
+         draw:function(){x.strokeStyle='#e11d48';x.lineWidth=1.7*sc;x.lineCap='round';for(var k=0;k<4;k++){x.beginPath();x.moveTo((D.x-18)*sc,(D.y-12+k*8)*sc);x.bezierCone=0;x.bezierCurveTo((D.x-38)*sc,(D.y-30+k*14)*sc,(D.x-30)*sc,(D.y+6+k*6)*sc,(D.x-54)*sc,(D.y-14+k*13)*sc);x.stroke();}for(var j=0;j<6;j++){x.beginPath();x.moveTo(112*sc,96*sc);x.lineTo((112+Math.cos(j*1.05)*20)*sc,(96+Math.sin(j*1.05)*20)*sc);x.stroke();}}}
+      ]
+    },
+    dme:{
+      title:'Macular oedema on a fundus photograph',
+      intro:['What is diabetic macular oedema?','Diabetic macular oedema (DME) is swelling of the macula — the centre of the retina that gives sharp vision — when fluid and fats leak from damaged vessels. It can happen at any stage of diabetic retinopathy and is the commonest cause of lost reading vision in diabetes. The grade depends on where the hard exudates lie: none (no DME), away from the fovea, or near the fovea (within about one disc diameter).'],
+      layers:[
+        {id:'ex',label:'Hard exudates',color:'#fff06a',ring:[M.x,M.y,52],
+         desc:'Yellow deposits that often form a ring (a circinate pattern) around the area of leakage. Hard exudates near the fovea are the sign the DME grade is based on.',
+         draw:function(){var r=R(41),k,a,d;for(k=0;k<24;k++){a=r()*6.283;d=32+r()*15;blot(M.x+Math.cos(a)*d,M.y+Math.sin(a)*d,2.2+r()*1.6,2.2+r()*1.6,0,'#fff06a');}for(k=0;k<4;k++){var p=near(r,M.x,M.y,20);blot(p[0],p[1],2,2,0,'#fff06a');}}},
+        {id:'edema',label:'Macular thickening',color:'#ffe9b0',ring:[M.x,M.y,58],
+         desc:'Fluid collects in the macula and swells it. On a fundus photograph it can look like a faint haze; it is measured precisely with OCT.',
+         draw:function(){fuzz(M.x,M.y,58,'255,244,205',.6);x.strokeStyle='rgba(255,255,255,.5)';x.lineWidth=1.6*sc;x.beginPath();x.arc(M.x*sc,M.y*sc,40*sc,0,7);x.stroke();}},
+        {id:'ma',label:'Microaneurysms',color:'#ff5a5a',ring:[M.x,M.y,48],
+         desc:'Leaky microaneurysms close to the fovea are often where the fluid comes from.',
+         draw:function(){var r=R(42),k,p;for(k=0;k<7;k++){p=near(r,M.x,M.y,44);blot(p[0],p[1],2.4,2.4,0,'#ff3b3b');}}},
+        {id:'hem',label:'Haemorrhages',color:'#c0392b',ring:[M.x,M.y,46],
+         desc:'Small blots of blood near the macula can come with DME and add to the damage.',
+         draw:function(){var r=R(43),k,p;for(k=0;k<3;k++){p=near(r,M.x,M.y,40);blot(p[0],p[1],6+r()*3,4+r()*2,r()*3,'rgba(120,8,8,.92)');}}},
+        {id:'fovea',label:'Distance from the fovea',color:'#ffffff',ring:null,
+         desc:'How near the exudates are to the centre decides the grade: none (no DME), away from the fovea, or near the fovea — within about one disc diameter, the most urgent group. The dashed circle is one disc diameter from the fovea.',
+         draw:function(){ring(M.x,M.y,46,true);x.strokeStyle='#fff';x.lineWidth=2*sc;x.beginPath();x.moveTo((M.x-6)*sc,M.y*sc);x.lineTo((M.x+6)*sc,M.y*sc);x.moveTo(M.x*sc,(M.y-6)*sc);x.lineTo(M.x*sc,(M.y+6)*sc);x.stroke();x.fillStyle='#fff';x.font='bold '+(10*sc)+'px Inter,sans-serif';x.textAlign='center';x.shadowColor='rgba(0,0,0,.6)';x.shadowBlur=4;x.fillText('1 disc diameter',M.x*sc,(M.y-52)*sc);x.shadowBlur=0;}}
+      ]
+    },
+    beta:{
+      title:'Other retinal diseases the beta screen looks for',
+      intro:['What is the multi-disease screen?','A research preview that looks past diabetic retinopathy for conditions that can be mistaken for it: age-related macular degeneration, myopic changes, retinal vein occlusion and chorioretinal scarring. It also gives referable-DR and macular-oedema probabilities.'],
+      layers:[
+        {id:'amd',label:'AMD (drusen)',color:'#f6e7a6',ring:[M.x,M.y,46],
+         desc:'Age-related macular degeneration: yellow deposits (drusen) under the retina, mostly at the macula.',
+         draw:function(){var r=R(51),k,p;for(k=0;k<26;k++){p=near(r,M.x,M.y,38);blot(p[0],p[1],2+r()*2.4,2+r()*2.4,0,'rgba(246,231,166,.95)');}}},
+        {id:'myopia',label:'Myopic changes',color:'#e6ac76',ring:[D.x-24,D.y,36],
+         desc:'In a very short-sighted (long) eye the background looks pale and striped (tessellated) and a pale crescent sits beside the optic disc.',
+         draw:function(){x.strokeStyle='rgba(150,60,30,.32)';x.lineWidth=2*sc;for(var ty=0;ty<16;ty++){var y0=20+ty*20;x.beginPath();x.moveTo(0,y0*sc);x.bezierCurveTo(100*sc,(y0+22)*sc,220*sc,(y0-22)*sc,360*sc,(y0+8)*sc);x.stroke();}x.fillStyle='rgba(245,210,170,.95)';x.beginPath();x.ellipse((D.x-26)*sc,D.y*sc,9*sc,21*sc,0,0,7);x.fill();}},
+        {id:'rvo',label:'Vein occlusion',color:'#c0392b',ring:[190,105,80],
+         desc:'Retinal vein occlusion: flame-shaped haemorrhages and swollen, tortuous veins along the area drained by the blocked vein.',
+         draw:function(){var r=R(52),k,q;x.strokeStyle='#4a0b0b';x.lineWidth=6*sc;x.beginPath();for(var t=0;t<=1.001;t+=0.04){q=bezPt(ARC[0],t);var off=Math.sin(t*22)*5;if(t===0)x.moveTo(q[0]*sc,(q[1]+3+off)*sc);else x.lineTo(q[0]*sc,(q[1]+3+off)*sc);}x.stroke();for(k=0;k<16;k++){q=bezPt(ARC[0],r());var side=(r()-.5)*2*34;blot(q[0]+side*0.3,q[1]+side,6+r()*5,1.8+r()*1.2,-0.7+r()*0.4,'rgba(138,15,15,.88)');}}},
+        {id:'scar',label:'Chorioretinal scar',color:'#f3e6cf',ring:[96,246,40],
+         desc:'A sharply outlined pale patch, often with dark pigment at its edge, left by old inflammation, infection or injury.',
+         draw:function(){var r=R(53),k;x.fillStyle='rgba(243,230,207,.96)';x.beginPath();x.ellipse(96*sc,246*sc,28*sc,20*sc,0.3,0,7);x.fill();for(k=0;k<14;k++){var a=r()*6.283;blot(96+Math.cos(a)*29,246+Math.sin(a)*21,1.8,1.8,0,'rgba(50,28,20,.9)');}}}
+      ]
+    },
+    exp:{
+      title:'One photograph, taken apart',
+      intro:['What does the Image Explorer do?','It takes one fundus photograph apart: the red, green and blue channels, a contrast-enhanced green view, the vessel maps, each lesion type on its own and a close-up of the optic disc. Every panel downloads as an image.'],
+      vesselHL:true,
+      layers:[
+        {id:'vessels',label:'Vessels',color:'#3df2c0',ring:null,desc:'Vessel map: the branching network of arteries and veins, segmented from the photograph.',draw:function(){}},
+        {id:'lesions',label:'Lesions',color:'#ff6b5e',ring:[M.x+20,M.y,100],desc:'Lesion maps: microaneurysms, haemorrhages, hard and soft exudates, each shown on its own.',
+         draw:function(){var r=R(61),k,p;for(k=0;k<14;k++){p=near(r,M.x+20,M.y,95);blot(p[0],p[1],2.4,2.4,0,'#ff3b3b');}for(k=0;k<6;k++){p=near(r,M.x+25,M.y,85);blot(p[0],p[1],6+r()*4,4+r()*2,r()*3,'rgba(120,8,8,.92)');}for(k=0;k<10;k++){p=near(r,M.x+10,M.y+5,72);blot(p[0],p[1],2.4+r()*1.6,2.4+r()*1.6,0,'#fff06a');}for(k=0;k<3;k++){p=near(r,M.x+50,M.y,90);fuzz(p[0],p[1],9,'255,255,255',.9);}}},
+        {id:'disc',label:'Optic disc',color:'#ffd35a',ring:null,desc:'Optic disc: where the nerve leaves the eye, cropped as a close-up and drawn as its own layer.',
+         draw:function(){x.strokeStyle='#ffd35a';x.lineWidth=2.6*sc;x.setLineDash([6*sc,4*sc]);x.beginPath();x.ellipse(D.x*sc,D.y*sc,27*sc,31*sc,0,0,7);x.stroke();x.setLineDash([]);}},
+        {id:'macula',label:'Macula',color:'#8e7dff',ring:null,desc:'Macula: the centre of the retina that gives sharp central vision.',
+         draw:function(){x.strokeStyle='#8e7dff';x.lineWidth=2.6*sc;x.beginPath();x.arc(M.x*sc,M.y*sc,34*sc,0,7);x.stroke();x.beginPath();x.arc(M.x*sc,M.y*sc,6*sc,0,7);x.stroke();}}
+      ]
+    }
+  };
+
+  var cur=null, on={}, focus=null;
+  function drawBase(vesselHL){
+    x.clearRect(0,0,S,S);
     var bg=x.createRadialGradient(170*sc,180*sc,10*sc,180*sc,180*sc,175*sc);bg.addColorStop(0,'#ee9158');bg.addColorStop(.6,'#d4683c');bg.addColorStop(1,'#8e3220');
     x.fillStyle=bg;x.fillRect(0,0,S,S);fuzz(M.x,M.y,30,'110,30,12',.55);x.lineCap='round';
-    var vc=st.vessels?['#3df2c0','#7bffe0']:['#7a1410','#c63a2a'];
-    x.strokeStyle=vc[0];x.lineWidth=(st.vessels?4.4:4)*sc;ARC.slice(0,4).forEach(function(a){bez(a,2.5)});
-    x.strokeStyle=vc[1];x.lineWidth=(st.vessels?2.8:2.6)*sc;ARC.slice(0,4).forEach(function(a){bez(a,-1)});
-    x.strokeStyle=st.vessels?'#58f5cf':'#a52a1f';x.lineWidth=1.9*sc;ARC.slice(4).forEach(function(a){bez(a,0)});
+    var vc=vesselHL?['#3df2c0','#7bffe0']:['#7a1410','#c63a2a'];
+    x.strokeStyle=vc[0];x.lineWidth=(vesselHL?4.4:4)*sc;ARC.slice(0,4).forEach(function(a){bez(a,2.5)});
+    x.strokeStyle=vc[1];x.lineWidth=(vesselHL?2.8:2.6)*sc;ARC.slice(0,4).forEach(function(a){bez(a,-1)});
+    x.strokeStyle=vesselHL?'#58f5cf':'#a52a1f';x.lineWidth=1.9*sc;ARC.slice(4).forEach(function(a){bez(a,0)});
     var dg=x.createRadialGradient(D.x*sc,D.y*sc,2*sc,D.x*sc,D.y*sc,24*sc);dg.addColorStop(0,'#fbe3a8');dg.addColorStop(1,'#e9a650');
     x.fillStyle=dg;x.beginPath();x.ellipse(D.x*sc,D.y*sc,19*sc,23*sc,0,0,7);x.fill();
     x.fillStyle='#fffbea';x.beginPath();x.ellipse((D.x-1)*sc,D.y*sc,7*sc,8*sc,0,0,7);x.fill();
-    if(st.disc){x.strokeStyle='#ffd35a';x.lineWidth=2.4*sc;x.setLineDash([6*sc,4*sc]);x.beginPath();x.ellipse(D.x*sc,D.y*sc,27*sc,31*sc,0,0,7);x.stroke();x.setLineDash([]);}
     fuzz(M.x,M.y,5,'150,50,25',.9);
-    if(st.macula){x.strokeStyle='#8e7dff';x.lineWidth=2.4*sc;x.beginPath();x.arc(M.x*sc,M.y*sc,34*sc,0,7);x.stroke();x.beginPath();x.arc(M.x*sc,M.y*sc,6*sc,0,7);x.stroke();}
-    if(st.lesions){var k,a,d;
-      for(k=0;k<14;k++){a=r()*6.283;d=Math.sqrt(r())*95;blot(M.x+20+Math.cos(a)*d,M.y+Math.sin(a)*d,2.4,2.4,0,'#ff3b3b');}
-      for(k=0;k<6;k++){a=r()*6.283;d=Math.sqrt(r())*85;blot(M.x+25+Math.cos(a)*d,M.y+Math.sin(a)*d,6+r()*4,4+r()*2,r()*3,'rgba(120,8,8,.92)');}
-      for(k=0;k<10;k++){a=r()*6.283;d=Math.sqrt(r())*72;blot(M.x+10+Math.cos(a)*d,M.y+5+Math.sin(a)*d,2.4+r()*1.6,2.4+r()*1.6,0,'#fff06a');}
-      for(k=0;k<3;k++){a=r()*6.283;d=Math.sqrt(r())*90;fuzz(M.x+50+Math.cos(a)*d,M.y+Math.sin(a)*d,9,'255,255,255',.9);}
-    }
   }
-  draw();
-  document.getElementById('layers').addEventListener('click',function(e){var b=e.target.closest('.lay');if(!b)return;var l=b.getAttribute('data-l');st[l]=!st[l];b.setAttribute('aria-pressed',st[l]);draw();});
+  function paint(){
+    var set=SETS[cur]; drawBase(set.vesselHL && on.vessels);
+    set.layers.forEach(function(l){ if(on[l.id]){ x.save(); l.draw(); x.restore(); } });
+    var f=focus && set.layers.filter(function(l){return l.id===focus;})[0];
+    if(f && on[f.id] && f.ring){ ring(f.ring[0],f.ring[1],f.ring[2],true); }
+  }
+  function info(l){
+    $('fd-it').textContent=l?l.label:'Tap a lesion type';
+    $('fd-id').textContent=l?l.desc:'Switch the markings on and off above. Tap one to see what it is and where it appears.';
+  }
+  function build(){
+    var set=SETS[cur], box=$('layers'); box.innerHTML='';
+    set.layers.forEach(function(l){
+      var b=document.createElement('button'); b.type='button'; b.className='lay'; b.setAttribute('data-id',l.id);
+      b.setAttribute('aria-pressed',on[l.id]?'true':'false');
+      var i=document.createElement('i'); i.style.background=l.color; b.appendChild(i); b.appendChild(document.createTextNode(l.label));
+      box.appendChild(b);
+    });
+    $('fd-title').textContent=set.title; $('fd-wh').textContent=set.intro[0]; $('fd-wp').textContent=set.intro[1];
+    info(null);
+  }
+  function setKey(k){
+    if(!SETS[k]) return; cur=k; focus=null; on={}; SETS[k].layers.forEach(function(l){ on[l.id]=true; });
+    build(); paint();
+  }
+  $('layers').addEventListener('click',function(e){
+    var b=e.target.closest('.lay'); if(!b) return;
+    var id=b.getAttribute('data-id'), set=SETS[cur], l=set.layers.filter(function(z){return z.id===id;})[0];
+    if(on[id] && focus===id){ on[id]=false; focus=null; info(null); }
+    else { on[id]=true; focus=id; info(l); }
+    b.setAttribute('aria-pressed',on[id]?'true':'false'); paint();
+  });
+  window.hxFundus={set:setKey};
+  setKey('dr');
 
   /* ---- analysis tabs ---- */
   var tabs=document.querySelectorAll('.v5 .tab'), ids={dr:'p-dr',dme:'p-dme',beta:'p-beta',exp:'p-exp'};
   tabs.forEach(function(t){t.addEventListener('click',function(){
     tabs.forEach(function(o){o.setAttribute('aria-selected',o===t);});
     document.querySelectorAll('.v5 .panel').forEach(function(p){p.classList.remove('on');});
-    document.getElementById(ids[t.getAttribute('data-t')]).classList.add('on');
+    var k=t.getAttribute('data-t'); document.getElementById(ids[k]).classList.add('on'); setKey(k);
   });});
 
   /* ---- simulator preview chips ---- */
-  var pv=document.getElementById('pv'), ov=document.getElementById('ov'), tx=pv.querySelector('.tx'), pvt=document.getElementById('pvt');
+  var pv=$('pv'), ov=$('ov'), tx=pv&&pv.querySelector('.tx'), pvt=$('pvt');
   var NAMES={normal:'Normal',glaucoma:'Glaucoma',dr:'Diabetic retinopathy',amd:'AMD',rd:'Retinal detachment',cataract:'Cataract',myopia:'High myopia'};
   function setC(c){
-    ov.style.background='none';ov.style.backdropFilter='none';ov.style.filter='none';pv.style.filter='none';tx.style.filter='none';
+    ov.style.background='none';ov.style.backdropFilter='none';ov.style.filter='none';pv.style.filter='none';
     if(c==='glaucoma') ov.style.background='radial-gradient(circle at 50% 50%,transparent 22%,rgba(0,0,0,.94) 62%)';
     if(c==='amd') ov.style.background='radial-gradient(circle at 50% 50%,rgba(18,18,22,.95) 0,rgba(18,18,22,.8) 16%,transparent 26%)';
     if(c==='rd') ov.style.background='radial-gradient(circle at 125% 62%,rgba(0,0,0,.95) 0,rgba(0,0,0,.92) 52%,transparent 66%)';
@@ -7027,11 +7131,11 @@ refresh();
     if(c==='myopia'){pv.style.filter='blur(3.2px)';}
     pvt.textContent=NAMES[c];
   }
-  document.getElementById('schips').addEventListener('click',function(e){var b=e.target.closest('.sc');if(!b)return;
+  if($('schips')) $('schips').addEventListener('click',function(e){var b=e.target.closest('.sc');if(!b)return;
     document.querySelectorAll('.v5 .sc').forEach(function(o){o.setAttribute('aria-pressed',o===b);});setC(b.getAttribute('data-c'));});
 
   /* ---- photo gallery: tap a photo to enlarge it ---- */
-  var gal=document.getElementById('gallery');
+  var gal=$('gallery');
   if(gal){
     gal.addEventListener('click',function(e){
       var f=e.target.closest('figure'); if(!f) return;
@@ -7039,14 +7143,13 @@ refresh();
       var host=gal.closest('.v5')||document.body;
       var lb=document.createElement('div'); lb.className='lb'; lb.setAttribute('role','dialog'); lb.setAttribute('aria-label','Photo');
       var big=document.createElement('img'); big.src=im.currentSrc||im.src; big.alt=im.alt||'';
-      var x=document.createElement('button'); x.type='button'; x.setAttribute('aria-label','Close'); x.textContent='×';
-      lb.appendChild(big); lb.appendChild(x); host.appendChild(lb);
+      var xb=document.createElement('button'); xb.type='button'; xb.setAttribute('aria-label','Close'); xb.textContent='×';
+      lb.appendChild(big); lb.appendChild(xb); host.appendChild(lb);
       function close(){ if(lb.parentNode) lb.parentNode.removeChild(lb); document.removeEventListener('keydown',onKey); }
       function onKey(ev){ if(ev.key==='Escape') close(); }
-      lb.addEventListener('click',close); document.addEventListener('keydown',onKey); x.focus();
+      lb.addEventListener('click',close); document.addEventListener('keydown',onKey); xb.focus();
     });
   }
-
 })();
 
 /* ---- home page: big options that open detail sheets on the same page ---- */
@@ -7074,6 +7177,12 @@ refresh();
     if(history.state && history.state.sheet){ history.back(); } else { hide(cur,false); }
   }
   function closeNow(){ if(cur) hide(cur,true); }
+  window.hxOpenSheet=openSheet;
+  window.hxGo=function(id){
+    var pg=document.getElementById('page-home');
+    if(pg && pg.classList.contains('active')){ openSheet(id); }
+    else { showPage('home'); setTimeout(function(){ openSheet(id); },80); }
+  };
 
   root.addEventListener('click',function(e){
     var tile=e.target.closest('.hx-tile');
